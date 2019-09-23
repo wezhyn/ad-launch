@@ -14,7 +14,10 @@
 默认 web 端口:8080
 默认 mysql 端口 :6666 
 > 默认端口是于 localhost本机服务而言
+>
 
+### 新增
 
+/api/file/avatar
 
 
