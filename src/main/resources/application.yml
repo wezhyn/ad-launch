@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
+    username: root
+    password: ${custom.mysql.password}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+      file-size-threshold: 0
+      resolve-lazily: false
+custom:
+  qn:
+    access-key: w8q1azRK1pjyjs0Fp-pDEBmhODVOOzL-PbDJTODU
+    secret-key: 4lHcLBv6Ywirb0ATkQ62ZnxtC_ONhRyF68Xb-xhG
+    bucket-name: wezhyn-pic
+    host-name: http://py63aayws.bkt.clouddn.com
+  jwt:
+    check-list-exclusion:
+      - /api/error
+      - /api/test
+    check-header: X-Token
+    default-hours: 1
+    remember-me-day: 1
