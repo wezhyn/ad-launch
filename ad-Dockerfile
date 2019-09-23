@@ -7,6 +7,7 @@ ENV LANG=C.UTF-8
 VOLUME /mvn-repo
 VOLUME /mvn-src
 WORKDIR /mvn-src
+# maven 配置
 COPY settings.xml /usr/share/maven/ref/
 
 CMD mvn clean spring-boot:run

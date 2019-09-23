@@ -2,18 +2,14 @@ package com.ad.adlaunch.controller;
 
 import com.ad.adlaunch.constants.QiNiuProperties;
 import com.ad.adlaunch.dto.ResponseResult;
-import com.ad.adlaunch.dto.SimpleResponseResult;
-import com.ad.adlaunch.enumate.FileType;
+import com.ad.adlaunch.exception.FileUploadException;
 import com.ad.adlaunch.service.FileUploadService;
 import com.ad.adlaunch.to.IFileUpload;
-import com.ad.adlaunch.utils.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 /**
+ * 文件上传相关 api
  * @author : wezhyn
  * @date : 2019/09/20
  */
@@ -29,23 +25,32 @@ public class FileController {
         this.qiNiuProperties=qiNiuProperties;
     }
 
-
-    @PostMapping("/upload")
-    public ResponseResult simpleFailureResponseResult(@RequestParam(value="file") MultipartFile multipartFile) {
-        IFileUpload fileUpload;
-        try {
-            fileUpload=fileUploadService.uploadFile(multipartFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseResult.forFailureBuilder()
-                    .withMessage(e.getMessage())
-                    .build();
-        }
+    @PostMapping("/avatar")
+    public ResponseResult modifyUserAvatar(@RequestParam(value="img") MultipartFile file) throws FileUploadException {
+        IFileUpload fileUpload=fileUploadService.modifyAvatarImg(file);
         return ResponseResult.forSuccessBuilder()
-                .withMessage("上传图片成功")
-                .withData("dir", fileUpload.getRelativeName())
-                .withData("host",qiNiuProperties.getHostName())
-                .withData("address",qiNiuProperties.getHostName()+"/"+fileUpload.getRelativeName())
+                .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
+                .withData("host", qiNiuProperties.getHostName())
+                .withData("relativeAddress", fileUpload.getRelativeName())
+                .withMessage("上传成功")
+                .build();
+
+    }
+
+    @PostMapping("/test/upload")
+    public ResponseResult simpleFailureResponseResult(@RequestParam(value="file") MultipartFile multipartFile) throws FileUploadException {
+        IFileUpload fileUpload=fileUploadService.uploadFile(multipartFile);
+        return ResponseResult.forSuccessBuilder()
+                .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
+                .withData("host", qiNiuProperties.getHostName())
+                .withData("relativeAddress", fileUpload.getRelativeName())
+                .build();
+    }
+
+    @ExceptionHandler(value={FileUploadException.class})
+    public ResponseResult handleFileError(Exception e) {
+        return ResponseResult.forFailureBuilder()
+                .withMessage("上传文件失败")
                 .build();
     }
 

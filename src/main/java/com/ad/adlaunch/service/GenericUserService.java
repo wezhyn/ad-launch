@@ -28,4 +28,6 @@ public interface GenericUserService {
     GenericUser updateGenericUser(GenericUser user);
 
     int deleteGenericUser(String username);
+
+    int modifyUserAvatar(String username,String avatar);
 }

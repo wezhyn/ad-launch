@@ -2,22 +2,28 @@ version: '2.0'
 
 services:
   ad:
-    build: .
+    build:
+      context: .
+      dockerfile: ad-Dockerfile
     ports:
       - "8080:8080"
     volumes:
 #      maven本地仓库或者docker虚拟卷
       - E:/jetbrains/maven/repository:/mvn-repo
 #      src目录
-      - C:\Users\13366\wen\ad-launch:/mvn-src
+      - .:/mvn-src
     depends_on:
       - ad_mysql
 
   ad_mysql:
-    image: mysql:5.7
+    build:
+      context: .
+      dockerfile: Mysql-Dockfile
     ports:
       - "6666:3306"
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: ad
+

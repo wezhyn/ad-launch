@@ -1,5 +1,6 @@
 package com.ad.adlaunch.to;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Data
+@Builder
 public class QiNiuPutSet implements IFileUpload {
     private String key;
     private String hash;

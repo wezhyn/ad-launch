@@ -2,6 +2,7 @@ package com.ad.adlaunch.config;
 
 import com.ad.adlaunch.constants.QiNiuProperties;
 import com.ad.adlaunch.enumate.BaseEnum;
+import com.ad.adlaunch.repository.GenericUserRepository;
 import com.ad.adlaunch.service.FileUploadService;
 import com.ad.adlaunch.service.impl.QiNiuFileUploadServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -37,8 +38,8 @@ public class BeanConfig {
     @Bean
     @ConditionalOnMissingBean(value={FileUploadService.class})
     @ConditionalOnProperty(prefix="custom.qn" ,name={"access-key","secret-key"})
-    public FileUploadService fileUploadService(QiNiuProperties qiNiuProperties) {
-        return new QiNiuFileUploadServiceImpl(qiNiuProperties);
+    public FileUploadService fileUploadService(QiNiuProperties qiNiuProperties, GenericUserRepository userRepository) {
+        return new QiNiuFileUploadServiceImpl(qiNiuProperties,userRepository);
     }
 
     @PostConstruct

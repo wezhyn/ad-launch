@@ -65,4 +65,9 @@ public class GenericUserServiceImpl implements GenericUserService {
         }
         return genericUserRepository.deleteGenericUserByUsername(username);
     }
+
+    @Override
+    public int modifyUserAvatar(String username, String avatar) {
+       return genericUserRepository.updateUserAvatar(username, avatar);
+    }
 }

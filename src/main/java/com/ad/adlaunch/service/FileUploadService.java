@@ -1,5 +1,6 @@
 package com.ad.adlaunch.service;
 
+import com.ad.adlaunch.exception.FileUploadException;
 import com.ad.adlaunch.to.IFileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,7 @@ public interface FileUploadService {
      * @param uploadFile  文件流
      * @return 文件储存状态
      */
-    IFileUpload uploadFile(MultipartFile uploadFile) throws IOException;
+    IFileUpload uploadFile(MultipartFile uploadFile) throws  FileUploadException;
 
     /**
      * 通过文件名删除 {@link IFileUpload#getRelativeName()}
@@ -35,7 +36,14 @@ public interface FileUploadService {
      * @param oldFileUpload 旧文件信息
      * @return fileUpload
      */
-    IFileUpload modifyFile(MultipartFile uploadFile, IFileUpload oldFileUpload) throws IOException;
+    IFileUpload modifyFile(MultipartFile uploadFile, IFileUpload oldFileUpload) throws  FileUploadException;
 
+
+    /**
+     * 修改用户图片，并删除远程存在的图片
+     * @param multipartFile file
+     * @return fileUpload
+     */
+    IFileUpload modifyAvatarImg(MultipartFile multipartFile) throws FileUploadException;
 
 }
