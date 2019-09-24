@@ -28,12 +28,6 @@ public interface GenericUserRepository extends JpaRepository<GenericUser, String
      */
     Optional<GenericUser> findGenericUserByUsername(String userName);
 
-    /**
-     * 删除用户
-     * @param username 账号
-     * @return 1
-     */
-    int deleteGenericUserByUsername(String username);
 
     /**
      * 修改用户头像

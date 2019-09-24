@@ -5,48 +5,32 @@ import com.ad.adlaunch.to.IFileUpload;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.time.LocalDate;
 import java.util.Collection;
 
 /**
  * @author : wezhyn
- * @date : 2019/09/19
+ * @date : 2019/09/24
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface IUser {
+public interface IAdmin {
 
     /**
      * id
-     *
      * @return #getUsername()
      */
     String getId();
 
-    /**
-     * 获取用户账号
-     *
-     * @return userName
-     */
-    String getUsername();
 
     /**
      * 昵称
-     *
      * @return nickName
      */
     String getNickName();
 
-    /**
-     * 获取真实名字：身份认证过的名字
-     *
-     * @return realName
-     */
-    String getRealName();
 
     /**
      * id card
-     *
      * @return 身份证
      */
     String getIdCard();
@@ -67,38 +51,15 @@ public interface IUser {
 
     /**
      * 头像
-     *
      * @return {@link IFileUpload#getRelativeName()}
      */
     String getAvatar();
-
-    /**
-     * 获取性别
-     *
-     * @return sex
-     */
-    String getSex();
-
-    /**
-     * 生日
-     *
-     * @return localDate
-     */
-    LocalDate getBirthDay();
-
-    /**
-     * 手机号
-     *
-     * @return mobile
-     */
-    String getMobilePhone();
 
     /**
      * 用户权限
      * @return AuthenticationEnum
      */
     AuthenticationEnum getRoles();
-
     /**
      * 获取用户的权限
      *
@@ -107,5 +68,4 @@ public interface IUser {
     default Collection<? extends GrantedAuthority> getAuthorities() {
         return RoleAuthenticationUtils.forGrantedAuthorities(getRoles());
     }
-
 }

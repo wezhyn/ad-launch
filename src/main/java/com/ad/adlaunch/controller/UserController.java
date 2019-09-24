@@ -1,7 +1,6 @@
 package com.ad.adlaunch.controller;
 
 import com.ad.adlaunch.dto.GenericUser;
-import com.ad.adlaunch.dto.IUser;
 import com.ad.adlaunch.dto.ResponseResult;
 import com.ad.adlaunch.dto.SimpleResponseResult;
 import com.ad.adlaunch.service.GenericUserService;
@@ -27,11 +26,12 @@ public class UserController {
     @Autowired
     private GenericUserService genericUserService;
 
+
     @GetMapping("/getInfo")
     public SimpleResponseResult<UserTo> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
-        IUser user=genericUserService.getById(name);
-        return SimpleResponseResult.successResponseResult("", UserTo.fromGenericUser((GenericUser) user));
+        GenericUser user=genericUserService.getById(name);
+        return SimpleResponseResult.successResponseResult("", UserTo.fromGenericUser(user));
     }
 
     @GetMapping("/getList")

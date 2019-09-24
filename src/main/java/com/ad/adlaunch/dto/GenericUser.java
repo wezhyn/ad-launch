@@ -3,14 +3,11 @@ package com.ad.adlaunch.dto;
 import com.ad.adlaunch.enumate.AuthenticationEnum;
 import com.ad.adlaunch.enumate.SexEnum;
 import com.ad.adlaunch.utils.EnumUtils;
-import com.ad.adlaunch.utils.RoleAuthenticationUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collection;
 
 /**
  * @author : wezhyn
@@ -50,7 +47,7 @@ public class GenericUser implements IUser {
     private String email;
 
 
-    private AuthenticationEnum userRole;
+    private AuthenticationEnum roles;
 
 
     @Override
@@ -64,10 +61,6 @@ public class GenericUser implements IUser {
     }
 
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return RoleAuthenticationUtils.forGrantedAuthorities(this.userRole);
-    }
 
     /*
         /**********************************************************
@@ -86,7 +79,7 @@ public class GenericUser implements IUser {
         setBirthDay(builder.birthDay);
         setMobilePhone(builder.mobilePhone);
         setEmail(builder.email);
-        setUserRole(builder.userRole);
+        setRoles(builder.userRole);
     }
 
     public static Builder newBuilder() {
@@ -105,7 +98,7 @@ public class GenericUser implements IUser {
         builder.birthDay=copy.getBirthDay();
         builder.mobilePhone=copy.getMobilePhone();
         builder.email=copy.getEmail();
-        builder.userRole=copy.getUserRole();
+        builder.userRole=copy.getRoles();
         return builder;
     }
 
