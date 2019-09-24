@@ -47,7 +47,7 @@ public class UserTo {
     public static UserTo fromGenericUser(GenericUser genericUser) {
         return UserTo.builder()
                 .username(genericUser.getUsername())
-                .roles(RoleAuthenticationUtils.authentication2StringList(genericUser.getUserRole()))
+                .roles(RoleAuthenticationUtils.authentication2StringList(genericUser.getRoles()))
                 .nickname(genericUser.getNickName())
                 .avatar(genericUser.getAvatar())
                 .email(genericUser.getEmail())
