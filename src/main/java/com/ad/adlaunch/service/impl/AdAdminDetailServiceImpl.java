@@ -48,6 +48,6 @@ public class AdAdminDetailServiceImpl implements AdUserDetailsService {
 
     @Override
     public boolean support(String url) {
-        return url!=null && url.startsWith("/api/user");
+        return url!=null && url.startsWith("/api/admin");
     }
 }

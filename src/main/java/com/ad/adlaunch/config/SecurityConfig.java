@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilterBefore(usernamePasswordAuthenticationFilter, LogoutFilter.class)
                 .addFilterBefore(jwtCheckAuthenticationFilter, usernamePasswordAuthenticationFilter.getClass())
-                .addFilterAt(adJwtLogoutAuthenticationFilter(jwtDetailService), LogoutFilter.class)
+                .addFilterAt(adJwtLogoutAuthenticationFilter(jwtProperties.getLogoutInterception(),jwtDetailService), LogoutFilter.class)
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
                 .antMatchers("/").permitAll();
 
@@ -149,9 +149,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    private AdJwtLogoutAuthenticationFilter adJwtLogoutAuthenticationFilter(JwtDetailService jwtDetailService) {
-        String match="/api/user/logout";
+    private AdJwtLogoutAuthenticationFilter adJwtLogoutAuthenticationFilter(List<String >matchs,JwtDetailService jwtDetailService) {
         LogoutAuthenticationSuccessHandler successHandler=new LogoutAuthenticationSuccessHandler(jwtDetailService);
-        return new AdJwtLogoutAuthenticationFilter(match, successHandler);
+        return new AdJwtLogoutAuthenticationFilter(matchs, successHandler);
     }
 }

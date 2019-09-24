@@ -15,7 +15,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -43,3 +43,6 @@ custom:
     login-interception-include:
       - /api/user/login
       - /api/admin/login
+    logout-interception:
+      - /api/user/logout
+      - /api/admin/logout

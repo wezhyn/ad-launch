@@ -5,7 +5,8 @@ import com.ad.adlaunch.enumate.AuthenticationEnum;
 import com.ad.adlaunch.enumate.SexEnum;
 import com.ad.adlaunch.utils.EnumUtils;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,9 +18,11 @@ import java.util.stream.Collectors;
 @Builder
 @Data
 public class AdminTo {
+    @JsonProperty("username")
     private String id;
+    @JsonProperty("nickname")
     private String nickName;
-    @Ignore
+    @JsonIgnore
     private String password;
     private String idCard;
     private String avatar;
@@ -47,7 +50,7 @@ public class AdminTo {
 
 
     public Admin toAdmin(){
-        return Admin.builder()
+        return Admin.newBuilder()
                 .id(this.getId())
                 .nickName(this.getNickName())
                 .password(this.getPassword())

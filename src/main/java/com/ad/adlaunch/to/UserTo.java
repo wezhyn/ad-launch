@@ -5,7 +5,7 @@ import com.ad.adlaunch.enumate.AuthenticationEnum;
 import com.ad.adlaunch.enumate.SexEnum;
 import com.ad.adlaunch.utils.EnumUtils;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -30,7 +30,7 @@ public class UserTo {
     private String realname;
     private String idCard;
 
-    @Ignore
+    @JsonIgnore
     private String password;
 
     private String avatar;

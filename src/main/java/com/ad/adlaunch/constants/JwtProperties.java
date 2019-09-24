@@ -1,7 +1,6 @@
 package com.ad.adlaunch.constants;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.EAN;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -24,5 +23,7 @@ public class JwtProperties {
     private List<String> checkListExclusion;
 
     private List<String > loginInterceptionInclude;
+
+    private List<String > logoutInterception;
 
 }

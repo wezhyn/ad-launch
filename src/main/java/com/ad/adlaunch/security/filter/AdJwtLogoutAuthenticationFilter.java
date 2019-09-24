@@ -2,8 +2,6 @@ package com.ad.adlaunch.security.filter;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.CompositeLogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -16,6 +14,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 *
@@ -27,9 +27,15 @@ public class AdJwtLogoutAuthenticationFilter extends GenericFilterBean {
     private RequestMatcher logoutRequestMatcher;
     private LogoutSuccessHandler logoutSuccessHandler;
 
-    public AdJwtLogoutAuthenticationFilter(String filterProcessesUrl, LogoutSuccessHandler logoutSuccessHandler) {
+
+    public AdJwtLogoutAuthenticationFilter(List<String> filterProcessesUrls, LogoutSuccessHandler logoutSuccessHandler) {
         this.logoutSuccessHandler=logoutSuccessHandler;
-        this.setFilterProcessesUrl(filterProcessesUrl);
+        List<RequestMatcher> requestMatchers=new ArrayList<>(3);
+//        this.setFilterProcessesUrl(filterProcessesUrl);
+        for (String s : filterProcessesUrls) {
+            requestMatchers.add(new AntPathRequestMatcher(s,null,false));
+        }
+        this.logoutRequestMatcher=new AntPathRequestMatcherExtractor(requestMatchers);
     }
 
     @Override
@@ -52,9 +58,6 @@ public class AdJwtLogoutAuthenticationFilter extends GenericFilterBean {
         return this.logoutRequestMatcher.matches(request);
     }
 
-    private void setFilterProcessesUrl(String filterProcessesUrl) {
-        this.logoutRequestMatcher=new AntPathRequestMatcher(filterProcessesUrl, null,false);
-    }
 
     public LogoutSuccessHandler getLogoutSuccessHandler() {
         return this.logoutSuccessHandler;
