@@ -1,20 +1,21 @@
 package com.ad.adlaunch.security.filter;
 
-import com.ad.adlaunch.security.AdUserNamePasswordAuthenticationToken;
+import com.ad.adlaunch.security.AdNamePasswordAuthenticationToken;
 import com.ad.adlaunch.security.IUsernamePasswordConvert;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,10 +32,15 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
     private final AuthenticationManager authenticationManager;
 
 
-    public AdUsernamePasswordAuthenticationFilter(String match,List<IUsernamePasswordConvert> usernamePasswordConverts,AuthenticationManager authenticationManager) {
-        super(new AntPathRequestMatcher(match,null,false));
+    public AdUsernamePasswordAuthenticationFilter(List<String > matchs,List<IUsernamePasswordConvert> usernamePasswordConverts,AuthenticationManager authenticationManager) {
+        super("/api/user/login");
+        List<RequestMatcher> requestMatchers=new ArrayList<>(3);
+        for (String match : matchs) {
+            requestMatchers.add(new AntPathRequestMatcher(match,null,false));
+        }
         this.usernamePasswordConverts=usernamePasswordConverts;
         this.authenticationManager=authenticationManager;
+        setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcherExtractor(requestMatchers));
     }
 
 
@@ -51,7 +57,7 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
         if (definition==null) {
             throw new IOException("从请求中读取账户信息出错");
         }
-        AdUserNamePasswordAuthenticationToken authRequest=new AdUserNamePasswordAuthenticationToken(definition.getUsername(), definition.getPassword());
+        AdNamePasswordAuthenticationToken authRequest=new AdNamePasswordAuthenticationToken(definition.getUsername(), definition.getPassword(),request.getRequestURI());
         return this.authenticationManager.authenticate(authRequest);
     }
 

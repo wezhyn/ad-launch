@@ -3,7 +3,7 @@ package com.ad.adlaunch.security.jwt;
 import com.ad.adlaunch.constants.JwtProperties;
 import com.ad.adlaunch.dto.IUser;
 import com.ad.adlaunch.exception.JwtParseException;
-import com.ad.adlaunch.security.AdUserNamePasswordAuthenticationToken;
+import com.ad.adlaunch.security.AdNamePasswordAuthenticationToken;
 import com.ad.adlaunch.service.JwtDetailService;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
 import io.jsonwebtoken.*;
@@ -19,7 +19,6 @@ import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * 提供 jwt的生成和解析
@@ -60,7 +59,7 @@ public class SecurityJwtProvider {
         Claims claims=validateToken(jwt);
         String authority=(String) claims.get("auth");
         Collection<? extends GrantedAuthority> grantedAuthorities=RoleAuthenticationUtils.forGrantedAuthorities(authority);
-        return new AdUserNamePasswordAuthenticationToken(claims.getId(), "", grantedAuthorities);
+        return new AdNamePasswordAuthenticationToken(claims.getId(), "", grantedAuthorities);
     }
 
     public void resetSignature(String userName) {

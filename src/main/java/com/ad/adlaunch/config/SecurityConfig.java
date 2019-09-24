@@ -1,10 +1,16 @@
 package com.ad.adlaunch.config;
 
+import com.ad.adlaunch.constants.JwtProperties;
 import com.ad.adlaunch.constants.ResourceConstant;
-import com.ad.adlaunch.security.*;
+import com.ad.adlaunch.security.IUsernamePasswordConvert;
+import com.ad.adlaunch.security.LoginAuthenticationFailureHandler;
+import com.ad.adlaunch.security.LoginAuthenticationSuccessHandler;
+import com.ad.adlaunch.security.LogoutAuthenticationSuccessHandler;
 import com.ad.adlaunch.security.filter.AdJwtCheckAuthenticationFilter;
 import com.ad.adlaunch.security.filter.AdJwtLogoutAuthenticationFilter;
 import com.ad.adlaunch.security.filter.AdUsernamePasswordAuthenticationFilter;
+import com.ad.adlaunch.security.filter.AdUsernamePasswordAuthenticationProvider;
+import com.ad.adlaunch.service.AdUserDetailsService;
 import com.ad.adlaunch.service.JwtDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,9 +28,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -53,6 +56,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private LoginAuthenticationFailureHandler loginAuthenticationFailureHandler;
     @Autowired
     private JwtDetailService jwtDetailService;
+    @Autowired
+    private JwtProperties jwtProperties;
+    @Autowired
+    private List<AdUserDetailsService> adUserDetailsServices;
 
     public SecurityConfig(@Qualifier("adUserDetailService") UserDetailsService userDetailsService) {
         this.userDetailsService=userDetailsService;
@@ -61,12 +68,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        String match="/api/user/login";
+        List<String > matchs=jwtProperties.getLoginInterceptionInclude();
         AdUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter=createUserNamePasswordAuthenticationFilter(
-                match, authenticationManager(), usernamePasswordConverts,
+                matchs, authenticationManager(), usernamePasswordConverts,
                 loginAuthenticationFailureHandler,
                 loginAuthenticationSuccessHandler);
-
         http.cors().and()
                 .formLogin().disable()
                 .csrf().disable()
@@ -82,10 +88,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        AdUsernamePasswordAuthenticationProvider adUsernamePasswordAuthenticationProvider=new AdUsernamePasswordAuthenticationProvider(passwordEncoder(), adUserDetailsServices);
         auth
                 .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-//                .and().authenticationProvider();
+                .passwordEncoder(passwordEncoder())
+                .and()
+                .authenticationProvider(adUsernamePasswordAuthenticationProvider);
     }
 
     @Override
@@ -129,12 +137,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @return filter
      */
     public AdUsernamePasswordAuthenticationFilter createUserNamePasswordAuthenticationFilter(
-            String match,
+            List<String > matchs,
             AuthenticationManager authenticationManager,
             List<IUsernamePasswordConvert> usernamePasswordConverts,
             LoginAuthenticationFailureHandler failureHandler,
             LoginAuthenticationSuccessHandler successHandler) {
-        AdUsernamePasswordAuthenticationFilter filter=new AdUsernamePasswordAuthenticationFilter(match, usernamePasswordConverts, authenticationManager);
+        AdUsernamePasswordAuthenticationFilter filter=new AdUsernamePasswordAuthenticationFilter(matchs, usernamePasswordConverts, authenticationManager);
         filter.setAuthenticationFailureHandler(failureHandler);
         filter.setAuthenticationSuccessHandler(successHandler);
         return filter;

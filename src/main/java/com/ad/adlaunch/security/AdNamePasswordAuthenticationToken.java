@@ -11,9 +11,10 @@ import java.util.Collection;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public class AdUserNamePasswordAuthenticationToken extends UsernamePasswordAuthenticationToken {
+public class AdNamePasswordAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
-    
+
+    private String loginUrl;
 
 /*
     /**********************************************************
@@ -21,11 +22,12 @@ public class AdUserNamePasswordAuthenticationToken extends UsernamePasswordAuthe
     /**********************************************************
 */
 
-    public AdUserNamePasswordAuthenticationToken(String userName,String password) {
+    public AdNamePasswordAuthenticationToken(String userName, String password,String url) {
         super(userName,password);
+        this.loginUrl=url;
     }
 
-    public AdUserNamePasswordAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    public AdNamePasswordAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
     }
 
@@ -37,4 +39,11 @@ public class AdUserNamePasswordAuthenticationToken extends UsernamePasswordAuthe
         return (String) getCredentials();
     }
 
+    public String getLoginUrl() {
+        return loginUrl;
+    }
+
+    public void setLoginUrl(String loginUrl) {
+        this.loginUrl=loginUrl;
+    }
 }

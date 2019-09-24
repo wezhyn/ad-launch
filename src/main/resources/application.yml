@@ -15,7 +15,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -40,3 +40,6 @@ custom:
     check-header: X-Token
     default-hours: 1
     remember-me-day: 1
+    login-interception-include:
+      - /api/user/login
+      - /api/admin/login
