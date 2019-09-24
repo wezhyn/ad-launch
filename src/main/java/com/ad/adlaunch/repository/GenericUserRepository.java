@@ -1,7 +1,6 @@
 package com.ad.adlaunch.repository;
 
 import com.ad.adlaunch.dto.GenericUser;
-import com.ad.adlaunch.dto.IUser;
 import com.ad.adlaunch.to.IFileUpload;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -19,7 +18,7 @@ import java.util.Optional;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Repository
-public interface GenericUserRepository extends JpaRepository<GenericUser, Long> {
+public interface GenericUserRepository extends JpaRepository<GenericUser, String> {
 
 
     /**

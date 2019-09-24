@@ -1,8 +1,10 @@
 package com.ad.adlaunch.dto;
 
+import com.ad.adlaunch.to.IFileUpload;
+import com.ad.adlaunch.utils.RoleAuthenticationUtils;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 /**
@@ -14,11 +16,35 @@ import java.util.Collection;
 public interface IUser  {
 
     /**
+     * id
+     * @return #getUsername()
+     */
+    String getId();
+
+    /**
      * 获取用户账号
      *
      * @return userName
      */
     String getUsername();
+
+    /**
+     * 昵称
+     * @return nickName
+     */
+    String getNickName();
+
+    /**
+     * 获取真实名字：身份认证过的名字
+     * @return realName
+     */
+    String getRealName();
+
+    /**
+     * id card
+     * @return 身份证
+     */
+    String getIdCard();
 
     /**
      * 获取用户密码
@@ -35,8 +61,34 @@ public interface IUser  {
     String getEmail();
 
     /**
-     * 获取用户的权限，从小到大 普通用户返回： User ;管理员返回：user Admin
-     * @return
+     * 头像
+     * @return {@link IFileUpload#getRelativeName()}
+     */
+    String getAvatar();
+
+    /**
+     * 获取性别
+     * @return sex
+     */
+    String  getSex();
+
+    /**
+     * 生日
+     * @return localDate
+     */
+    LocalDate getBirthDay();
+
+    /**
+     * 手机号
+     * @return mobile
+     */
+    String getMobilePhone();
+
+    /**
+     * 获取用户的权限
+     * @return {@link RoleAuthenticationUtils#forGrantedAuthorities}
      */
     Collection<? extends GrantedAuthority> getAuthorities();
+
+
 }

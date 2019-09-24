@@ -6,6 +6,7 @@ server:
 spring:
   profiles:
     active: dev
+#    active: pro
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}

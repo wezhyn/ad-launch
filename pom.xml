@@ -91,15 +91,6 @@
             <version>7.2.0</version>
         </dependency>
     </dependencies>
-    <repositories><!-- 代码库 -->
-        <repository>
-            <id>maven</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
     <build>
         <plugins>
             <plugin>

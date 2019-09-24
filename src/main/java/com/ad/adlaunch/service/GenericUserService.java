@@ -1,9 +1,7 @@
 package com.ad.adlaunch.service;
 
 import com.ad.adlaunch.dto.GenericUser;
-import com.ad.adlaunch.dto.IUser;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.ad.adlaunch.to.IFileUpload;
 
 /**
  * @author : wezhyn
@@ -11,23 +9,14 @@ import org.springframework.data.domain.Pageable;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface GenericUserService {
+public interface GenericUserService extends BaseService<GenericUser,String> {
+
 
     /**
-     * 通过账号获取用户信息
-     * @param userName userName
-     * @return IUser
+     * 修改用户头像
+     * @param username 主键
+     * @param avatar 头像地址 {@link IFileUpload#getRelativeName()}
+     * @return 1
      */
-    IUser getUserByUserName(String userName);
-
-    GenericUser saveGenericUser(GenericUser user);
-
-    Page<GenericUser> getGenericList(Pageable pageable);
-
-
-    GenericUser updateGenericUser(GenericUser user);
-
-    int deleteGenericUser(String username);
-
     int modifyUserAvatar(String username,String avatar);
 }

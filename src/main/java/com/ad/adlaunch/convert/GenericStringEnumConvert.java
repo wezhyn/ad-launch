@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 支持序列化以下类实现{@link String} -> @{@link StringEnum}
+ * 用于 SpringMvc
  * {@link org.springframework.web.bind.annotation.PathVariable}
  * {@link org.springframework.web.bind.annotation.RequestParam}
  *

@@ -22,7 +22,7 @@ public class TestController {
 
     @GetMapping("/api/test/register")
     public String register(String username) {
-        genericUserService.saveGenericUser(
+        genericUserService.save(
                 GenericUser.newBuilder().username(username)
                 .password(passwordEncoder.encode("111111")).build()
         );

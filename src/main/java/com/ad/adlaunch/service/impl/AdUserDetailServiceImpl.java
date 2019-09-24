@@ -3,9 +3,7 @@ package com.ad.adlaunch.service.impl;
 import com.ad.adlaunch.dto.GenericUser;
 import com.ad.adlaunch.dto.IUser;
 import com.ad.adlaunch.service.GenericUserService;
-import com.ad.adlaunch.utils.RoleAuthenticationUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,7 +32,7 @@ public class AdUserDetailServiceImpl implements UserDetailsService {
         if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("无效的账户： " + username+"，请检查是否为空");
         }
-        IUser user=genericUserService.getUserByUserName(username);
+        IUser user=genericUserService.getById(username);
         if (user==GenericUser.EMPTY_USER) {
             throw new UsernameNotFoundException("无法找到该用户 : " + username);
         }

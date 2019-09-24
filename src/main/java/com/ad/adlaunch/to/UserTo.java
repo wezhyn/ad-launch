@@ -2,13 +2,12 @@ package com.ad.adlaunch.to;
 
 import com.ad.adlaunch.dto.GenericUser;
 import com.ad.adlaunch.enumate.AuthenticationEnum;
+import com.ad.adlaunch.enumate.SexEnum;
 import com.ad.adlaunch.utils.EnumUtils;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -25,8 +24,6 @@ import java.util.stream.Collectors;
 @Data
 public class UserTo {
 
-    @JsonProperty("id")
-    private Long userId;
 
     private String username;
     private String nickname;
@@ -38,7 +35,7 @@ public class UserTo {
 
     private String avatar;
 
-    private int sex;
+    private String  sex;
 
     private LocalDate birthDay;
 
@@ -49,7 +46,6 @@ public class UserTo {
 
     public static UserTo fromGenericUser(GenericUser genericUser) {
         return UserTo.builder()
-                .userId(genericUser.getUserId())
                 .username(genericUser.getUsername())
                 .roles(RoleAuthenticationUtils.authentication2StringList(genericUser.getUserRole()))
                 .nickname(genericUser.getNickName())
@@ -72,7 +68,7 @@ public class UserTo {
     public GenericUser toGenericUser() {
         return GenericUser.newBuilder()
                 .email(this.email)
-                .sex(this.sex)
+                .sex(SexEnum.toSexEnum(this.sex))
                 .password(password)
                 .birthDay(birthDay)
                 .mobilePhone(mobilePhone)
@@ -81,6 +77,7 @@ public class UserTo {
                 .idCard(idCard)
                 .avatar(avatar)
                 .username(username)
+                .userRole(EnumUtils.valueOfBaseEnum(AuthenticationEnum.class,this.roles[0]))
                 .username(this.username).build();
     }
 

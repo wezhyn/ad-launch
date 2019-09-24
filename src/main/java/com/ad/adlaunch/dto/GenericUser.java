@@ -1,10 +1,11 @@
 package com.ad.adlaunch.dto;
 
 import com.ad.adlaunch.enumate.AuthenticationEnum;
+import com.ad.adlaunch.enumate.SexEnum;
+import com.ad.adlaunch.utils.EnumUtils;
 import com.ad.adlaunch.utils.RoleAuthenticationUtils;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -18,21 +19,20 @@ import java.util.Collection;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Entity
-@Getter
-@Setter
 @Table(name="ad_generic_user")
 @NoArgsConstructor
+@Data
 public class GenericUser implements IUser {
 
     /**
      * 默认的空 User 对象
      */
     public static final GenericUser EMPTY_USER;
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long userId;
 
+
+    @Id
     private String username;
+
     private String nickName;
     private String realName;
     private String idCard;
@@ -41,7 +41,8 @@ public class GenericUser implements IUser {
 
     private String avatar;
 
-    private int sex;
+    @Enumerated(value=EnumType.STRING)
+    private SexEnum sex;
 
     private LocalDate birthDay;
 
@@ -51,8 +52,30 @@ public class GenericUser implements IUser {
 
     private AuthenticationEnum userRole;
 
+
+    @Override
+    public String getId() {
+       return getUsername();
+    }
+
+    @Override
+    public String getSex() {
+        return this.sex.getValue();
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return RoleAuthenticationUtils.forGrantedAuthorities(this.userRole);
+    }
+
+    /*
+        /**********************************************************
+        /* builder 模式
+        /**********************************************************
+    */
+
     private GenericUser(Builder builder) {
-        setUserId(builder.userId);
         setUsername(builder.username);
         setNickName(builder.nickName);
         setRealName(builder.realName);
@@ -72,34 +95,19 @@ public class GenericUser implements IUser {
 
     public static Builder newBuilder(GenericUser copy) {
         Builder builder=new Builder();
-        builder.userId=copy.getUserId();
         builder.username=copy.getUsername();
         builder.nickName=copy.getNickName();
         builder.realName=copy.getRealName();
         builder.idCard=copy.getIdCard();
         builder.password=copy.getPassword();
         builder.avatar=copy.getAvatar();
-        builder.sex=copy.getSex();
+        builder.sex=EnumUtils.valueOfBaseEnum(SexEnum.class, copy.getSex());
         builder.birthDay=copy.getBirthDay();
         builder.mobilePhone=copy.getMobilePhone();
         builder.email=copy.getEmail();
         builder.userRole=copy.getUserRole();
         return builder;
     }
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return RoleAuthenticationUtils.forGrantedAuthorities(this.userRole);
-    }
-
-    static {
-        EMPTY_USER=GenericUser.newBuilder()
-                .userId(-1L)
-                .username("")
-                .email("").build();
-    }
-
 
     public static final class Builder {
         private Long userId;
@@ -109,7 +117,7 @@ public class GenericUser implements IUser {
         private String idCard;
         private String password;
         private String avatar;
-        private int sex;
+        private SexEnum sex;
         private LocalDate birthDay;
         private String mobilePhone;
         private String email;
@@ -153,7 +161,7 @@ public class GenericUser implements IUser {
             return this;
         }
 
-        public Builder sex(int sex) {
+        public Builder sex(SexEnum sex) {
             this.sex=sex;
             return this;
         }
@@ -181,5 +189,17 @@ public class GenericUser implements IUser {
         public GenericUser build() {
             return new GenericUser(this);
         }
+    }
+
+    /*
+        /**********************************************************
+        /* 静态成员变量初始化
+        /**********************************************************
+    */
+    static {
+        EMPTY_USER=GenericUser.newBuilder()
+                .userId(-1L)
+                .username("")
+                .email("").build();
     }
 }

@@ -30,14 +30,14 @@ public class UserController {
     @GetMapping("/getInfo")
     public SimpleResponseResult<UserTo> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
-        IUser user=genericUserService.getUserByUserName(name);
+        IUser user=genericUserService.getById(name);
         return SimpleResponseResult.successResponseResult("", UserTo.fromGenericUser((GenericUser) user));
     }
 
     @GetMapping("/getList")
-    public ResponseResult getList(@RequestParam("limit")int limit,@RequestParam("page")int page) {
-        Pageable pageable=PageRequest.of(page-1,limit);
-        Page<GenericUser> genericUsers=genericUserService.getGenericList(pageable);
+    public ResponseResult getList(@RequestParam(name="limit",defaultValue="10") int limit, @RequestParam(name="page",defaultValue="1") int page) {
+        Pageable pageable=PageRequest.of(page - 1, limit);
+        Page<GenericUser> genericUsers=genericUserService.getList(pageable);
         return ResponseResult.forSuccessBuilder()
                 .withData("items", UserTo.fromGenericUserList(genericUsers.getContent()))
                 .withData("total", genericUsers.getTotalElements())
@@ -47,8 +47,8 @@ public class UserController {
     @PostMapping("/register")
     public ResponseResult register(@RequestBody UserTo userTo) {
         GenericUser genericUser=userTo.toGenericUser();
-        genericUser=genericUserService.saveGenericUser(genericUser);
-        if (genericUser!=null && genericUser.getUserId() > 0) {
+        genericUser=genericUserService.save(genericUser);
+        if (genericUser!=null && genericUser.getId()!=null) {
             return ResponseResult.forSuccessBuilder()
                     .withMessage("注册成功").build();
         }
@@ -56,41 +56,45 @@ public class UserController {
                 .withMessage("注册失败").build();
     }
 
-    @PostMapping("/editUser")
+    @PostMapping("/edit")
     public ResponseResult editUser(@RequestBody UserTo userTo) {
         GenericUser oldUser=userTo.toGenericUser();
-        GenericUser newUser=genericUserService.saveGenericUser(oldUser);
-        if (oldUser!=null && oldUser.getUserId() > 0) {
+        GenericUser newUser=genericUserService.save(oldUser);
+        if (oldUser!=null) {
             return ResponseResult.forSuccessBuilder()
-                    .withMessage("注册成功")
-                    .withData("newUser",UserTo.fromGenericUser(newUser))
+                    .withMessage("修改成功")
+                    .withData("newUser", UserTo.fromGenericUser(newUser))
                     .build();
         }
         return ResponseResult.forFailureBuilder()
-                .withMessage("注册失败").build();
+                .withMessage("修改失败").build();
     }
 
     @PostMapping("/delete")
     public ResponseResult deleteUser(@RequestBody UserTo userTo) {
         String username=userTo.getUsername();
-        int count=genericUserService.deleteGenericUser(username);
-        if (count>0) {
-            return ResponseResult.forSuccessBuilder()
-                    .withMessage("删除成功").build();
-        }
-        return ResponseResult.forFailureBuilder()
-                .withMessage("删除失败").build();
+        genericUserService.delete(username);
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("删除成功").build();
     }
+
+    @ExceptionHandler
+    public ResponseResult handleError(Exception e) {
+        String m=e.getMessage();
+        return ResponseResult.forFailureBuilder()
+                .withMessage(m==null?m:"操作失败")
+                .build();
+    }
+
     private ResponseResult outputResult(String dM, String fM, GenericUser genericUser) {
 
-        if (genericUser!=null && genericUser.getUserId() > 0) {
+        if (genericUser!=null ) {
             return ResponseResult.forSuccessBuilder()
                     .withMessage(dM).build();
         }
         return ResponseResult.forFailureBuilder()
                 .withMessage(fM).build();
     }
-
 
 
 }

@@ -7,5 +7,9 @@ package com.ad.adlaunch.enumate;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 public interface StringEnum {
+    /**
+     * 枚举类对应的值
+     * @return value
+     */
     String getValue();
 }
