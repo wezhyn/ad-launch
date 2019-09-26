@@ -3,6 +3,7 @@ package com.ad.admain.dto;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import lombok.Data;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
@@ -15,6 +16,7 @@ import javax.persistence.*;
 @Data
 @Table(name="ad_admin")
 @Entity
+@DynamicUpdate
 public class Admin implements IAdmin {
 
     public static final Admin EMPTY_ADMIN;

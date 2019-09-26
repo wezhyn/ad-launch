@@ -48,4 +48,10 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
     public GenericUser getEmpty() {
         return GenericUser.EMPTY_USER;
     }
+
+    @Override
+    public GenericUser update(GenericUser newObject) {
+
+        return newObject;
+    }
 }
