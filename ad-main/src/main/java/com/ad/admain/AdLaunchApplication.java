@@ -3,6 +3,7 @@ package com.ad.admain;
 import com.ad.admain.constants.JwtProperties;
 import com.ad.admain.constants.QiNiuProperties;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 * @date : 2019/09/20
 *
 */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages="com.ad")
 @EnableTransactionManagement
 @EnableConfigurationProperties(value={JwtProperties.class, QiNiuProperties.class})
 public class AdLaunchApplication {

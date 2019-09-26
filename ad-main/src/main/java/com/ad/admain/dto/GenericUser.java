@@ -5,6 +5,7 @@ import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 @Table(name="ad_generic_user")
 @NoArgsConstructor
 @Data
+@DynamicUpdate
 public class GenericUser implements IUser {
 
     /**

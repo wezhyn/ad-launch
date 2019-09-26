@@ -1,5 +1,6 @@
 package com.ad.admain.repository;
 
+import com.ad.admain.dto.GenericUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,14 @@ public class GenericUserRepositoryTest {
     @Test
     public void updateUserAvatar() {
         genericUserRepository.updateUserAvatar("wezhyn", "11");
+    }
+
+    @Test
+    public void update() {
+        GenericUser user=GenericUser.newBuilder()
+                .username("wezhyn123")
+                .avatar("123123")
+                .build();
+        genericUserRepository.save(user);
     }
 }
