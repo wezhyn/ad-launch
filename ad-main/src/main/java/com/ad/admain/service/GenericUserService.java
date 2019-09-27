@@ -19,4 +19,6 @@ public interface GenericUserService extends BaseService<GenericUser,String> {
      * @return 1
      */
     int modifyUserAvatar(String username,String avatar);
+
+
 }
