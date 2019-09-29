@@ -12,9 +12,13 @@ public enum AuthenticationEnum implements BaseEnum {
 
     /**
      * show authenticate
+     * ordinal: 权重
+     * 用户的权限：包含当前权重之下的权限
      */
-    USER(1, "user"),
-    ADMIN(2, "admin");
+    CUSTOMER(10, "customer"),
+    DEVELOPER(20, "developer"),
+    FINANCE(20, "finance");
+
 
     private int ordinal;
     private String value;
@@ -25,7 +29,7 @@ public enum AuthenticationEnum implements BaseEnum {
     }
 
     public static AuthenticationEnum valueOfRs(String roleName) {
-        return EnumUtils.valueOfBaseEnum(AuthenticationEnum.class, roleName);
+        return EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, roleName);
     }
 
 

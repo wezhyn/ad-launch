@@ -38,7 +38,7 @@ public class AdminTo {
                 .idCard(admin.getIdCard())
                 .sex(admin.getSex())
                 .email(admin.getEmail())
-                .roles(RoleAuthenticationUtils.authentication2StringList(admin.getRoles()))
+                .roles(RoleAuthenticationUtils.authentication2ValueStringList(admin.getRoles()))
                 .build();
     }
 
@@ -58,7 +58,7 @@ public class AdminTo {
                 .avatar(this.getAvatar())
                 .sex(this.sex)
                 .email(this.email)
-                .roles(EnumUtils.valueOfBaseEnum(AuthenticationEnum.class,roles[0]))
+                .roles(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, roles[0]))
                 .build();
 
     }

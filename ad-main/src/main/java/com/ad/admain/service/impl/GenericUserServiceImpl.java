@@ -37,12 +37,16 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
         return genericUserRepository.updateUserAvatar(username, avatar);
     }
 
-
+    @Override
+    public GenericUser save(GenericUser object) {
+        return super.save(object);
+    }
 
     @Override
     public JpaRepository<GenericUser, String> getRepository() {
         return this.genericUserRepository;
     }
+
 
     @Override
     public GenericUser getEmpty() {
@@ -51,7 +55,6 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
 
     @Override
     public GenericUser update(GenericUser newObject) {
-
         return newObject;
     }
 }

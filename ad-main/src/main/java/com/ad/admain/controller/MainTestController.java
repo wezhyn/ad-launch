@@ -2,7 +2,6 @@ package com.ad.admain.controller;
 
 import com.ad.admain.dto.GenericUser;
 import com.ad.admain.service.GenericUserService;
-import com.ad.message.config.EasemobProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;

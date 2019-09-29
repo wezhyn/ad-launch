@@ -1,5 +1,6 @@
 package com.ad.admain.dto;
 
+import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
@@ -36,6 +37,7 @@ public class GenericUser implements IUser {
     private String realName;
     private String idCard;
 
+    @UpdateIgnore
     private String password;
 
     private String avatar;
@@ -48,7 +50,7 @@ public class GenericUser implements IUser {
     private String mobilePhone;
     private String email;
 
-
+    @Enumerated(value=EnumType.STRING)
     private AuthenticationEnum roles;
 
 
@@ -96,7 +98,7 @@ public class GenericUser implements IUser {
         builder.idCard=copy.getIdCard();
         builder.password=copy.getPassword();
         builder.avatar=copy.getAvatar();
-        builder.sex=EnumUtils.valueOfBaseEnum(SexEnum.class, copy.getSex());
+        builder.sex=EnumUtils.valueOfBaseEnumIgnoreCase(SexEnum.class, copy.getSex());
         builder.birthDay=copy.getBirthDay();
         builder.mobilePhone=copy.getMobilePhone();
         builder.email=copy.getEmail();
@@ -119,11 +121,6 @@ public class GenericUser implements IUser {
         private AuthenticationEnum userRole;
 
         private Builder() {
-        }
-
-        public Builder userId(Long userId) {
-            this.userId=userId;
-            return this;
         }
 
         public Builder username(String username) {
@@ -193,7 +190,6 @@ public class GenericUser implements IUser {
     */
     static {
         EMPTY_USER=GenericUser.newBuilder()
-                .userId(-1L)
                 .username("")
                 .email("").build();
     }

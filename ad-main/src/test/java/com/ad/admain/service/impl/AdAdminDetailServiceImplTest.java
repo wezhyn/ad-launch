@@ -30,7 +30,7 @@ public class AdAdminDetailServiceImplTest {
         Admin admin=Admin.newBuilder()
                 .id("zhaoo")
                 .password(passwordEncoder.encode("zhaoo"))
-                .roles(AuthenticationEnum.ADMIN)
+                .roles(AuthenticationEnum.DEVELOPER)
                 .nickName("兆儿子")
                 .email("zhaoo@vip.com")
                 .build();

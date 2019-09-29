@@ -74,7 +74,7 @@ public class SecurityJwtProvider {
         } else {
             time=new Date(time.getTime() + this.tokenValidTime);
         }
-        String authority=RoleAuthenticationUtils.grantedAuthorities2String(authentication.getAuthorities());
+        String authority=RoleAuthenticationUtils.grantedAuthorities2SingleString(authentication.getAuthorities());
         Claims claims=new DefaultClaims();
         claims
                 .setExpiration(time)

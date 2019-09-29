@@ -36,7 +36,7 @@ public enum  SexEnum implements BaseEnum {
     }
 
     public static SexEnum toSexEnum(String value) {
-        return EnumUtils.valueOfBaseEnum(SexEnum.class, value);
+        return EnumUtils.valueOfBaseEnumIgnoreCase(SexEnum.class, value);
     }
 
 

@@ -65,18 +65,18 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
         String avatarName=genericUserRepository.findGenericUserByUsername(userName)
                 .orElse(GenericUser.EMPTY_USER).getAvatar();
         IFileUpload fileUpload;
-//       覆盖旧头像
+//       删除旧头像
         if (avatarName!=null && !StringUtils.isEmpty(avatarName)) {
             QiNiuPutSet oldFile=QiNiuPutSet.builder()
                     .key(avatarName)
                     .build();
-            fileUpload=upload(multipartFile, oldFile);
-        }else {
-//            生成新头像
-            fileUpload=upload(multipartFile, null);
-//            保存地址
-            genericUserRepository.updateUserAvatar(userName, fileUpload.getRelativeName());
+            deleteFile(oldFile);
         }
+//        生成新头像
+        fileUpload=upload(multipartFile, null);
+//        保存地址
+        genericUserRepository.updateUserAvatar(userName, fileUpload.getRelativeName());
+
         return fileUpload;
     }
 
@@ -105,7 +105,7 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
         if (oldFileUpload!=null) {
             key=oldFileUpload.getRelativeName();
             defaultUploadToken=auth.uploadToken(bucketName, key);
-        }else {
+        } else {
             defaultUploadToken=auth.uploadToken(bucketName);
         }
         IFileUpload iFileUpload=null;

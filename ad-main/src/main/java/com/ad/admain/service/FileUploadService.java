@@ -41,6 +41,7 @@ public interface FileUploadService {
      * 修改用户图片，并删除远程存在的图片
      * @param multipartFile file
      * @return fileUpload
+     * @throws FileUploadException 文件上传异常
      */
     IFileUpload modifyAvatarImg(MultipartFile multipartFile) throws FileUploadException;
 

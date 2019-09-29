@@ -36,7 +36,6 @@
     </dependencyManagement>
 
     <modules>
-        <module>ad-message</module>
         <module>ad-main</module>
     </modules>
 

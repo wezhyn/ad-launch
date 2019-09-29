@@ -5,7 +5,7 @@ import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
 import com.ad.admain.utils.RoleAuthenticationUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -30,7 +30,7 @@ public class UserTo {
     private String realname;
     private String idCard;
 
-    @JsonIgnore
+    @JsonProperty(access=JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String avatar;
@@ -47,7 +47,7 @@ public class UserTo {
     public static UserTo fromGenericUser(GenericUser genericUser) {
         return UserTo.builder()
                 .username(genericUser.getUsername())
-                .roles(RoleAuthenticationUtils.authentication2StringList(genericUser.getRoles()))
+                .roles(RoleAuthenticationUtils.authentication2ValueStringList(genericUser.getRoles()))
                 .nickname(genericUser.getNickName())
                 .avatar(genericUser.getAvatar())
                 .email(genericUser.getEmail())
@@ -77,7 +77,7 @@ public class UserTo {
                 .idCard(idCard)
                 .avatar(avatar)
                 .username(username)
-                .userRole(EnumUtils.valueOfBaseEnum(AuthenticationEnum.class,this.roles[0]))
+                .userRole(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, this.roles[0]))
                 .username(this.username).build();
     }
 

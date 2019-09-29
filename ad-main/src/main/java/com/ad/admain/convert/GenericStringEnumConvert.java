@@ -29,7 +29,7 @@ public class GenericStringEnumConvert implements ConverterFactory<String, String
         return new StringToBaseEnum(enumType);
     }
 
-    private static class StringToBaseEnum<T extends BaseEnum> implements Converter<String, T> {
+    private static class StringToBaseEnum<T extends Enum & BaseEnum> implements Converter<String, T> {
 
         private final Class<T> enumType;
 
@@ -42,7 +42,7 @@ public class GenericStringEnumConvert implements ConverterFactory<String, String
             if (StringUtils.isEmpty(s)) {
                 return null;
             }
-            return EnumUtils.valueOfBaseEnum(enumType, s);
+            return EnumUtils.valueOfBaseEnumIgnoreCase(enumType, s);
         }
     }
 }

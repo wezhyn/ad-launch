@@ -39,6 +39,7 @@ public class Admin implements IAdmin {
     private String email;
 
 
+    @Enumerated(value=EnumType.STRING)
     private AuthenticationEnum roles;
 
     public Admin() {
