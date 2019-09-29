@@ -16,13 +16,16 @@ public final class EnumUtils {
      * @return BaseEnum
      */
     public static <T extends BaseEnum> T valueOfBaseEnum(Class<T> tClass, String name) {
-        T[] enums=tClass.getEnumConstants();
+            T[] enums=tClass.getEnumConstants();
         return Arrays.stream(enums)
                 .filter(t->t.getValue().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseThrow(()->new RuntimeException("提供的参数无效 -> class: " + tClass.getSimpleName() + " name: " + name));
     }
     public static <T extends BaseEnum> T valueOfBaseEnum(Class<T> tClass, Integer o) {
+        if (tClass == null) {
+            throw new RuntimeException("枚举类型丢失");
+        }
         T[] enums=tClass.getEnumConstants();
         return Arrays.stream(enums)
                 .filter(t->t.getOrdinal()==o)

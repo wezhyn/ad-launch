@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author : wezhyn
@@ -22,7 +23,7 @@ public class Admin implements IAdmin {
     public static final Admin EMPTY_ADMIN;
 
     @Id
-    private String id;
+    private String username;
 
 
     private String nickName;
@@ -41,6 +42,7 @@ public class Admin implements IAdmin {
 
     private AuthenticationEnum roles;
 
+    private Date authTime;
     public Admin() {
     }
 
@@ -52,7 +54,7 @@ public class Admin implements IAdmin {
     }
 
     private Admin(Builder builder) {
-        setId(builder.id);
+        setUsername(builder.username);
         setNickName(builder.nickName);
         setPassword(builder.password);
         setIdCard(builder.idCard);
@@ -60,6 +62,7 @@ public class Admin implements IAdmin {
         setSex(builder.sex);
         setEmail(builder.email);
         setRoles(builder.roles);
+        setAuthTime(builder.authTime);
     }
 
     public static Builder newBuilder() {
@@ -68,7 +71,7 @@ public class Admin implements IAdmin {
 
     public static Builder newBuilder(Admin copy) {
         Builder builder=new Builder();
-        builder.id=copy.getId();
+        builder.username=copy.getUsername();
         builder.nickName=copy.getNickName();
         builder.password=copy.getPassword();
         builder.idCard=copy.getIdCard();
@@ -76,12 +79,18 @@ public class Admin implements IAdmin {
         builder.sex=copy.getSex();
         builder.email=copy.getEmail();
         builder.roles=copy.getRoles();
+        builder.authTime=copy.getAuthTime();
         return builder;
+    }
+
+    @Override
+    public String getId() {
+        return this.username;
     }
 
 
     public static final class Builder {
-        private String id;
+        private String username;
         private String nickName;
         private String password;
         private String idCard;
@@ -89,12 +98,13 @@ public class Admin implements IAdmin {
         private SexEnum sex;
         private String email;
         private AuthenticationEnum roles;
+        private Date authTime;
 
         private Builder() {
         }
 
-        public Builder id(String id) {
-            this.id=id;
+        public Builder id(String username) {
+            this.username=username;
             return this;
         }
 
@@ -130,6 +140,10 @@ public class Admin implements IAdmin {
 
         public Builder roles(AuthenticationEnum roles) {
             this.roles=roles;
+            return this;
+        }
+        public Builder authTime(Date authTime){
+            this.authTime = authTime;
             return this;
         }
 

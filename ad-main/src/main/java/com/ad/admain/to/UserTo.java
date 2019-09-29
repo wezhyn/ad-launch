@@ -1,11 +1,13 @@
 package com.ad.admain.to;
 
+import com.ad.admain.common.IBaseTo;
 import com.ad.admain.dto.GenericUser;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
 import com.ad.admain.utils.RoleAuthenticationUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Builder
 @Data
-public class UserTo {
+public class UserTo implements IBaseTo<String > {
 
 
     private String username;
@@ -30,7 +32,7 @@ public class UserTo {
     private String realname;
     private String idCard;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private String avatar;
@@ -43,6 +45,10 @@ public class UserTo {
     private String email;
     private String[] roles;
 
+    @Override
+    public String getId() {
+        return getUsername();
+    }
 
     public static UserTo fromGenericUser(GenericUser genericUser) {
         return UserTo.builder()

@@ -1,5 +1,6 @@
 package com.ad.admain.to;
 
+import com.ad.admain.common.IBaseTo;
 import com.ad.admain.dto.Admin;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Builder
 @Data
-public class AdminTo {
+public class AdminTo implements IBaseTo<String > {
     @JsonProperty("username")
     private String id;
     @JsonProperty("nickname")
@@ -29,6 +30,9 @@ public class AdminTo {
     private SexEnum sex;
     private String email;
     private String[] roles;
+
+
+
 
     public static AdminTo fromAdmin(Admin admin){
         return AdminTo.builder()
