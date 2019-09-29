@@ -1,13 +1,11 @@
 package com.ad.admain.to;
 
+import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.common.IBaseTo;
 import com.ad.admain.dto.GenericUser;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
-import com.ad.admain.utils.RoleAuthenticationUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -34,6 +32,7 @@ public class UserTo implements IBaseTo<String > {
     private String idCard;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @UpdateIgnore
     private String password;
 
     private String avatar;
@@ -44,7 +43,7 @@ public class UserTo implements IBaseTo<String > {
 
     private String mobilePhone;
     private String email;
-    private String[] roles;
+    private String roles;
 
     @Override
     public String getId() {
@@ -54,7 +53,7 @@ public class UserTo implements IBaseTo<String > {
     public static UserTo fromGenericUser(GenericUser genericUser) {
         return UserTo.builder()
                 .username(genericUser.getUsername())
-                .roles(RoleAuthenticationUtils.authentication2ValueStringList(genericUser.getRoles()))
+                .roles(genericUser.getRoles().getValue())
                 .nickname(genericUser.getNickName())
                 .avatar(genericUser.getAvatar())
                 .email(genericUser.getEmail())
@@ -84,7 +83,7 @@ public class UserTo implements IBaseTo<String > {
                 .idCard(idCard)
                 .avatar(avatar)
                 .username(username)
-                .userRole(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, this.roles[0]))
+                .userRole(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, this.roles))
                 .username(this.username).build();
     }
 

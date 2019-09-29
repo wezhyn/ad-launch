@@ -18,13 +18,6 @@ import java.util.Collection;
 public interface IUser extends IBaseTo<String > {
 
     /**
-     * id
-     *
-     * @return #getUsername()
-     */
-    String getId();
-
-    /**
      * 获取用户账号
      *
      * @return userName

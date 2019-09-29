@@ -1,12 +1,11 @@
 package com.ad.admain.to;
 
+import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.common.IBaseTo;
 import com.ad.admain.dto.Admin;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.utils.EnumUtils;
-import com.ad.admain.utils.RoleAuthenticationUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -23,13 +22,16 @@ public class AdminTo implements IBaseTo<String > {
     private String id;
     @JsonProperty("nickname")
     private String nickName;
-    @JsonIgnore
+
+    @UpdateIgnore
+    @JsonProperty(access=JsonProperty.Access.WRITE_ONLY)
     private String password;
+
     private String idCard;
     private String avatar;
     private SexEnum sex;
     private String email;
-    private String[] roles;
+    private String roles;
 
 
 
@@ -42,7 +44,7 @@ public class AdminTo implements IBaseTo<String > {
                 .idCard(admin.getIdCard())
                 .sex(admin.getSex())
                 .email(admin.getEmail())
-                .roles(RoleAuthenticationUtils.authentication2ValueStringList(admin.getRoles()))
+                .roles(admin.getRoles().getValue())
                 .build();
     }
 
@@ -62,7 +64,7 @@ public class AdminTo implements IBaseTo<String > {
                 .avatar(this.getAvatar())
                 .sex(this.sex)
                 .email(this.email)
-                .roles(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, roles[0]))
+                .roles(EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, roles))
                 .build();
 
     }

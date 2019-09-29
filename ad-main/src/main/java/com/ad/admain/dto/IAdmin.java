@@ -1,7 +1,7 @@
 package com.ad.admain.dto;
 
-import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.common.IBaseTo;
+import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.to.IFileUpload;
 import com.ad.admain.utils.RoleAuthenticationUtils;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,11 +16,6 @@ import java.util.Collection;
  */
 public interface IAdmin extends IBaseTo<String > {
 
-    /**
-     * id
-     * @return #getUsername()
-     */
-    String getId();
 
 
     /**

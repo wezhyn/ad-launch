@@ -6,7 +6,7 @@ server:
 spring:
   profiles:
     active: dev
-#    active: pro
+  #    active: pro
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
@@ -16,6 +16,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

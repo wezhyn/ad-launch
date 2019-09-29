@@ -1,16 +1,10 @@
 package com.ad.admain.utils;
 
 import com.ad.admain.annotation.UpdateIgnore;
-import com.ad.admain.dto.GenericUser;
-import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.enumate.SexEnum;
-import com.ad.admain.to.UserTo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.HashSet;

@@ -22,7 +22,7 @@ public class UserControllerTest extends BaseControllerTest {
         UserTo genericUser=UserTo.builder()
                 .username("wezhyn-register")
                 .password("111111")
-                .roles(new String[]{"user"})
+                .roles("customer")
                 .avatar("123")
                 .sex("male")
                 .build();
