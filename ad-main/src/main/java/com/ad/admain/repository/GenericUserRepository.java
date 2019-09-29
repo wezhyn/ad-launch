@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +41,16 @@ public interface GenericUserRepository extends JpaRepository<GenericUser, String
     int updateUserAvatar(@Param("username") String username,
                          @Param("avatar") String avatar);
 
-
-
+    /**
+     * 修改用户密码
+     * @param username 用户名
+     * @param password 密码
+     * @return 1
+     */
+    @Query("update GenericUser u set u.password=:password where u.username=:username")
+    @Modifying(clearAutomatically = true)
+    @Transactional(rollbackFor = Exception.class)
+    int updateUserPassword(@Param("username") String username,
+                           @Param("password") String password);
 
 }

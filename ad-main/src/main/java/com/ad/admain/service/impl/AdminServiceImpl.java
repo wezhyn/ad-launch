@@ -4,6 +4,8 @@ import com.ad.admain.dto.Admin;
 import com.ad.admain.repository.AdminRepository;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.AdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -31,4 +33,5 @@ public class AdminServiceImpl extends AbstractBaseService<Admin,String >implemen
     public Admin getEmpty() {
         return Admin.EMPTY_ADMIN;
     }
+
 }

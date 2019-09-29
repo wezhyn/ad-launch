@@ -13,7 +13,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 
@@ -25,6 +28,11 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 public class BeanConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,5 +57,7 @@ public class BeanConfig {
         SimpleModule module=new SimpleModule("simpleModule");
         this.objectMapper.registerModule(module);
     }
+
+
 
 }

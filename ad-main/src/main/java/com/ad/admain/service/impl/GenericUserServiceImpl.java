@@ -4,7 +4,10 @@ import com.ad.admain.dto.GenericUser;
 import com.ad.admain.repository.GenericUserRepository;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.GenericUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -19,7 +22,8 @@ import org.springframework.stereotype.Service;
 public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, String> implements GenericUserService {
 
     private final GenericUserRepository genericUserRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public GenericUserServiceImpl(GenericUserRepository genericUserRepository) {
         this.genericUserRepository=genericUserRepository;
@@ -43,6 +47,13 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
     }
 
     @Override
+    public int modifyUserPassword(String username, String password) {
+        String newPasword = passwordEncoder.encode(password);
+        return genericUserRepository.updateUserPassword(username,newPasword);
+    }
+
+
+    @Override
     public JpaRepository<GenericUser, String> getRepository() {
         return this.genericUserRepository;
     }
@@ -53,8 +64,4 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
         return GenericUser.EMPTY_USER;
     }
 
-    @Override
-    public GenericUser update(GenericUser newObject) {
-        return newObject;
-    }
 }

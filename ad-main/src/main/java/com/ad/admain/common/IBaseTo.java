@@ -1,12 +1,13 @@
-package com.ad.admain.common;
-
-/**
- * @author wezhyn
- * @date 2019/09/27
- * <p>
- * Copyright (c) 2018-2019 All Rights Reserved.
+package com.ad.admain.common;/*
+ *
+ * to ，dto层均继承此方法，返回一个Id
+ * @author ZLB_KAM
+ * @date 2019/9/27
+ *
  */
 public interface IBaseTo<ID> {
 
     ID getId();
+
+
 }

@@ -1,5 +1,6 @@
 package com.ad.admain.dto;
 
+import com.ad.admain.common.IBaseTo;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.to.IFileUpload;
 import com.ad.admain.utils.RoleAuthenticationUtils;
@@ -14,7 +15,7 @@ import java.util.Collection;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface IUser {
+public interface IUser extends IBaseTo<String > {
 
     /**
      * id

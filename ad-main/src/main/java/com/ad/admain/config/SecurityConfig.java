@@ -41,7 +41,10 @@ import java.util.List;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
+
+
 @Configuration
+//启用web安全性,若开发选择spring mvc技术则使用@EnableWebMvcSecurity
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -61,6 +64,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private List<AdUserDetailsService> adUserDetailsServices;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     public SecurityConfig(@Qualifier("adUserDetailService") UserDetailsService userDetailsService) {
         this.userDetailsService=userDetailsService;
     }
@@ -88,10 +94,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        AdUsernamePasswordAuthenticationProvider adUsernamePasswordAuthenticationProvider=new AdUsernamePasswordAuthenticationProvider(passwordEncoder(), adUserDetailsServices);
+        AdUsernamePasswordAuthenticationProvider adUsernamePasswordAuthenticationProvider=new AdUsernamePasswordAuthenticationProvider(passwordEncoder, adUserDetailsServices);
         auth
                 .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder())
+                .passwordEncoder(passwordEncoder)
                 .and()
                 .authenticationProvider(adUsernamePasswordAuthenticationProvider);
     }
@@ -122,10 +128,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+   
 
     /**
      * 创建 登录拦截器 拦截请求：/api/user/login

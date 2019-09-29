@@ -12,8 +12,8 @@ public enum  FileType implements StringEnum {
      * 图片类型
      */
     IMAGE("image"),FILE("file");
-    private String value;
 
+    private String value;
 
     FileType(String value) {
         this.value=value;

@@ -1,6 +1,9 @@
 package com.ad.admain.service;
 
 import com.ad.admain.exception.DeleteOperateException;
+import com.ad.admain.common.IBaseTo;
+import com.ad.admain.exception.UpdateOperationException;
+import com.ad.admain.utils.PropertyUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public abstract class AbstractBaseService<T,ID> implements BaseService<T, ID> {
+public abstract class AbstractBaseService<T extends IBaseTo<ID>,ID> implements BaseService<T, ID> {
 
 
     @Override
@@ -32,9 +35,16 @@ public abstract class AbstractBaseService<T,ID> implements BaseService<T, ID> {
     }
 
     @Override
+    @Transactional(rollbackFor = UpdateOperationException.class)
     public T update(T newObject) {
-        return getRepository().save(newObject);
+        T oldObject = getRepository().findById(newObject.getId())
+                .orElseThrow(() -> new UpdateOperationException("无法更新，无目标对象"));
+        PropertyUtils.copyProperties(newObject,oldObject);
+        return getRepository().save(oldObject);
     }
+
+
+
 
     @Override
     @Transactional(rollbackFor=DeleteOperateException.class)
