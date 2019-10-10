@@ -14,8 +14,11 @@ public enum AuthenticationEnum implements BaseEnum {
      * show authenticate
      * ordinal: 权重
      * 用户的权限：包含当前权重之下的权限
+     * 例如DEVELOPER 拥有 DEVELOPER,ADMIN,CUSTOMER,USER
      */
+    USER(5, "user"),
     CUSTOMER(10, "customer"),
+    ADMIN(15, "admin"),
     DEVELOPER(20, "developer"),
     FINANCE(20, "finance");
 
@@ -23,7 +26,7 @@ public enum AuthenticationEnum implements BaseEnum {
     private int ordinal;
     private String value;
 
-     AuthenticationEnum(int ordinal, String s) {
+    AuthenticationEnum(int ordinal, String s) {
         this.ordinal=ordinal;
         this.value=s;
     }

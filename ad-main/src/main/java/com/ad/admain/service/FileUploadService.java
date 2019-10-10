@@ -1,7 +1,7 @@
 package com.ad.admain.service;
 
+import com.ad.admain.dto.IFileUpload;
 import com.ad.admain.exception.FileUploadException;
-import com.ad.admain.to.IFileUpload;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

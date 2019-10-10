@@ -1,6 +1,6 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.to.UserTo;
+import com.ad.admain.dto.UserDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +19,7 @@ public class UserControllerTest extends BaseControllerTest {
 
     @Test
     public void register() throws Exception {
-        UserTo genericUser=UserTo.builder()
+        UserDto genericUser=UserDto.builder()
                 .username("wezhyn-register")
                 .password("111111")
                 .roles("customer")

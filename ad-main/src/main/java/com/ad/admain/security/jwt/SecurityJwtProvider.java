@@ -1,10 +1,10 @@
 package com.ad.admain.security.jwt;
 
 import com.ad.admain.constants.JwtProperties;
-import com.ad.admain.dto.IUser;
 import com.ad.admain.exception.JwtParseException;
 import com.ad.admain.security.AdNamePasswordAuthenticationToken;
 import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.to.IUser;
 import com.ad.admain.utils.RoleAuthenticationUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;

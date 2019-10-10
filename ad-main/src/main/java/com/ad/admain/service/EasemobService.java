@@ -1,6 +1,8 @@
 package com.ad.admain.service;
 
-import com.ad.admain.dto.EasemobUser;
+import com.ad.admain.to.EasemobUser;
+
+import java.util.Optional;
 
 /**
  * @author wezhyn
@@ -16,6 +18,6 @@ public interface EasemobService extends MessageService, BaseService<EasemobUser,
      * @param registerUsers list<User>
      * @return easemobUser
      */
-    EasemobUser registerEasemob(EasemobUser registerUsers);
+    Optional<EasemobUser> registerEasemob(EasemobUser registerUsers);
 
 }

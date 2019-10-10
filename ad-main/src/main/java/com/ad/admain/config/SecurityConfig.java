@@ -19,13 +19,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,6 +46,7 @@ import java.util.List;
 @Configuration
 //启用web安全性,若开发选择spring mvc技术则使用@EnableWebMvcSecurity
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
@@ -66,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     public SecurityConfig(@Qualifier("adUserDetailService") UserDetailsService userDetailsService) {
         this.userDetailsService=userDetailsService;
     }
@@ -74,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        List<String > matchs=jwtProperties.getLoginInterceptionInclude();
+        List<String> matchs=jwtProperties.getLoginInterceptionInclude();
         AdUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter=createUserNamePasswordAuthenticationFilter(
                 matchs, authenticationManager(), usernamePasswordConverts,
                 loginAuthenticationFailureHandler,
@@ -86,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilterBefore(usernamePasswordAuthenticationFilter, LogoutFilter.class)
                 .addFilterBefore(jwtCheckAuthenticationFilter, usernamePasswordAuthenticationFilter.getClass())
-                .addFilterAt(adJwtLogoutAuthenticationFilter(jwtProperties.getLogoutInterception(),jwtDetailService), LogoutFilter.class)
+                .addFilterAt(adJwtLogoutAuthenticationFilter(jwtProperties.getLogoutInterception(), jwtDetailService), LogoutFilter.class)
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
                 .antMatchers("/").permitAll();
 
@@ -128,7 +129,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-   
 
     /**
      * 创建 登录拦截器 拦截请求：/api/user/login
@@ -140,7 +140,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @return filter
      */
     public AdUsernamePasswordAuthenticationFilter createUserNamePasswordAuthenticationFilter(
-            List<String > matchs,
+            List<String> matchs,
             AuthenticationManager authenticationManager,
             List<IUsernamePasswordConvert> usernamePasswordConverts,
             LoginAuthenticationFailureHandler failureHandler,
@@ -152,7 +152,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    private AdJwtLogoutAuthenticationFilter adJwtLogoutAuthenticationFilter(List<String >matchs,JwtDetailService jwtDetailService) {
+    private AdJwtLogoutAuthenticationFilter adJwtLogoutAuthenticationFilter(List<String> matchs, JwtDetailService jwtDetailService) {
         LogoutAuthenticationSuccessHandler successHandler=new LogoutAuthenticationSuccessHandler(jwtDetailService);
         return new AdJwtLogoutAuthenticationFilter(matchs, successHandler);
     }

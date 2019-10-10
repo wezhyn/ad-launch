@@ -1,6 +1,6 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.dto.ResponseResult;
+import com.ad.admain.to.ResponseResult;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;

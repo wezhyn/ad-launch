@@ -1,8 +1,8 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.dto.GenericUser;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
+import com.ad.admain.to.GenericUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -19,24 +19,24 @@ public class PropertyUtilsTest {
 
     @Test
     public void copyPropertiesTest() {
-        GenericUser sourceUser=new GenericUser();
-        sourceUser.setRealName("兆兆");
-        sourceUser.setUsername("zhaoo");
-        sourceUser.setPassword("wezhyn");
-        sourceUser.setSex(SexEnum.MALE);
-        sourceUser.setRoles(AuthenticationEnum.CUSTOMER);
-        log.info("sourceUser: {}", sourceUser.toString());
+        GenericUser target=new GenericUser();
+        target.setRealName("兆兆");
+        target.setUsername("zhaoo");
+        target.setPassword("wezhyn");
+        target.setSex(SexEnum.MALE);
+        target.setRoles(AuthenticationEnum.CUSTOMER);
+        log.info("sourceUser: {}", target.toString());
 
-        GenericUser requestUser=new GenericUser();
-        requestUser.setRealName("dzj");
-        requestUser.setSex(SexEnum.MALE);
-        requestUser.setPassword("passsword");
-        requestUser.setRoles(AuthenticationEnum.CUSTOMER);
-        requestUser.setEmail("fuckyou@dzj.com");
-        log.info("targetUser :{}", requestUser);
-        copyProperties(requestUser, sourceUser);
+        GenericUser source=new GenericUser();
+        source.setRealName("dzj");
+        source.setSex(SexEnum.MALE);
+        source.setPassword("passsword");
+        source.setRoles(AuthenticationEnum.CUSTOMER);
+        source.setEmail("fuckyou@dzj.com");
+        log.info("targetUser :{}", source);
+        copyProperties(source, target);
 
-        log.info("target after copy :{}", requestUser);
-        log.info("source after copoy: {}", sourceUser);
+        log.info("target after copy :{}", source);
+        log.info("source after copoy: {}", target);
     }
 }

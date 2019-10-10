@@ -6,3 +6,14 @@ custom:
     port: 3306
     database: ad
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true
+
+#用于显示绑定的参数具体值
+logging:
+  level:
+    org:
+      hibernate:
+        #        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace

@@ -1,15 +1,17 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.dto.Admin;
-import com.ad.admain.dto.IAdmin;
 import com.ad.admain.service.AdUserDetailsService;
 import com.ad.admain.service.AdminService;
+import com.ad.admain.to.Admin;
+import com.ad.admain.to.IAdmin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 /**
  * @author : wezhyn
@@ -31,17 +33,15 @@ public class AdAdminDetailServiceImpl implements AdUserDetailsService {
         if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("无效的账户： " + username + "，请检查是否为空");
         }
-        IAdmin user=adminService.getById(username);
-        if (user==Admin.EMPTY_ADMIN) {
-            throw new UsernameNotFoundException("无法找到该用户 : " + username);
-        }
-        if (log.isDebugEnabled()) {
-            log.debug("找到用户 : " + user);
-        }
-        return createUser(user);
+        Optional<Admin> user=adminService.getById(username);
+        return user.map(this::createUser)
+                .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
     }
 
     private User createUser(IAdmin user) {
+        if (log.isDebugEnabled()) {
+            log.debug("找到用户 : " + user);
+        }
         return new User(user.getId(), user.getPassword(), user.getAuthorities());
 
     }

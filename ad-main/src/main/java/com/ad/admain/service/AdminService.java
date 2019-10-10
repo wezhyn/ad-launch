@@ -1,6 +1,6 @@
 package com.ad.admain.service;
 
-import com.ad.admain.dto.Admin;
+import com.ad.admain.to.Admin;
 
 /**
  * @author : wezhyn

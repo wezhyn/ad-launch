@@ -1,9 +1,10 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.dto.ResponseResult;
 import com.ad.admain.message.common.TargetTypeEnum;
+import com.ad.admain.to.ResponseResult;
 import io.swagger.client.model.Msg;
 import io.swagger.client.model.UserName;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/message")
+@PreAuthorize("isAuthenticated()")
 public class MessageController {
 
 

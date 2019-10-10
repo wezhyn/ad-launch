@@ -3,6 +3,8 @@ package com.ad.admain.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 /**
  * @author : wezhyn
  * @date : 2019/09/24
@@ -13,17 +15,17 @@ public interface BaseService<T,ID> {
 
     /**
      * 通过账号获取用户信息
-     * @param id userName
+     * @param id userName @NotNull ,应当确保传入的对象非空
      * @return T id对应的对象
      */
-    T getById(ID id);
+    Optional<T> getById(ID id);
 
     /**
      * 储存目标对象
      * @param object 储存的对象
      * @return 储存后的对象
      */
-    T save(T object);
+    Optional<T> save(T object);
 
 
     /**
@@ -31,7 +33,7 @@ public interface BaseService<T,ID> {
      * @param newObject 新的完整参数
      * @return T
      */
-    T update(T newObject);
+    Optional<T> update(T newObject);
 
     /**
      * 根据主键删除对象

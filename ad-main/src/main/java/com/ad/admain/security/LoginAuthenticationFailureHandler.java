@@ -1,6 +1,6 @@
 package com.ad.admain.security;
 
-import com.ad.admain.dto.ResponseResult;
+import com.ad.admain.to.ResponseResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;

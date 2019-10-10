@@ -1,7 +1,9 @@
-package com.ad.admain.dto;
+package com.ad.admain.to;
 
+import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -20,7 +22,6 @@ import java.util.Date;
 @DynamicUpdate
 public class Admin implements IAdmin {
 
-    public static final Admin EMPTY_ADMIN;
 
     @Id
     private String username;
@@ -28,6 +29,8 @@ public class Admin implements IAdmin {
 
     private String nickName;
 
+    @JsonProperty(access=JsonProperty.Access.WRITE_ONLY)
+    @UpdateIgnore
     private String password;
 
     private String idCard;
@@ -47,12 +50,6 @@ public class Admin implements IAdmin {
     public Admin() {
     }
 
-    static {
-        EMPTY_ADMIN=new Builder()
-                .id(null)
-                .nickName("")
-                .build();
-    }
 
     private Admin(Builder builder) {
         setUsername(builder.username);

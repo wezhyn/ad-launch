@@ -1,4 +1,4 @@
-package com.ad.admain.dto;
+package com.ad.admain.to;
 
 import com.ad.admain.common.IBaseTo;
 import io.swagger.client.model.User;
@@ -22,8 +22,6 @@ import javax.persistence.Table;
 @Builder
 public class EasemobUser implements IBaseTo<String> {
 
-    public final static EasemobUser EMPTY_EASEMOB=EasemobUser.builder()
-            .build();
 
     /**
      * 账号 {@link IUser#getId()}

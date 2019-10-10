@@ -1,6 +1,7 @@
 package com.ad.admain.utils;
 
 import com.ad.admain.enumate.BaseEnum;
+import com.ad.admain.enumate.StringEnum;
 
 import java.util.Arrays;
 
@@ -17,12 +18,12 @@ public final class EnumUtils {
     /**
      * 返回 BaseEnum 子类中 value对应的枚举类
      *
-     * @param tClass BaseEnum 的子类
+     * @param tClass StringEnum 的子类
      * @param name value
      * @param <T> T extends BaseEnum
      * @return BaseEnum
      */
-    public static <T extends Enum & BaseEnum> T valueOfBaseEnumIgnoreCase(Class<T> tClass, String name) {
+    public static <T extends Enum & StringEnum> T valueOfBaseEnumIgnoreCase(Class<T> tClass, String name) {
         T[] enums=tClass.getEnumConstants();
         return Arrays.stream(enums)
                 .filter(t->t.getValue().equalsIgnoreCase(name))

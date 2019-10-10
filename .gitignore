@@ -4,6 +4,14 @@ target/
 !**/src/main/**
 !**/src/test/**
 
+### VIM ###
+*\.*~
+
+### MVN ###
+mvnw
+mvnw.cmd
+.mvn
+
 ### STS ###
 .apt_generated
 .classpath

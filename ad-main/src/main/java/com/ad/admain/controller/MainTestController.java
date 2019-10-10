@@ -1,7 +1,7 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.dto.GenericUser;
 import com.ad.admain.service.GenericUserService;
+import com.ad.admain.to.GenericUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,10 +24,16 @@ public class MainTestController {
     @GetMapping("/api/test/register")
     public String register(String username) {
         genericUserService.save(
-                GenericUser.newBuilder().username(username)
-                .password(passwordEncoder.encode("111111")).build()
+                GenericUser.builder().username(username)
+                        .password(passwordEncoder.encode("111111")).build()
         );
         return "true";
     }
+
+    @GetMapping(value={"/", "/api"})
+    public String hello() {
+        return "Hello";
+    }
+
 
 }

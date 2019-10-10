@@ -1,8 +1,8 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.dto.JwtUserSecret;
 import com.ad.admain.repository.JwtUserSecretRepository;
 import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.to.JwtUserSecret;
 import org.springframework.stereotype.Service;
 
 /**

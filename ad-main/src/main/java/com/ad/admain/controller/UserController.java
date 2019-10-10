@@ -1,17 +1,21 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.dto.GenericUser;
-import com.ad.admain.dto.ResponseResult;
-import com.ad.admain.dto.SimpleResponseResult;
+import com.ad.admain.convert.GenericUserMapper;
+import com.ad.admain.dto.UserDto;
 import com.ad.admain.service.GenericUserService;
-import com.ad.admain.to.UserTo;
-import com.ad.admain.utils.PropertyUtils;
+import com.ad.admain.to.GenericUser;
+import com.ad.admain.to.ResponseResult;
+import com.ad.admain.to.SimpleResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 /**
  * @author : wezhyn
@@ -21,34 +25,38 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/user")
+@PreAuthorize("isAuthenticated()")
 public class UserController {
 
 
     private final GenericUserService genericUserService;
+    private final GenericUserMapper genericUserMapper;
 
 
-    public UserController(GenericUserService genericUserService) {
-        this.genericUserService = genericUserService;
+    public UserController(GenericUserService genericUserService, GenericUserMapper genericUserMapper) {
+        this.genericUserService=genericUserService;
+        this.genericUserMapper=genericUserMapper;
     }
 
     @PostMapping("/test")
-    public void updateTest(@RequestBody UserTo userTo) {
-        System.out.println(userTo.toString());
+    public void updateTest(@RequestBody UserDto userDto) {
+        System.out.println(userDto.toString());
     }
 
     @GetMapping("/getInfo")
-    public SimpleResponseResult<UserTo> info(@AuthenticationPrincipal Authentication authentication) {
-        String name = authentication.getName();
-        GenericUser user = genericUserService.getById(name);
-        return SimpleResponseResult.successResponseResult("", UserTo.fromGenericUser(user));
+    public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal Authentication authentication) {
+        String name=authentication.getName();
+        Optional<GenericUser> user=genericUserService.getById(name);
+        return user.map(u->SimpleResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
+                .orElse(SimpleResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
     @GetMapping("/getList")
-    public ResponseResult getList(@RequestParam(name = "limit", defaultValue = "10") int limit, @RequestParam(name = "page", defaultValue = "1") int page) {
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<GenericUser> genericUsers = genericUserService.getList(pageable);
+    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
+        Pageable pageable=PageRequest.of(page - 1, limit);
+        Page<GenericUser> genericUsers=genericUserService.getList(pageable);
         return ResponseResult.forSuccessBuilder()
-                .withData("items", UserTo.fromGenericUserList(genericUsers.getContent()))
+                .withData("items", genericUserMapper.toDtoList(genericUsers.getContent()))
                 .withData("total", genericUsers.getTotalElements())
                 .build();
     }
@@ -56,12 +64,13 @@ public class UserController {
     @PostMapping("/password")
     public ResponseResult editPassword(@RequestParam("username") String username,
                                        @RequestParam("oldpwd") String oldpwd,
-                                       @RequestParam("newpwd")String newpwd) {
+                                       @RequestParam("newpwd") String newpwd) {
 //        默认结果为失败 result==-1
-        int result =-1;
+        int result=-1;
 
-        GenericUser genericUser = genericUserService.getById(username);
-        if (genericUser.getPassword()!=oldpwd){
+        GenericUser genericUser=genericUserService.getById(username)
+                .orElseThrow(()->new UsernameNotFoundException("无该用户信息"));
+        if (!genericUser.getPassword().equals(oldpwd)) {
             return ResponseResult.forFailureBuilder()
                     .withMessage("旧密码错误")
                     .withCode(50000)
@@ -69,7 +78,7 @@ public class UserController {
         }
 
         try {
-            result = genericUserService.modifyUserPassword(genericUser.getId(),newpwd);
+            result=genericUserService.modifyUserPassword(genericUser.getId(), newpwd);
             return ResponseResult.forSuccessBuilder()
                     .withMessage("修改密码成功")
                     .withCode(20000)
@@ -86,34 +95,28 @@ public class UserController {
     }
 
 
-    public ResponseResult register(@RequestBody UserTo userTo) {
-        GenericUser genericUser = userTo.toGenericUser();
-        genericUser = genericUserService.save(genericUser);
-        if (genericUser != null && genericUser.getId() != null) {
-            return ResponseResult.forSuccessBuilder()
-                    .withMessage("注册成功").build();
-        }
-        return ResponseResult.forFailureBuilder()
-                .withMessage("注册失败").build();
+    public ResponseResult register(@RequestBody UserDto userDto) {
+        GenericUser requestUser=genericUserMapper.toTo(userDto);
+        Optional<GenericUser> genericUser=genericUserService.save(requestUser);
+        return genericUser.map(u->ResponseResult.forSuccessBuilder().withMessage("注册成功").build())
+                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
     }
 
     @PostMapping("/edit")
-    public ResponseResult editUser(@RequestBody UserTo userTo) {
-        GenericUser targetUser = userTo.toGenericUser();
-        GenericUser newUser=genericUserService.update(targetUser);
-        if (targetUser != null) {
-            return ResponseResult.forSuccessBuilder()
-                    .withMessage("修改成功")
-                    .withData("newUser", UserTo.fromGenericUser(newUser))
-                    .build();
-        }
-        return ResponseResult.forFailureBuilder()
-                .withMessage("修改失败").build();
+    public ResponseResult editUser(@RequestBody UserDto userDto) {
+        GenericUser targetUser=genericUserMapper.toTo(userDto);
+        Optional<GenericUser> newUser=genericUserService.update(targetUser);
+        return newUser.map(u->ResponseResult.forSuccessBuilder()
+                .withMessage("修改成功")
+                .withData("newUser", genericUserMapper.toDto(u))
+                .build())
+                .orElse(ResponseResult.forFailureBuilder()
+                        .withMessage("修改失败").build());
     }
 
     @PostMapping("/delete")
-    public ResponseResult deleteUser(@RequestBody UserTo userTo) {
-        String username = userTo.getUsername();
+    public ResponseResult deleteUser(@RequestBody UserDto userDto) {
+        String username=userDto.getUsername();
         genericUserService.delete(username);
         return ResponseResult.forSuccessBuilder()
                 .withMessage("删除成功").build();
@@ -121,20 +124,20 @@ public class UserController {
 
     @ExceptionHandler
     public ResponseResult handleError(Exception e) {
-        String m = e.getMessage();
+        String m=e.getMessage();
         return ResponseResult.forFailureBuilder()
-                .withMessage(m == null ? m : "操作失败")
+                .withMessage(m==null ? m : "操作失败")
                 .build();
     }
 
-    private ResponseResult outputResult(String dM, String fM, GenericUser genericUser) {
+    private ResponseResult outputResult(String dm, String fm, GenericUser genericUser) {
 
-        if (genericUser != null) {
+        if (genericUser!=null) {
             return ResponseResult.forSuccessBuilder()
-                    .withMessage(dM).build();
+                    .withMessage(dm).build();
         }
         return ResponseResult.forFailureBuilder()
-                .withMessage(fM).build();
+                .withMessage(fm).build();
     }
 
 

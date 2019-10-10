@@ -1,8 +1,8 @@
 package com.ad.admain.config;
 
 import com.ad.admain.constants.QiNiuProperties;
-import com.ad.admain.repository.GenericUserRepository;
 import com.ad.admain.service.FileUploadService;
+import com.ad.admain.service.GenericUserService;
 import com.ad.admain.service.impl.QiNiuFileUploadServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,10 +13,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 
@@ -29,10 +26,6 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class BeanConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -40,9 +33,9 @@ public class BeanConfig {
 
     @Bean
     @ConditionalOnMissingBean(value={FileUploadService.class})
-    @ConditionalOnProperty(prefix="custom.qn" ,name={"access-key","secret-key"})
-    public FileUploadService fileUploadService(QiNiuProperties qiNiuProperties, GenericUserRepository userRepository) {
-        return new QiNiuFileUploadServiceImpl(qiNiuProperties,userRepository);
+    @ConditionalOnProperty(prefix="custom.qn", name={"access-key", "secret-key"})
+    public FileUploadService fileUploadService(QiNiuProperties qiNiuProperties, GenericUserService genericUserService) {
+        return new QiNiuFileUploadServiceImpl(qiNiuProperties, genericUserService);
     }
 
     @PostConstruct
@@ -57,7 +50,5 @@ public class BeanConfig {
         SimpleModule module=new SimpleModule("simpleModule");
         this.objectMapper.registerModule(module);
     }
-
-
 
 }

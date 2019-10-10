@@ -1,10 +1,10 @@
-package com.ad.admain.to;
+package com.ad.admain.dto;
 
 import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.common.IBaseTo;
-import com.ad.admain.dto.Admin;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
+import com.ad.admain.to.Admin;
 import com.ad.admain.utils.EnumUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Builder
 @Data
-public class AdminTo implements IBaseTo<String > {
+public class AdminDto implements IBaseTo<String> {
     @JsonProperty("username")
     private String id;
     @JsonProperty("nickname")
@@ -34,10 +34,8 @@ public class AdminTo implements IBaseTo<String > {
     private String roles;
 
 
-
-
-    public static AdminTo fromAdmin(Admin admin){
-        return AdminTo.builder()
+    public static AdminDto fromAdmin(Admin admin) {
+        return AdminDto.builder()
                 .id(admin.getId())
                 .nickName(admin.getNickName())
                 .password(admin.getPassword())
@@ -48,9 +46,9 @@ public class AdminTo implements IBaseTo<String > {
                 .build();
     }
 
-    public static List<AdminTo> fromUserList(Collection<Admin> admins) {
+    public static List<AdminDto> fromUserList(Collection<Admin> admins) {
         return admins.stream()
-                .map(AdminTo::fromAdmin)
+                .map(AdminDto::fromAdmin)
                 .collect(Collectors.toList());
     }
 

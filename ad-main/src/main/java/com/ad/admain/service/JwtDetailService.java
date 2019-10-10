@@ -1,6 +1,6 @@
 package com.ad.admain.service;
 
-import com.ad.admain.dto.IUser;
+import com.ad.admain.to.IUser;
 
 /**
  * @author : wezhyn

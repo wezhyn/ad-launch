@@ -1,9 +1,8 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.dto.GenericUser;
-import com.ad.admain.dto.IUser;
 import com.ad.admain.service.AdUserDetailsService;
 import com.ad.admain.service.GenericUserService;
+import com.ad.admain.to.IUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,10 +31,9 @@ public class AdUserDetailServiceImpl implements AdUserDetailsService {
         if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("无效的账户： " + username + "，请检查是否为空");
         }
-        IUser user=genericUserService.getById(username);
-        if (user==GenericUser.EMPTY_USER) {
-            throw new UsernameNotFoundException("无法找到该用户 : " + username);
-        }
+        IUser user=genericUserService.getById(username)
+                .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
+
         if (log.isDebugEnabled()) {
             log.debug("找到用户 : " + user);
         }

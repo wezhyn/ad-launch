@@ -1,10 +1,10 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.dto.ImgBed;
 import com.ad.admain.enumate.ImgBedType;
 import com.ad.admain.repository.ImgBedRepository;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.ImgBedService;
+import com.ad.admain.to.ImgBed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +29,6 @@ public class ImgBedServiceImpl extends AbstractBaseService<ImgBed, Integer> impl
         return imgBedRepository;
     }
 
-    @Override
-    public ImgBed getEmpty() {
-        return ImgBed.EMPTY_IMG_BED;
-    }
 
     @Override
     public Page<ImgBed> getImgBedListByType(ImgBedType imgBedType, Pageable pa) {

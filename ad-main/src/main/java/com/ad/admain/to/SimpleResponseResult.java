@@ -1,4 +1,4 @@
-package com.ad.admain.dto;
+package com.ad.admain.to;
 
 import lombok.Data;
 
@@ -29,6 +29,10 @@ public class SimpleResponseResult<T> {
 
     public  static <T> SimpleResponseResult<T> successResponseResult(String message, T data) {
         return new SimpleResponseResult<>(SUCCESS_CODE, data, message);
+    }
+
+    public static <T> SimpleResponseResult<T> failureResponseResult(String message) {
+        return new SimpleResponseResult<>(FAILURE_CODE, null, message);
     }
 
 }

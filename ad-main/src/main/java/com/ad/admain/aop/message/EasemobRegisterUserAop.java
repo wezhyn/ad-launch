@@ -1,16 +1,17 @@
 package com.ad.admain.aop.message;
 
-import com.ad.admain.dto.EasemobUser;
-import com.ad.admain.dto.GenericUser;
-import com.ad.admain.dto.IUser;
 import com.ad.admain.service.EasemobService;
+import com.ad.admain.to.EasemobUser;
+import com.ad.admain.to.GenericUser;
+import com.ad.admain.to.IUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 /**
  * @author wezhyn
@@ -23,8 +24,11 @@ import org.springframework.util.StringUtils;
 @Component
 public class EasemobRegisterUserAop {
 
-    @Autowired
-    private EasemobService easemobService;
+    private final EasemobService easemobService;
+
+    public EasemobRegisterUserAop(EasemobService easemobService) {
+        this.easemobService=easemobService;
+    }
 
     @Pointcut("execution(public * com.ad.admain.service.impl.GenericUserServiceImpl.save(..))" +
             "&&args(user)")
@@ -38,7 +42,6 @@ public class EasemobRegisterUserAop {
      *
      * @param joinPoint joinPoint
      * @param user      注册的用户
-     * @return {@link EasemobUser#EMPTY_EASEMOB}
      */
     @Around(value="registerEasemobUser(user)", argNames="joinPoint,user")
     public Object easemobUserRegister(ProceedingJoinPoint joinPoint,
@@ -46,17 +49,17 @@ public class EasemobRegisterUserAop {
 
         String username=user.getUsername();
         if (StringUtils.isEmpty(username)) {
-            return GenericUser.EMPTY_USER;
+            return Optional.empty();
         }
         EasemobUser easemobUser=EasemobUser.builder()
                 .easemobId(user.getId())
                 .nickname(user.getUsername())
                 .password(user.getPassword()).build();
-        EasemobUser savedUser=easemobService.registerEasemob(easemobUser);
-        if (savedUser==EasemobUser.EMPTY_EASEMOB) {
-            return GenericUser.EMPTY_USER;
-        } else {
+        Optional<EasemobUser> savedUser=easemobService.registerEasemob(easemobUser);
+        if (savedUser.isPresent()) {
             return joinPoint.proceed();
+        } else {
+            return Optional.empty();
         }
     }
 }

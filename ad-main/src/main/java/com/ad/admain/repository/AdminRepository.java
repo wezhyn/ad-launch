@@ -1,6 +1,6 @@
 package com.ad.admain.repository;
 
-import com.ad.admain.dto.Admin;
+import com.ad.admain.to.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

@@ -1,6 +1,6 @@
 package com.ad.admain.config;
 
-import com.ad.admain.convert.GenericStringEnumConvert;
+import com.ad.admain.controller.GenericStringEnumConvert;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -13,8 +13,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

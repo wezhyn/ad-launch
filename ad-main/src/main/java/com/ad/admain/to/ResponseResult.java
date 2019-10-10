@@ -1,4 +1,4 @@
-package com.ad.admain.dto;
+package com.ad.admain.to;
 
 import lombok.Data;
 

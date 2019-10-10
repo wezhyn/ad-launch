@@ -1,4 +1,4 @@
-package com.ad.admain.to;
+package com.ad.admain.dto;
 
 import lombok.Builder;
 import lombok.Data;

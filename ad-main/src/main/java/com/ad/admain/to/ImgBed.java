@@ -1,8 +1,9 @@
-package com.ad.admain.dto;
+package com.ad.admain.to;
 
 import com.ad.admain.common.IBaseTo;
+import com.ad.admain.dto.IFileUpload;
 import com.ad.admain.enumate.ImgBedType;
-import com.ad.admain.to.IFileUpload;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -19,10 +20,10 @@ import javax.persistence.*;
 @Data
 public class ImgBed implements IBaseTo<Integer> {
 
-    public static final ImgBed EMPTY_IMG_BED=new ImgBed();
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @JsonIgnore
     private Integer id;
 
 
@@ -30,6 +31,7 @@ public class ImgBed implements IBaseTo<Integer> {
      * 图片类别
      */
     @Enumerated(value=EnumType.STRING)
+    @JsonProperty(access=JsonProperty.Access.READ_WRITE)
     private ImgBedType type;
 
     /**
@@ -41,6 +43,7 @@ public class ImgBed implements IBaseTo<Integer> {
     /**
      * 上传的文件名
      */
+    @JsonProperty(value="key")
     private String filename;
 
     /**

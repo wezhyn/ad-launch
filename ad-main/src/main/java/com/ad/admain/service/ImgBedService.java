@@ -1,7 +1,7 @@
 package com.ad.admain.service;
 
-import com.ad.admain.dto.ImgBed;
 import com.ad.admain.enumate.ImgBedType;
+import com.ad.admain.to.ImgBed;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

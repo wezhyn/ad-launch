@@ -1,6 +1,6 @@
 package com.ad.admain.repository;
 
-import com.ad.admain.dto.EasemobUser;
+import com.ad.admain.to.EasemobUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

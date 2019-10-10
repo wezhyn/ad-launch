@@ -1,19 +1,21 @@
 package com.ad.admain.controller;
 
 import com.ad.admain.constants.QiNiuProperties;
-import com.ad.admain.dto.ImgBed;
-import com.ad.admain.dto.ResponseResult;
+import com.ad.admain.dto.IFileUpload;
 import com.ad.admain.enumate.ImgBedType;
 import com.ad.admain.exception.FileUploadException;
 import com.ad.admain.service.FileUploadService;
 import com.ad.admain.service.ImgBedService;
-import com.ad.admain.to.IFileUpload;
+import com.ad.admain.to.ImgBed;
+import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 /**
  * 文件上传相关 api
@@ -93,13 +95,11 @@ public class FileController {
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
-        ImgBed bed=imgBedService.save(imgBed);
-        if (bed!=null) {
-            return ResponseResult.forSuccessBuilder()
-                    .withMessage("上传：" + type.getValue() + " 成功").build();
-        }
-        return ResponseResult.forFailureBuilder()
-                .withMessage("上传: " + type.getValue() + "失败").build();
+        Optional<ImgBed> bed=imgBedService.save(imgBed);
+        return bed.map(b->ResponseResult.forSuccessBuilder()
+                .withMessage("上传：" + type.getValue() + " 成功").build())
+                .orElse(ResponseResult.forFailureBuilder()
+                        .withMessage("上传: " + type.getValue() + "失败").build());
 
     }
 

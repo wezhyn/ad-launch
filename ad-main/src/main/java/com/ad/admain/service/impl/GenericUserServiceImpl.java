@@ -1,14 +1,15 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.dto.GenericUser;
 import com.ad.admain.repository.GenericUserRepository;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.GenericUserService;
+import com.ad.admain.to.GenericUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 
 /**
@@ -42,26 +43,34 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
     }
 
     @Override
-    public GenericUser save(GenericUser object) {
+    public Optional<GenericUser> save(GenericUser object) {
         return super.save(object);
     }
 
     @Override
     public int modifyUserPassword(String username, String password) {
-        String newPasword = passwordEncoder.encode(password);
-        return genericUserRepository.updateUserPassword(username,newPasword);
+        String newPasword=passwordEncoder.encode(password);
+        return genericUserRepository.updateUserPassword(username, newPasword);
     }
 
 
     @Override
-    public JpaRepository<GenericUser, String> getRepository() {
+    public GenericUserRepository getRepository() {
         return this.genericUserRepository;
     }
 
 
     @Override
-    public GenericUser getEmpty() {
-        return GenericUser.EMPTY_USER;
+    public int updateUserAvatar(String username, String avatarKey) {
+        return getRepository().updateUserAvatar(username, avatarKey);
     }
 
+    @Override
+    public Optional<String> getUserAvatar(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return Optional.empty();
+        }
+        Optional<GenericUser> user=getById(username);
+        return user.map(GenericUser::getAvatar);
+    }
 }
