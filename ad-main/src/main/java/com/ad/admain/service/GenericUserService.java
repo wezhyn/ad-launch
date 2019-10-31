@@ -11,7 +11,7 @@ import java.util.Optional;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface GenericUserService extends BaseService<GenericUser, String> {
+public interface GenericUserService extends BaseService<GenericUser, Integer> {
 
 
     /**
@@ -25,6 +25,8 @@ public interface GenericUserService extends BaseService<GenericUser, String> {
 
     int modifyUserPassword(String username, String password);
 
+    int modifyUserPasswordById(Integer id, String password);
+
     /**
      * 获取用户头像
      *
@@ -32,6 +34,8 @@ public interface GenericUserService extends BaseService<GenericUser, String> {
      * @return username：null | “” 返回Optional.empty()
      */
     Optional<String> getUserAvatar(String username);
+
+    Optional<GenericUser> getUserByUsername(String username);
 
     /**
      * 更新用户头像

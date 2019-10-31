@@ -23,7 +23,7 @@ import java.util.Optional;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class EasemobServiceImpl extends AbstractBaseService<EasemobUser, String> implements EasemobService {
+public class EasemobServiceImpl extends AbstractBaseService<EasemobUser, Integer> implements EasemobService {
 
 
     @Autowired
@@ -49,7 +49,7 @@ public class EasemobServiceImpl extends AbstractBaseService<EasemobUser, String>
     }
 
     @Override
-    public JpaRepository<EasemobUser, String> getRepository() {
+    public JpaRepository<EasemobUser, Integer> getRepository() {
         return easemobRepository;
     }
 

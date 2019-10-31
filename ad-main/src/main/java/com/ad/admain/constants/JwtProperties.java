@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : wezhyn
@@ -22,8 +23,12 @@ public class JwtProperties {
 
     private List<String> checkListExclusion;
 
-    private List<String > loginInterceptionInclude;
+    /**
+     * user: /api/login/user
+     * admin: /api/login/admin
+     */
+    private Map<String, String> loginInterceptionInclude;
 
-    private List<String > logoutInterception;
+    private List<String> logoutInterception;
 
 }

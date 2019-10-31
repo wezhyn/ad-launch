@@ -18,6 +18,7 @@ public enum AuthenticationEnum implements BaseEnum {
      */
     USER(5, "user"),
     CUSTOMER(10, "customer"),
+    PARTNER(12, "partner"),
     ADMIN(15, "admin"),
     DEVELOPER(20, "developer"),
     FINANCE(20, "finance");

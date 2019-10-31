@@ -40,12 +40,14 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
     protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         AdNamePasswordAuthenticationToken auth=(AdNamePasswordAuthenticationToken) authentication;
         UserDetails user=null;
+        String mark=MarkAntPathRequestMatcherExtractor.MARK_CACHE.get();
         for (AdUserDetailsService userDetailsService : userDetailsServices) {
-            if (userDetailsService.support(auth.getLoginUrl())) {
-                 user=userDetailsService.loadUserByUsername(username);
+            if (userDetailsService.support(mark==null ? "" : mark)) {
+                user=userDetailsService.loadUserByUsername(username);
                 this.preAuthenticationChecks.check(user);
             }
         }
+        MarkAntPathRequestMatcherExtractor.MARK_CACHE.remove();
         return user;
     }
 

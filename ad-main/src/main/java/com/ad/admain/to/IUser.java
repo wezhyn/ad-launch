@@ -15,13 +15,15 @@ import java.util.Collection;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface IUser extends IBaseTo<String > {
+public interface IUser extends IBaseTo<Integer> {
+
 
     /**
      * 获取用户账号
      *
      * @return userName
      */
+    @Override
     String getUsername();
 
     /**
@@ -89,9 +91,12 @@ public interface IUser extends IBaseTo<String > {
 
     /**
      * 用户权限
+     *
      * @return AuthenticationEnum
      */
     AuthenticationEnum getRoles();
+
+    String getStatus();
 
     /**
      * 获取用户的权限

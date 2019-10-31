@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author : wezhyn
@@ -20,9 +21,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserDto implements IBaseTo<String> {
+public class UserDto implements IBaseTo<Integer> {
 
 
+    private Integer id;
     private String username;
     private String nickname;
     private String realname;
@@ -34,16 +36,22 @@ public class UserDto implements IBaseTo<String> {
 
     private String avatar;
 
+    private String wechat;
+    private String intro;
     private String sex;
 
     private LocalDate birthDay;
+    private LocalDateTime regTime;
+    private LocalDateTime lastModified;
+    private String enable;
+    private boolean accountNonExpired;
+    private boolean credentialsNonExpired;
+    private boolean accountNonLocked;
+    private boolean certification;
+    private LocalDateTime loginTime;
 
     private String mobilePhone;
     private String email;
     private String roles;
 
-    @Override
-    public String getId() {
-        return getUsername();
-    }
 }

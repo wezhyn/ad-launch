@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 public class AdUserDetailServiceImpl implements AdUserDetailsService {
 
     private final GenericUserService genericUserService;
+    private final static String INTERCEPT_MARK="user";
 
     public AdUserDetailServiceImpl(GenericUserService genericUserService) {
         this.genericUserService=genericUserService;
@@ -31,7 +32,8 @@ public class AdUserDetailServiceImpl implements AdUserDetailsService {
         if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("无效的账户： " + username + "，请检查是否为空");
         }
-        IUser user=genericUserService.getById(username)
+//        IUser user=genericUserService.getById(username)
+        IUser user=genericUserService.getUserByUsername(username)
                 .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
 
         if (log.isDebugEnabled()) {
@@ -46,8 +48,8 @@ public class AdUserDetailServiceImpl implements AdUserDetailsService {
     }
 
     @Override
-    public boolean support(String url) {
-        return url!=null && url.startsWith("/api/user");
+    public boolean support(String mark) {
+        return INTERCEPT_MARK.equalsIgnoreCase(mark);
     }
 
 }

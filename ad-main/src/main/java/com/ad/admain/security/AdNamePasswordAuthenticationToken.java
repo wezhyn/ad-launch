@@ -1,5 +1,6 @@
 package com.ad.admain.security;
 
+import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -11,10 +12,12 @@ import java.util.Collection;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
+@Getter
 public class AdNamePasswordAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
 
     private String loginUrl;
+    private Integer id;
 
 /*
     /**********************************************************
@@ -22,8 +25,8 @@ public class AdNamePasswordAuthenticationToken extends UsernamePasswordAuthentic
     /**********************************************************
 */
 
-    public AdNamePasswordAuthenticationToken(String userName, String password,String url) {
-        super(userName,password);
+    public AdNamePasswordAuthenticationToken(String userName, String password, String url) {
+        super(userName, password);
         this.loginUrl=url;
     }
 
@@ -39,11 +42,4 @@ public class AdNamePasswordAuthenticationToken extends UsernamePasswordAuthentic
         return (String) getCredentials();
     }
 
-    public String getLoginUrl() {
-        return loginUrl;
-    }
-
-    public void setLoginUrl(String loginUrl) {
-        this.loginUrl=loginUrl;
-    }
 }

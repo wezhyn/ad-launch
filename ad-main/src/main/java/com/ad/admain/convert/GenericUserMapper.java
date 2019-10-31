@@ -27,7 +27,7 @@ public interface GenericUserMapper extends AbstractMapper<GenericUser, UserDto> 
     @Override
     @Mappings({
             @Mapping(source="nickName", target="nickname"),
-            @Mapping(source="realName", target="realname")
+            @Mapping(source="realName", target="realname"),
     })
     UserDto toDto(GenericUser genericUser);
 }

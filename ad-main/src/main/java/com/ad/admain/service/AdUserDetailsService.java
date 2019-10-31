@@ -1,5 +1,6 @@
 package com.ad.admain.service;
 
+import com.ad.admain.constants.JwtProperties;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -11,12 +12,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface AdUserDetailsService extends UserDetailsService {
 
     /**
-     * 拦截的 url
-     * @param url /api/user /api/admin
+     * mark: 为{@link JwtProperties#getLoginInterceptionInclude()}中的key
+     *
+     * @param mark 拦截标识
      * @return true
      */
-    boolean support(String url);
-
+    boolean support(String mark);
 
 
 }

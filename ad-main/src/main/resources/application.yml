@@ -45,8 +45,8 @@ custom:
     default-hours: 1
     remember-me-day: 1
     login-interception-include:
-      - /api/user/login
-      - /api/admin/login
+      user: /api/user/login
+      admin: /api/admin/login
     logout-interception:
       - /api/user/logout
       - /api/admin/logout

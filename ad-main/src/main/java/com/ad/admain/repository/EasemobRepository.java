@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Repository
-public interface EasemobRepository extends JpaRepository<EasemobUser, String> {
+public interface EasemobRepository extends JpaRepository<EasemobUser, Integer> {
 
 }

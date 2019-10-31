@@ -38,7 +38,7 @@ public class EasemobUserResponse {
                 easemobUsers.add(EasemobUser.builder()
                         .uuid(userEntity.getUuid())
                         .nickname(userEntity.getNickname())
-                        .easemobId(userEntity.getUsername())
+                        .easemobId(Integer.parseInt(userEntity.getUsername()))
                         .activated(userEntity.isActivated())
                         .modified(userEntity.getModified())
                         .created(userEntity.getCreated())

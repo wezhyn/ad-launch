@@ -4,8 +4,13 @@ import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,12 +23,18 @@ import java.util.Date;
  */
 @Data
 @Table(name="ad_admin")
+@Builder(builderClassName="Builder", builderMethodName="newBuilder")
+@AllArgsConstructor
 @Entity
 @DynamicUpdate
 public class Admin implements IAdmin {
 
-
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Integer id;
+
+    @UpdateIgnore
+    @Column(unique=true)
     private String username;
 
 
@@ -38,6 +49,7 @@ public class Admin implements IAdmin {
     private String avatar;
 
     @Enumerated(value=EnumType.STRING)
+    @ColumnDefault("'UNKNOWN'")
     private SexEnum sex;
 
     private String email;
@@ -46,107 +58,16 @@ public class Admin implements IAdmin {
     @Enumerated(value=EnumType.STRING)
     private AuthenticationEnum roles;
 
+    /**
+     * 认证时间？？
+     */
+    @Generated(value=GenerationTime.INSERT)
+    @Column(insertable=false, updatable=false)
+    @ColumnDefault("current_timestamp")
     private Date authTime;
+
     public Admin() {
     }
 
 
-    private Admin(Builder builder) {
-        setUsername(builder.username);
-        setNickName(builder.nickName);
-        setPassword(builder.password);
-        setIdCard(builder.idCard);
-        setAvatar(builder.avatar);
-        setSex(builder.sex);
-        setEmail(builder.email);
-        setRoles(builder.roles);
-        setAuthTime(builder.authTime);
-    }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-    public static Builder newBuilder(Admin copy) {
-        Builder builder=new Builder();
-        builder.username=copy.getUsername();
-        builder.nickName=copy.getNickName();
-        builder.password=copy.getPassword();
-        builder.idCard=copy.getIdCard();
-        builder.avatar=copy.getAvatar();
-        builder.sex=copy.getSex();
-        builder.email=copy.getEmail();
-        builder.roles=copy.getRoles();
-        builder.authTime=copy.getAuthTime();
-        return builder;
-    }
-
-    @Override
-    public String getId() {
-        return this.username;
-    }
-
-
-    public static final class Builder {
-        private String username;
-        private String nickName;
-        private String password;
-        private String idCard;
-        private String avatar;
-        private SexEnum sex;
-        private String email;
-        private AuthenticationEnum roles;
-        private Date authTime;
-
-        private Builder() {
-        }
-
-        public Builder id(String username) {
-            this.username=username;
-            return this;
-        }
-
-        public Builder nickName(String nickName) {
-            this.nickName=nickName;
-            return this;
-        }
-
-        public Builder password(String password) {
-            this.password=password;
-            return this;
-        }
-
-        public Builder idCard(String idCard) {
-            this.idCard=idCard;
-            return this;
-        }
-
-        public Builder avatar(String avatar) {
-            this.avatar=avatar;
-            return this;
-        }
-
-        public Builder sex(SexEnum sex) {
-            this.sex=sex;
-            return this;
-        }
-
-        public Builder email(String email) {
-            this.email=email;
-            return this;
-        }
-
-        public Builder roles(AuthenticationEnum roles) {
-            this.roles=roles;
-            return this;
-        }
-        public Builder authTime(Date authTime){
-            this.authTime = authTime;
-            return this;
-        }
-
-        public Admin build() {
-            return new Admin(this);
-        }
-    }
 }

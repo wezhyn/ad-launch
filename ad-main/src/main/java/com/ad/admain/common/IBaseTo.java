@@ -15,5 +15,12 @@ public interface IBaseTo<ID> {
      */
     ID getId();
 
+    /**
+     * 默认使用该值来查找用户/管理员，unique
+     *
+     * @return username
+     */
+    String getUsername();
+
 
 }

@@ -38,15 +38,12 @@ public class UserController {
         this.genericUserMapper=genericUserMapper;
     }
 
-    @PostMapping("/test")
-    public void updateTest(@RequestBody UserDto userDto) {
-        System.out.println(userDto.toString());
-    }
-
     @GetMapping("/getInfo")
     public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
-        Optional<GenericUser> user=genericUserService.getById(name);
+//        Optional<GenericUser> user=genericUserService.getById(name);
+        Optional<GenericUser> user=genericUserService.getUserByUsername(name);
+
         return user.map(u->SimpleResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
                 .orElse(SimpleResponseResult.failureResponseResult("获取用户信息失败"));
     }
@@ -68,7 +65,8 @@ public class UserController {
 //        默认结果为失败 result==-1
         int result=-1;
 
-        GenericUser genericUser=genericUserService.getById(username)
+//        GenericUser genericUser=genericUserService.getById(username)
+        GenericUser genericUser=genericUserService.getUserByUsername(username)
                 .orElseThrow(()->new UsernameNotFoundException("无该用户信息"));
         if (!genericUser.getPassword().equals(oldpwd)) {
             return ResponseResult.forFailureBuilder()
@@ -76,9 +74,8 @@ public class UserController {
                     .withCode(50000)
                     .build();
         }
-
         try {
-            result=genericUserService.modifyUserPassword(genericUser.getId(), newpwd);
+            result=genericUserService.modifyUserPassword(genericUser.getUsername(), newpwd);
             return ResponseResult.forSuccessBuilder()
                     .withMessage("修改密码成功")
                     .withCode(20000)
@@ -90,11 +87,10 @@ public class UserController {
                     .withCode(50000).build();
 
         }
-
-
     }
 
 
+    @PostMapping("/register")
     public ResponseResult register(@RequestBody UserDto userDto) {
         GenericUser requestUser=genericUserMapper.toTo(userDto);
         Optional<GenericUser> genericUser=genericUserService.save(requestUser);
@@ -117,7 +113,7 @@ public class UserController {
     @PostMapping("/delete")
     public ResponseResult deleteUser(@RequestBody UserDto userDto) {
         String username=userDto.getUsername();
-        genericUserService.delete(username);
+        genericUserService.delete(userDto.getId());
         return ResponseResult.forSuccessBuilder()
                 .withMessage("删除成功").build();
     }

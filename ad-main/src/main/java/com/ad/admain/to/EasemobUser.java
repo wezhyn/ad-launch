@@ -20,14 +20,14 @@ import javax.persistence.Table;
 @Table(name="ad_easemob_user")
 @Data
 @Builder
-public class EasemobUser implements IBaseTo<String> {
+public class EasemobUser implements IBaseTo<Integer> {
 
 
     /**
      * 账号 {@link IUser#getId()}
      */
     @Id
-    private String easemobId;
+    private Integer easemobId;
 
     private String uuid;
     private String created;
@@ -42,13 +42,18 @@ public class EasemobUser implements IBaseTo<String> {
     private String password;
 
     @Override
-    public String getId() {
+    public Integer getId() {
         return easemobId;
+    }
+
+    @Override
+    public String getUsername() {
+        return getId().toString();
     }
 
     public static User toRegisterUser(EasemobUser easemobUser) {
         return new User().password(easemobUser.getPassword())
-                .username(easemobUser.getId());
+                .username(easemobUser.getId().toString());
     }
 
 

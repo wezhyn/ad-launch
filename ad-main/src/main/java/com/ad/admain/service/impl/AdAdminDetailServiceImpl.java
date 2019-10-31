@@ -17,12 +17,15 @@ import java.util.Optional;
  * @author : wezhyn
  * @date : 2019/09/24
  * <p>
+ * 实现类
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Slf4j
 @Service
 public class AdAdminDetailServiceImpl implements AdUserDetailsService {
+    private final static String INTERCEPT_MARK="admin";
     private final AdminService adminService;
+
 
     public AdAdminDetailServiceImpl(AdminService adminService) {
         this.adminService=adminService;
@@ -33,7 +36,7 @@ public class AdAdminDetailServiceImpl implements AdUserDetailsService {
         if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("无效的账户： " + username + "，请检查是否为空");
         }
-        Optional<Admin> user=adminService.getById(username);
+        Optional<Admin> user=adminService.getByUsername(username);
         return user.map(this::createUser)
                 .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
     }
@@ -42,12 +45,12 @@ public class AdAdminDetailServiceImpl implements AdUserDetailsService {
         if (log.isDebugEnabled()) {
             log.debug("找到用户 : " + user);
         }
-        return new User(user.getId(), user.getPassword(), user.getAuthorities());
+        return new User(user.getUsername(), user.getPassword(), user.getAuthorities());
 
     }
 
     @Override
-    public boolean support(String url) {
-        return url!=null && url.startsWith("/api/admin");
+    public boolean support(String mark) {
+        return INTERCEPT_MARK.equalsIgnoreCase(mark);
     }
 }

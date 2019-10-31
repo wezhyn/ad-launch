@@ -4,8 +4,9 @@ import com.ad.admain.repository.AdminRepository;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.AdminService;
 import com.ad.admain.to.Admin;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * @author : wezhyn
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class AdminServiceImpl extends AbstractBaseService<Admin,String >implements AdminService {
+public class AdminServiceImpl extends AbstractBaseService<Admin, Integer> implements AdminService {
 
     private final AdminRepository adminRepository;
 
@@ -23,9 +24,12 @@ public class AdminServiceImpl extends AbstractBaseService<Admin,String >implemen
     }
 
     @Override
-    public JpaRepository<Admin, String> getRepository() {
+    public AdminRepository getRepository() {
         return adminRepository;
     }
 
-
+    @Override
+    public Optional<Admin> getByUsername(String s) {
+        return getRepository().findByUsername(s);
+    }
 }

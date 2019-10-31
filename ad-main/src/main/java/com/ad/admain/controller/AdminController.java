@@ -1,5 +1,6 @@
 package com.ad.admain.controller;
 
+import com.ad.admain.convert.AdminMapper;
 import com.ad.admain.dto.AdminDto;
 import com.ad.admain.service.AdminService;
 import com.ad.admain.to.Admin;
@@ -28,16 +29,19 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    public AdminController(AdminService adminService) {
+    private final AdminMapper adminMapper;
+
+    public AdminController(AdminService adminService, AdminMapper adminMapper) {
         this.adminService=adminService;
+        this.adminMapper=adminMapper;
     }
 
 
     @GetMapping("/getInfo")
     public SimpleResponseResult<AdminDto> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
-        Optional<Admin> admin=adminService.getById(name);
-        return admin.map(a->SimpleResponseResult.successResponseResult("", AdminDto.fromAdmin(a)))
+        Optional<Admin> admin=adminService.getByUsername(name);
+        return admin.map(a->SimpleResponseResult.successResponseResult("", adminMapper.toDto(a)))
                 .orElseGet(()->SimpleResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
@@ -46,14 +50,14 @@ public class AdminController {
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<Admin> admins=adminService.getList(pageable);
         return ResponseResult.forSuccessBuilder()
-                .withData("items", AdminDto.fromUserList(admins.getContent()))
+                .withData("items", adminMapper.toDtoList(admins.getContent()))
                 .withData("total", admins.getTotalElements())
                 .build();
     }
 
     @PostMapping("/register")
     public ResponseResult register(@RequestBody AdminDto adminDto) {
-        Admin requestAdmin=adminDto.toAdmin();
+        Admin requestAdmin=adminMapper.toTo(adminDto);
         Optional<Admin> savedAdmin=adminService.save(requestAdmin);
         return savedAdmin.map(a->ResponseResult.forSuccessBuilder().withMessage("注册成功").build())
                 .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
@@ -61,11 +65,11 @@ public class AdminController {
 
     @PostMapping("/edit")
     public ResponseResult editUser(@RequestBody AdminDto adminDto) {
-        Admin oldUser=adminDto.toAdmin();
-        Optional<Admin> newUser=adminService.save(oldUser);
+        Admin oldUser=adminMapper.toTo(adminDto);
+        Optional<Admin> newUser=adminService.update(oldUser);
         return newUser.map(a->ResponseResult.forSuccessBuilder()
                 .withMessage("修改成功")
-                .withData("newUser", AdminDto.fromAdmin(newUser.get()))
+                .withData("newUser", adminMapper.toDto(newUser.get()))
                 .build())
                 .orElse(ResponseResult.forFailureBuilder()
                         .withMessage("修改失败").build());
@@ -73,7 +77,7 @@ public class AdminController {
 
     @PostMapping("/delete")
     public ResponseResult deleteUser(@RequestBody AdminDto adminDto) {
-        String id=adminDto.getId();
+        Integer id=adminDto.getId();
         adminService.delete(id);
         return ResponseResult.forSuccessBuilder()
                 .withMessage("删除成功").build();

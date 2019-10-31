@@ -1,8 +1,8 @@
 package com.ad.admain.service;
 
-import com.ad.admain.to.GenericUser;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
+import com.ad.admain.to.GenericUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class GenericUserServiceTest {
 
     @Test
     public void getGenericUser() {
-        Optional<GenericUser> genericUser=genericUserService.getById("zhaoo");
+        Optional<GenericUser> genericUser=genericUserService.getUserByUsername("zhao");
         System.out.println(genericUser.get());
     }
 }

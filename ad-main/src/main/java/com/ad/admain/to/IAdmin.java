@@ -14,12 +14,13 @@ import java.util.Collection;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface IAdmin extends IBaseTo<String > {
+public interface IAdmin extends IBaseTo<Integer> {
 
 
 
     /**
      * 昵称
+     *
      * @return nickName
      */
     String getNickName();
@@ -27,6 +28,7 @@ public interface IAdmin extends IBaseTo<String > {
 
     /**
      * id card
+     *
      * @return 身份证
      */
     String getIdCard();
@@ -47,15 +49,18 @@ public interface IAdmin extends IBaseTo<String > {
 
     /**
      * 头像
+     *
      * @return {@link IFileUpload#getRelativeName()}
      */
     String getAvatar();
 
     /**
      * 用户权限
+     *
      * @return AuthenticationEnum
      */
     AuthenticationEnum getRoles();
+
     /**
      * 获取用户的权限
      *

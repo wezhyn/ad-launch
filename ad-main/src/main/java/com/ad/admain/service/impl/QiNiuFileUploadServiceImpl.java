@@ -61,7 +61,6 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
 
     @Override
     public IFileUpload modifyAvatarImg(MultipartFile multipartFile) throws FileUploadException {
-//        todo: 使用注解保护该方法，使得认证用户才能访问
         String userName=SecurityContextHolder.getContext().getAuthentication().getName();
 //        读取历史头像地址
         String avatarName=genericUserService.getUserAvatar(userName).orElse("");

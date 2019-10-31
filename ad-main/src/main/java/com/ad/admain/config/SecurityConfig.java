@@ -34,6 +34,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : wezhyn
@@ -75,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        List<String> matchs=jwtProperties.getLoginInterceptionInclude();
+        Map<String, String> matchs=jwtProperties.getLoginInterceptionInclude();
         AdUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter=createUserNamePasswordAuthenticationFilter(
                 matchs, authenticationManager(), usernamePasswordConverts,
                 loginAuthenticationFailureHandler,
@@ -140,7 +141,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @return filter
      */
     public AdUsernamePasswordAuthenticationFilter createUserNamePasswordAuthenticationFilter(
-            List<String> matchs,
+            Map<String, String> matchs,
             AuthenticationManager authenticationManager,
             List<IUsernamePasswordConvert> usernamePasswordConverts,
             LoginAuthenticationFailureHandler failureHandler,

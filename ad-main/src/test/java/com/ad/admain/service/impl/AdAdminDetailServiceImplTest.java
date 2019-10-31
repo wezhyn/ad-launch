@@ -26,11 +26,10 @@ public class AdAdminDetailServiceImplTest {
     private AdminService adminService;
 
 
-
     @Test
     public void create() {
         Admin admin=Admin.newBuilder()
-                .id("zhaoo")
+                .username("zhaoo")
                 .password(passwordEncoder.encode("zhaoo"))
                 .roles(AuthenticationEnum.DEVELOPER)
                 .nickName("兆儿子")
@@ -39,6 +38,7 @@ public class AdAdminDetailServiceImplTest {
         adminService.save(admin);
 
     }
+
     @Test
     public void encode() {
         String str=passwordEncoder.encode("zhaoo");

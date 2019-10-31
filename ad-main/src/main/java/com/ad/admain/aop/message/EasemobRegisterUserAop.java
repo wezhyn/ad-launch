@@ -6,9 +6,7 @@ import com.ad.admain.to.GenericUser;
 import com.ad.admain.to.IUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
@@ -20,8 +18,10 @@ import java.util.Optional;
  * 用于在用户注册后，向环信注册用户
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
+/*
 @Aspect
 @Component
+*/
 public class EasemobRegisterUserAop {
 
     private final EasemobService easemobService;

@@ -10,7 +10,7 @@ import java.util.Optional;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public interface EasemobService extends MessageService, BaseService<EasemobUser, String> {
+public interface EasemobService extends MessageService, BaseService<EasemobUser, Integer> {
 
     /**
      * 向环信注册用户，并保存到数据库

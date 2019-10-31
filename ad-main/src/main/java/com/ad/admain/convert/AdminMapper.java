@@ -3,7 +3,6 @@ package com.ad.admain.convert;
 import com.ad.admain.dto.AdminDto;
 import com.ad.admain.to.Admin;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 
@@ -26,7 +25,6 @@ public interface AdminMapper extends AbstractMapper<Admin, AdminDto> {
      */
     @Override
     @Mappings({
-            @Mapping(source="username", target="id")
     })
     AdminDto toDto(Admin admin);
 }

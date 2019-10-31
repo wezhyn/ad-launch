@@ -20,7 +20,7 @@ import java.util.Optional;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, String> implements GenericUserService {
+public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Integer> implements GenericUserService {
 
     private final GenericUserRepository genericUserRepository;
     @Autowired
@@ -53,6 +53,11 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
         return genericUserRepository.updateUserPassword(username, newPasword);
     }
 
+    @Override
+    public int modifyUserPasswordById(Integer id, String password) {
+        String newPasword=passwordEncoder.encode(password);
+        return genericUserRepository.updateUserPassword(id, newPasword);
+    }
 
     @Override
     public GenericUserRepository getRepository() {
@@ -66,11 +71,16 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Str
     }
 
     @Override
+    public Optional<GenericUser> getUserByUsername(String username) {
+        return getRepository().findGenericUserByUsername(username);
+    }
+
+    @Override
     public Optional<String> getUserAvatar(String username) {
         if (StringUtils.isEmpty(username)) {
             return Optional.empty();
         }
-        Optional<GenericUser> user=getById(username);
+        Optional<GenericUser> user=getRepository().findGenericUserByUsername(username);
         return user.map(GenericUser::getAvatar);
     }
 }
