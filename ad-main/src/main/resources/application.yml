@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
   address: 0.0.0.0
 
 
@@ -35,14 +35,14 @@ custom:
   qn:
     access-key: w8q1azRK1pjyjs0Fp-pDEBmhODVOOzL-PbDJTODU
     secret-key: 4lHcLBv6Ywirb0ATkQ62ZnxtC_ONhRyF68Xb-xhG
-    bucket-name: wezhyn-pic
-    host-name: http://py63aayws.bkt.clouddn.com
+    bucket-name: qiniu
+    host-name: http://qiniu.izhaoo.com
   jwt:
     check-list-exclusion:
       - /api/error
       - /api/test
     check-header: X-Token
-    default-hours: 1
+    default-hours: 10
     remember-me-day: 1
     login-interception-include:
       user: /api/user/login

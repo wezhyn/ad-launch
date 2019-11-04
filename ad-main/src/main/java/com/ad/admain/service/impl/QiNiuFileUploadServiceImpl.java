@@ -97,7 +97,6 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
      * @param oldFileUpload 旧文件信息
      * @return fileUpload
      * @throws FileUploadException 异常
-     *
      */
     private IFileUpload upload(MultipartFile multipartFile, IFileUpload oldFileUpload) throws FileUploadException {
 
@@ -108,11 +107,12 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
         putPolicy.put("forceSaveKey", true);
         putPolicy.put("saveKey", "$(year)/$(mon)/$(day) $(hour):$(min):$(sec)&$(endUser)&$(fname)");
         putPolicy.put("endUser", name);
+//        基于时间戳作为名字
         if (oldFileUpload!=null) {
             key=oldFileUpload.getRelativeName();
-            defaultUploadToken=auth.uploadToken(bucketName, key, 0L, putPolicy);
+            defaultUploadToken=auth.uploadToken(bucketName, key);
         } else {
-            defaultUploadToken=auth.uploadToken(bucketName);
+            defaultUploadToken=auth.uploadToken(bucketName, key, 0L, putPolicy);
         }
         IFileUpload iFileUpload=null;
         try {

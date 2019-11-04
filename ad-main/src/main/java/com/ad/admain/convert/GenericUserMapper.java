@@ -1,10 +1,12 @@
 package com.ad.admain.convert;
 
+import com.ad.admain.constants.QiNiuProperties;
 import com.ad.admain.dto.UserDto;
 import com.ad.admain.to.GenericUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author wezhyn
@@ -16,7 +18,10 @@ import org.mapstruct.Mappings;
 @Mapper(
         config=CentralMapperConfig.class,
         uses={})
-public interface GenericUserMapper extends AbstractMapper<GenericUser, UserDto> {
+public abstract class GenericUserMapper implements AbstractMapper<GenericUser, UserDto> {
+
+    @Autowired
+    protected QiNiuProperties qiNiuProperties;
 
     /**
      * 实现 to -> dto 的转变
@@ -28,6 +33,10 @@ public interface GenericUserMapper extends AbstractMapper<GenericUser, UserDto> 
     @Mappings({
             @Mapping(source="nickName", target="nickname"),
             @Mapping(source="realName", target="realname"),
+            @Mapping(source="birthDay", target="birthday"),
+            @Mapping(source="sex", target="gender"),
+            @Mapping(target="avatar",
+                    expression="java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )")
     })
-    UserDto toDto(GenericUser genericUser);
+    public abstract UserDto toDto(GenericUser genericUser);
 }

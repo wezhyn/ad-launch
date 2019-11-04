@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
 /*
  *
  * @author ZLB_KAM
@@ -19,9 +19,20 @@ import static org.junit.Assert.*;
 public class GenericUserServiceImplTest {
     @Autowired
     GenericUserService genericUserService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Test
+    public void updatePassword() {
+        String password="wezhyn";
+        String username=password;
+        genericUserService.modifyUserPassword(username, passwordEncoder.encode(password));
+
+    }
+
     @Test
     public void modifyUserPassword() {
-        int  i = genericUserService.modifyUserPassword("wezhyn","fuck");
+        int i=genericUserService.modifyUserPassword("wezhyn", "fuck");
         System.out.println(i);
     }
 }

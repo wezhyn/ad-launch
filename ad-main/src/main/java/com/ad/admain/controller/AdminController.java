@@ -37,7 +37,7 @@ public class AdminController {
     }
 
 
-    @GetMapping("/getInfo")
+    @GetMapping("/info")
     public SimpleResponseResult<AdminDto> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
         Optional<Admin> admin=adminService.getByUsername(name);
@@ -45,7 +45,7 @@ public class AdminController {
                 .orElseGet(()->SimpleResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
-    @GetMapping("/getList")
+    @GetMapping("/list")
     public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<Admin> admins=adminService.getList(pageable);
@@ -55,7 +55,7 @@ public class AdminController {
                 .build();
     }
 
-    @PostMapping("/register")
+    @PostMapping("/create")
     public ResponseResult register(@RequestBody AdminDto adminDto) {
         Admin requestAdmin=adminMapper.toTo(adminDto);
         Optional<Admin> savedAdmin=adminService.save(requestAdmin);
@@ -63,7 +63,7 @@ public class AdminController {
                 .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
     }
 
-    @PostMapping("/edit")
+    @PostMapping("/update")
     public ResponseResult editUser(@RequestBody AdminDto adminDto) {
         Admin oldUser=adminMapper.toTo(adminDto);
         Optional<Admin> newUser=adminService.update(oldUser);

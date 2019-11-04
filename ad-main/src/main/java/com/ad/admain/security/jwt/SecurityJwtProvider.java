@@ -23,10 +23,10 @@ import java.util.Random;
 /**
  * 提供 jwt的生成和解析
  * 默认jwt字段：
- *      过期时间
- *      签发时间
- *      id：{@link IUser#getUsername()}
- *      auth: 权限信息
+ * 过期时间
+ * 签发时间
+ * id：{@link IUser#getUsername()}
+ * auth: 权限信息
  *
  * @author : wezhyn
  * @date : 2019/09/20
@@ -90,31 +90,32 @@ public class SecurityJwtProvider {
 
     /**
      * 创建 jwt 密钥 Key
+     *
      * @param username 账户
-     * @param secret 密钥 为空时创建 key
+     * @param secret   密钥 为空时创建 key
      * @return Key
      */
-    private  Key createOrGetKey(String username,String secret) {
+    public Key createOrGetKey(String username, String secret) {
         if (secret==null) {
             secret=getRandomString(50);
-            jwtDetailService.saveSecretByUsername(username,secret);
+            jwtDetailService.saveSecretByUsername(username, secret);
         }
         byte[] encodeKey=Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(encodeKey);
     }
 
-    public static String getRandomString(int length){
+    public static String getRandomString(int length) {
         String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random=new Random();
         StringBuilder sb=new StringBuilder();
-        for(int i=0;i<length;i++){
+        for (int i=0; i < length; i++) {
             int number=random.nextInt(62);
             sb.append(str.charAt(number));
         }
         return sb.toString();
     }
 
-    public  Claims validateToken(String jwt) {
+    public Claims validateToken(String jwt) {
         Claims claims=null;
         String errMsg=null;
         boolean isError=false;

@@ -11,7 +11,7 @@ public enum ImgBedType implements StringEnum {
     /**
      * 图床类型
      */
-    GUIDE("guide"), SHUFFING("shuffing");
+    GUIDE("guide"), SHUFFING("shuffing"), AVATAR("avatar");
 
     private String value;
 

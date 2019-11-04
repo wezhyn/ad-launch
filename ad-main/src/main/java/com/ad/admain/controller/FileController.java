@@ -96,21 +96,15 @@ public class FileController {
                 throw new IllegalStateException("Unexpected value: " + type);
         }
         Optional<ImgBed> bed=imgBedService.save(imgBed);
+        final IFileUpload savedBed=fileUpload;
         return bed.map(b->ResponseResult.forSuccessBuilder()
-                .withMessage("上传：" + type.getValue() + " 成功").build())
+                .withMessage("上传：" + type.getValue() + " 成功")
+                .withData("address", qiNiuProperties.getHostName() + "/" + savedBed.getRelativeName())
+                .withData("host", qiNiuProperties.getHostName())
+                .withData("relativeAddress", savedBed.getRelativeName()).build())
                 .orElse(ResponseResult.forFailureBuilder()
                         .withMessage("上传: " + type.getValue() + "失败").build());
 
-    }
-
-    @PostMapping("/test/upload")
-    public ResponseResult simpleFailureResponseResult(@RequestParam(value="file") MultipartFile multipartFile) throws FileUploadException {
-        IFileUpload fileUpload=fileUploadService.uploadFile(multipartFile);
-        return ResponseResult.forSuccessBuilder()
-                .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
-                .withData("host", qiNiuProperties.getHostName())
-                .withData("relativeAddress", fileUpload.getRelativeName())
-                .build();
     }
 
     @ExceptionHandler(value={FileUploadException.class})

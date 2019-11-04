@@ -33,7 +33,16 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-
+        if (authentication.getCredentials()==null) {
+            this.logger.debug("Authentication failed: no credentials provided");
+            throw new AdUsernamePasswordException("密码错误");
+        } else {
+            String presentedPassword=authentication.getCredentials().toString();
+            if (!this.passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
+                this.logger.debug("Authentication failed: password does not match stored value");
+                throw new AdUsernamePasswordException("密码错误");
+            }
+        }
     }
 
     @Override
@@ -54,19 +63,6 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
     @Override
     public boolean supports(Class<?> authentication) {
         return AdNamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
-    }
-
-    protected void additionalAuthenticationChecks(UserDetails userDetails, AdNamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        if (authentication.getCredentials()==null) {
-            this.logger.debug("Authentication failed: no credentials provided");
-            throw new AdUsernamePasswordException("密码错误");
-        } else {
-            String presentedPassword=authentication.getCredentials().toString();
-            if (!this.passwordEncoder.matches(presentedPassword, userDetails.getPassword())) {
-                this.logger.debug("Authentication failed: password does not match stored value");
-                throw new AdUsernamePasswordException("密码错误");
-            }
-        }
     }
 
     private class DefaultPreAuthenticationChecks implements UserDetailsChecker {

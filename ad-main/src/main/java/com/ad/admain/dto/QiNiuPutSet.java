@@ -1,5 +1,6 @@
 package com.ad.admain.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,11 +12,16 @@ import lombok.Data;
  */
 @Data
 @Builder
+@AllArgsConstructor
 public class QiNiuPutSet implements IFileUpload {
     private String key;
     private String hash;
     private String bucket;
     private long fsize;
+
+    public QiNiuPutSet(String key) {
+        this.key=key;
+    }
 
     @Override
     public String getRelativeName() {

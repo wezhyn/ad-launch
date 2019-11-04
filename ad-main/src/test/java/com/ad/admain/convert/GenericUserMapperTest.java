@@ -34,8 +34,8 @@ public class GenericUserMapperTest {
                 .password("123123")
                 .avatar(null)
                 .roles(AuthenticationEnum.CUSTOMER.getValue())
-                .sex("MALE")
-                .birthDay(LocalDate.now())
+                .gender("MALE")
+                .birthday(LocalDate.now())
                 .email("sss@vip.com")
                 .idCard("1")
                 .mobilePhone("1")
@@ -73,7 +73,7 @@ public class GenericUserMapperTest {
         UserDto target=new UserDto();
         target.setUsername("wezhyn111");
         target.setRealname("dzj");
-        target.setSex(SexEnum.FEMALE.getValue());
+        target.setGender(SexEnum.FEMALE.getValue());
         target.setPassword("passsword");
         target.setMobilePhone("123123123");
         target.setAvatar("avatar");

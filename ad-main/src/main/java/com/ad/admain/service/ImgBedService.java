@@ -14,6 +14,14 @@ import org.springframework.data.domain.Pageable;
 public interface ImgBedService extends BaseService<ImgBed, Integer> {
 
 
+    /**
+     * 获取图床list
+     *
+     * @param imgBedType type
+     * @param pageable   分页
+     * @return list
+     */
     Page<ImgBed> getImgBedListByType(ImgBedType imgBedType, Pageable pageable);
+
 
 }

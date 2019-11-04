@@ -17,6 +17,7 @@ public class UserControllerTest extends BaseControllerTest {
     private PasswordEncoder passwordEncoder;
 
 
+
     @Test
     public void register() throws Exception {
         UserDto genericUser=UserDto.builder()
@@ -24,7 +25,7 @@ public class UserControllerTest extends BaseControllerTest {
                 .password("111111")
                 .roles("customer")
                 .avatar("123")
-                .sex("male")
+                .gender("male")
                 .build();
         System.out.println(objectMapper.writeValueAsString(genericUser));
 //        mockMvc.perform(post("/api/user/register")

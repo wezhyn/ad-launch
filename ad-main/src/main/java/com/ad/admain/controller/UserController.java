@@ -4,8 +4,10 @@ import com.ad.admain.convert.GenericUserMapper;
 import com.ad.admain.dto.UserDto;
 import com.ad.admain.service.GenericUserService;
 import com.ad.admain.to.GenericUser;
+import com.ad.admain.to.PasswordModifyWrap;
 import com.ad.admain.to.ResponseResult;
 import com.ad.admain.to.SimpleResponseResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -31,6 +34,8 @@ public class UserController {
 
     private final GenericUserService genericUserService;
     private final GenericUserMapper genericUserMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public UserController(GenericUserService genericUserService, GenericUserMapper genericUserMapper) {
@@ -38,17 +43,16 @@ public class UserController {
         this.genericUserMapper=genericUserMapper;
     }
 
-    @GetMapping("/getInfo")
+    @GetMapping("/info")
     public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
 //        Optional<GenericUser> user=genericUserService.getById(name);
         Optional<GenericUser> user=genericUserService.getUserByUsername(name);
-
         return user.map(u->SimpleResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
                 .orElse(SimpleResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
-    @GetMapping("/getList")
+    @GetMapping("/list")
     public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<GenericUser> genericUsers=genericUserService.getList(pageable);
@@ -59,23 +63,29 @@ public class UserController {
     }
 
     @PostMapping("/password")
-    public ResponseResult editPassword(@RequestParam("username") String username,
-                                       @RequestParam("oldpwd") String oldpwd,
-                                       @RequestParam("newpwd") String newpwd) {
+    public ResponseResult editPassword(
+            @RequestBody PasswordModifyWrap passwordModifyWrap) {
 //        默认结果为失败 result==-1
+        Integer id=passwordModifyWrap.getId();
+        String newPwd=passwordModifyWrap.getNewPwd();
+        String oldPwd=passwordModifyWrap.getOldPwd();
+/*
+        if (!Objects.equals(newPwd, againPwd)) {
+            throw new IllegalArgumentException("二次密码不一样");
+        }
+*/
         int result=-1;
-
-//        GenericUser genericUser=genericUserService.getById(username)
-        GenericUser genericUser=genericUserService.getUserByUsername(username)
+        GenericUser genericUser=genericUserService.getById(id)
+//        GenericUser genericUser=genericUserService.getUserByUsername(username)
                 .orElseThrow(()->new UsernameNotFoundException("无该用户信息"));
-        if (!genericUser.getPassword().equals(oldpwd)) {
+        if (!passwordEncoder.matches(oldPwd, genericUser.getPassword())) {
             return ResponseResult.forFailureBuilder()
                     .withMessage("旧密码错误")
                     .withCode(50000)
                     .build();
         }
         try {
-            result=genericUserService.modifyUserPassword(genericUser.getUsername(), newpwd);
+            result=genericUserService.modifyUserPassword(genericUser.getUsername(), newPwd);
             return ResponseResult.forSuccessBuilder()
                     .withMessage("修改密码成功")
                     .withCode(20000)
@@ -90,15 +100,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/register")
-    public ResponseResult register(@RequestBody UserDto userDto) {
-        GenericUser requestUser=genericUserMapper.toTo(userDto);
-        Optional<GenericUser> genericUser=genericUserService.save(requestUser);
-        return genericUser.map(u->ResponseResult.forSuccessBuilder().withMessage("注册成功").build())
-                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
-    }
-
-    @PostMapping("/edit")
+    @PostMapping("/update")
     public ResponseResult editUser(@RequestBody UserDto userDto) {
         GenericUser targetUser=genericUserMapper.toTo(userDto);
         Optional<GenericUser> newUser=genericUserService.update(targetUser);

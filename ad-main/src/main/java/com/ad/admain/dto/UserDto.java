@@ -38,9 +38,9 @@ public class UserDto implements IBaseTo<Integer> {
 
     private String wechat;
     private String intro;
-    private String sex;
+    private String gender;
 
-    private LocalDate birthDay;
+    private LocalDate birthday;
     private LocalDateTime regTime;
     private LocalDateTime lastModified;
     private String enable;
