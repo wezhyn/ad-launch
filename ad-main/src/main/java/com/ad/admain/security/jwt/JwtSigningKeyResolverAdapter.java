@@ -1,6 +1,5 @@
 package com.ad.admain.security.jwt;
 
-import com.ad.admain.service.JwtDetailService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.SigningKeyResolverAdapter;
@@ -13,8 +12,9 @@ import java.security.Key;
 
 /**
  * 首先从 jwt头部中获取当前用户信息，再通过
- * {@link com.ad.admain.service.JwtDetailService#loadSecretByUsername(String)}
+ * {@link JwtDetailService#loadSecretByUsername(String)}
  * 加载密钥
+ *
  * @author : wezhyn
  * @date : 2019/09/20
  */
@@ -28,9 +28,9 @@ public class JwtSigningKeyResolverAdapter extends SigningKeyResolverAdapter {
 
     @Override
     public Key resolveSigningKey(JwsHeader header, Claims claims) {
-//        当前 id 必须为 {Iuser@getUsername}
-        String username=claims.getId();
-        String secret=jwtDetailService.loadSecretByUsername(username);
+//        当前 id 必须为 {Iuser@getId}
+        Integer id=Integer.valueOf(claims.getId());
+        String secret=jwtDetailService.loadSecretById(id);
         if (StringUtils.isEmpty(secret)) {
             throw new UsernameNotFoundException("无法找到对应账户信息");
         }

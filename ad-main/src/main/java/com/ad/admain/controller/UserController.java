@@ -2,6 +2,7 @@ package com.ad.admain.controller;
 
 import com.ad.admain.convert.GenericUserMapper;
 import com.ad.admain.dto.UserDto;
+import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.service.GenericUserService;
 import com.ad.admain.to.GenericUser;
 import com.ad.admain.to.PasswordModifyWrap;
@@ -44,7 +45,7 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal Authentication authentication) {
+    public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal AdAuthentication authentication) {
         String name=authentication.getName();
 //        Optional<GenericUser> user=genericUserService.getById(name);
         Optional<GenericUser> user=genericUserService.getUserByUsername(name);
@@ -64,6 +65,7 @@ public class UserController {
 
     @PostMapping("/password")
     public ResponseResult editPassword(
+            @AuthenticationPrincipal Authentication authentication,
             @RequestBody PasswordModifyWrap passwordModifyWrap) {
 //        默认结果为失败 result==-1
         Integer id=passwordModifyWrap.getId();
@@ -85,7 +87,7 @@ public class UserController {
                     .build();
         }
         try {
-            result=genericUserService.modifyUserPassword(genericUser.getUsername(), newPwd);
+            result=genericUserService.modifyUserPasswordById(id, authentication.getName(), newPwd);
             return ResponseResult.forSuccessBuilder()
                     .withMessage("修改密码成功")
                     .withCode(20000)

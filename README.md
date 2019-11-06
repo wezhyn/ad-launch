@@ -1,18 +1,20 @@
 ## AD
 > 闸种开发小组出品：闸种广告投放
 
-### 新增
-* 使用mapStruct 映射 to <-> dto
+### 代办
+jpa 默认值无效
 
-### 修改
-* to: 对 mysql 端数据对象的映射
-* dto: 对前台传送数据的映射
-* 使用
+### 新增
+* 在Controller中使用 `@AuthenticationPrincipal AdAuthentication authentication`
+代替 `@AuthenticationPrincipal Authentication authentication`,
+`authentication.getName()` 返回当前用户名，`authentication.getId` 返回用户自增Id
+
 
 
 ### 旧
 
-/api/file/avatar
+* /api/file/avatar
+* 使用[mapStruct](https://mapstruct.org/documentation/stable/reference/html/#defining-mapper) 映射 to <-> dto
 
 ### 启动
 #### 环境准备

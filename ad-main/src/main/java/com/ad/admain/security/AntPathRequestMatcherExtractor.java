@@ -1,4 +1,4 @@
-package com.ad.admain.security.filter;
+package com.ad.admain.security;
 
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.Assert;

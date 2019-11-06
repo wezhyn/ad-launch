@@ -1,6 +1,6 @@
 package com.ad.admain.security;
 
-import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.security.jwt.JwtDetailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,11 +32,12 @@ public class LogoutAuthenticationSuccessHandler implements LogoutSuccessHandler 
                 "    \"code\": 20000\n" +
                 "}";
         try (PrintWriter printWriter=response.getWriter()) {
-            String name=authentication.getName();
-            jwtDetailService.deleteSecretByUsername(name);
+//            String name=authentication.getName();
+            Integer id=((AdAuthentication) authentication).getId();
+            jwtDetailService.deleteSecretByUsername(id);
             printWriter.write(result);
             response.flushBuffer();
-            SecurityContext context = SecurityContextHolder.getContext();
+            SecurityContext context=SecurityContextHolder.getContext();
             context.setAuthentication(null);
 
         }

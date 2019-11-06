@@ -26,13 +26,8 @@ public class GenericUserServiceImplTest {
     public void updatePassword() {
         String password="wezhyn";
         String username=password;
-        genericUserService.modifyUserPassword(username, passwordEncoder.encode(password));
+        genericUserService.modifyUserPasswordById(2, username, passwordEncoder.encode(password));
 
     }
 
-    @Test
-    public void modifyUserPassword() {
-        int i=genericUserService.modifyUserPassword("wezhyn", "fuck");
-        System.out.println(i);
-    }
 }

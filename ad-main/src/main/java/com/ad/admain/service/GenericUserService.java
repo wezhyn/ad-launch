@@ -23,9 +23,8 @@ public interface GenericUserService extends BaseService<GenericUser, Integer> {
      */
     int modifyUserAvatar(String username, String avatar);
 
-    int modifyUserPassword(String username, String password);
 
-    int modifyUserPasswordById(Integer id, String password);
+    int modifyUserPasswordById(Integer id, String username, String password);
 
     /**
      * 获取用户头像
