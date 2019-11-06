@@ -31,7 +31,6 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     private JwtDetailService jwtDetailService;
 
     @Autowired
-
     public GenericUserServiceImpl(GenericUserRepository genericUserRepository) {
         this.genericUserRepository=genericUserRepository;
     }

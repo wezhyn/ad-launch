@@ -2,7 +2,7 @@
 custom:
   mysql:
     address: ad_mysql
-    password: 123123
+    password: root
     port: 3306
     database: ad
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true
