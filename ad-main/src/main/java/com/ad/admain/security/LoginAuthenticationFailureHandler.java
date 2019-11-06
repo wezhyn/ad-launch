@@ -15,11 +15,12 @@ import java.io.IOException;
  * @author : wezhyn
  * @date : 2019/09/19
  */
-public class LoginAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class LoginAuthenticationFailureHandler implements AuthenticationFailureHandler, LoginAuthenticationCleanHandler {
     private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
+        clean();
         String errMsg=exception.getMessage();
         exception.printStackTrace();
         ResponseResult responseResult=ResponseResult
@@ -30,5 +31,10 @@ public class LoginAuthenticationFailureHandler implements AuthenticationFailureH
 
     public LoginAuthenticationFailureHandler(ObjectMapper objectMapper) {
         this.objectMapper=objectMapper;
+    }
+
+    @Override
+    public void clean() {
+        MarkAntPathRequestMatcherExtractor.removeThreadLocal();
     }
 }

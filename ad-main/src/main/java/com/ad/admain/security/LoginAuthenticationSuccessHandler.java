@@ -16,29 +16,35 @@ import java.io.PrintWriter;
  * @author : wezhyn
  * @date : 2019/09/19
  */
-public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler, LoginAuthenticationCleanHandler {
     private SecurityJwtProvider securityJwtProvider;
 
     private ObjectMapper objectMapper;
-    public LoginAuthenticationSuccessHandler(SecurityJwtProvider securityJwtProvider,ObjectMapper objectMapper) {
+
+    public LoginAuthenticationSuccessHandler(SecurityJwtProvider securityJwtProvider, ObjectMapper objectMapper) {
         this.securityJwtProvider=securityJwtProvider;
         this.objectMapper=objectMapper;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        clean();
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        PrintWriter printWriter=response.getWriter();
         String token=securityJwtProvider.createToken(authentication, false, authentication.getName());
         ResponseResult result=ResponseResult.forSuccessBuilder()
                 .withData("token", token).build();
-        write(result,request,response);
+        write(result, request, response);
     }
 
-    private  void write(ResponseResult result,HttpServletRequest request,HttpServletResponse response) throws IOException {
+    private void write(ResponseResult result, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String r=objectMapper.writeValueAsString(result);
-        try(PrintWriter printWriter=response.getWriter()) {
+        try (PrintWriter printWriter=response.getWriter()) {
             printWriter.write(r);
         }
+    }
+
+    @Override
+    public void clean() {
+        MarkAntPathRequestMatcherExtractor.removeThreadLocal();
     }
 }

@@ -2,10 +2,10 @@ package com.ad.admain.security.jwt;
 
 import com.ad.admain.constants.JwtProperties;
 import com.ad.admain.exception.JwtParseException;
-import com.ad.admain.security.AdNamePasswordAuthenticationToken;
-import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.to.IUser;
 import com.ad.admain.utils.RoleAuthenticationUtils;
+import com.ad.admain.utils.StringUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.io.Decoders;
@@ -18,14 +18,17 @@ import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Random;
+
+import static com.ad.admain.utils.StringUtils.getRandomString;
 
 /**
+ * 系统中只支持 AdNamePasswordAuthenticationToken
  * 提供 jwt的生成和解析
  * 默认jwt字段：
  * 过期时间
  * 签发时间
- * id：{@link IUser#getUsername()}
+ * username：{@link IUser#getUsername()}
+ * id: {@link IUser#getId()}
  * auth: 权限信息
  *
  * @author : wezhyn
@@ -58,31 +61,36 @@ public class SecurityJwtProvider {
     public Authentication getAuthentication(String jwt) {
         Claims claims=validateToken(jwt);
         String authority=(String) claims.get("auth");
+        Integer id=Integer.valueOf(claims.getId());
+        String username=(String) claims.get("username");
         Collection<? extends GrantedAuthority> grantedAuthorities=RoleAuthenticationUtils.forGrantedAuthorities(authority);
-        return new AdNamePasswordAuthenticationToken(claims.getId(), "", grantedAuthorities);
+        return AdAuthentication.createByJwt(id, username, grantedAuthorities);
     }
 
-    public void resetSignature(String userName) {
-        jwtDetailService.deleteSecretByUsername(userName);
+    public void resetSignature(Integer userId) {
+        jwtDetailService.deleteSecretByUsername(userId);
     }
 
     public String createToken(Authentication authentication, boolean rememberMe, String userName) {
-        Key key=createOrGetKey(userName, null);
+        AdAuthentication adAuthentication=(AdAuthentication) authentication;
+        String secret=jwtDetailService.loadSecretById(adAuthentication.getId());
+        Key key=createOrGetKey(adAuthentication.getId(), adAuthentication.getName(), secret);
         Date time=new Date();
         if (rememberMe) {
             time=new Date(time.getTime() + this.tokenRememberTime);
         } else {
             time=new Date(time.getTime() + this.tokenValidTime);
         }
-        String authority=RoleAuthenticationUtils.grantedAuthorities2SingleString(authentication.getAuthorities());
+        String authority=RoleAuthenticationUtils.grantedAuthorities2SingleString(adAuthentication.getAuthorities());
         Claims claims=new DefaultClaims();
         claims
                 .setExpiration(time)
                 .setIssuedAt(new Date())
-                .setId(authentication.getName())
+                .setId(adAuthentication.getId().toString())
                 .setIssuer("system");
         return Jwts.builder()
                 .claim("auth", authority)
+                .claim("username", adAuthentication.getName())
                 .addClaims(claims)
                 .signWith(key).compact();
     }
@@ -91,29 +99,20 @@ public class SecurityJwtProvider {
     /**
      * 创建 jwt 密钥 Key
      *
+     * @param id       {@link IUser#getId()}
      * @param username 账户
      * @param secret   密钥 为空时创建 key
      * @return Key
      */
-    public Key createOrGetKey(String username, String secret) {
-        if (secret==null) {
+    public Key createOrGetKey(Integer id, String username, String secret) {
+        if (StringUtils.isEmpty(secret)) {
             secret=getRandomString(50);
-            jwtDetailService.saveSecretByUsername(username, secret);
+            jwtDetailService.saveSecretByUsername(id, username, secret);
         }
         byte[] encodeKey=Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(encodeKey);
     }
 
-    public static String getRandomString(int length) {
-        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random=new Random();
-        StringBuilder sb=new StringBuilder();
-        for (int i=0; i < length; i++) {
-            int number=random.nextInt(62);
-            sb.append(str.charAt(number));
-        }
-        return sb.toString();
-    }
 
     public Claims validateToken(String jwt) {
         Claims claims=null;

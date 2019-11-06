@@ -1,20 +1,19 @@
 package com.ad.admain.security.filter;
 
-import com.ad.admain.security.AdNamePasswordAuthenticationToken;
+import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.security.IUsernamePasswordConvert;
+import com.ad.admain.security.MarkAntPathRequestMatcherExtractor;
 import lombok.Data;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
 
     public AdUsernamePasswordAuthenticationFilter(Map<String, String> matchs, List<IUsernamePasswordConvert> usernamePasswordConverts, AuthenticationManager authenticationManager) {
         super("/login");
-        List<RequestMatcher> requestMatchers=new ArrayList<>(3);
         this.usernamePasswordConverts=usernamePasswordConverts;
         this.authenticationManager=authenticationManager;
         setRequiresAuthenticationRequestMatcher(new MarkAntPathRequestMatcherExtractor(matchs));
@@ -54,7 +52,7 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
         if (definition==null) {
             throw new IOException("从请求中读取账户信息出错");
         }
-        AdNamePasswordAuthenticationToken authRequest=new AdNamePasswordAuthenticationToken(definition.getUsername(), definition.getPassword(), request.getRequestURI());
+        AdAuthentication authRequest=new AdAuthentication(definition.getUsername(), definition.getPassword());
         return this.authenticationManager.authenticate(authRequest);
     }
 

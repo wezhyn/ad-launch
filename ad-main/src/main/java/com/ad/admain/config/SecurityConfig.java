@@ -2,18 +2,13 @@ package com.ad.admain.config;
 
 import com.ad.admain.constants.JwtProperties;
 import com.ad.admain.constants.ResourceConstant;
-import com.ad.admain.security.IUsernamePasswordConvert;
-import com.ad.admain.security.LoginAuthenticationFailureHandler;
-import com.ad.admain.security.LoginAuthenticationSuccessHandler;
-import com.ad.admain.security.LogoutAuthenticationSuccessHandler;
+import com.ad.admain.security.*;
 import com.ad.admain.security.filter.AdJwtCheckAuthenticationFilter;
 import com.ad.admain.security.filter.AdJwtLogoutAuthenticationFilter;
 import com.ad.admain.security.filter.AdUsernamePasswordAuthenticationFilter;
 import com.ad.admain.security.filter.AdUsernamePasswordAuthenticationProvider;
-import com.ad.admain.service.AdUserDetailsService;
-import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.security.jwt.JwtDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -50,7 +44,6 @@ import java.util.Map;
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsService userDetailsService;
     @Autowired
     private AdJwtCheckAuthenticationFilter jwtCheckAuthenticationFilter;
     @Autowired
@@ -68,10 +61,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    public SecurityConfig(@Qualifier("adUserDetailService") UserDetailsService userDetailsService) {
-        this.userDetailsService=userDetailsService;
-    }
 
 
     @Override
@@ -98,9 +87,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         AdUsernamePasswordAuthenticationProvider adUsernamePasswordAuthenticationProvider=new AdUsernamePasswordAuthenticationProvider(passwordEncoder, adUserDetailsServices);
         auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder)
-                .and()
                 .authenticationProvider(adUsernamePasswordAuthenticationProvider);
     }
 

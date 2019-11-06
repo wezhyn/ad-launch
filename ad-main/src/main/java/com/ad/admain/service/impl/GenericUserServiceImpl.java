@@ -1,9 +1,9 @@
 package com.ad.admain.service.impl;
 
 import com.ad.admain.repository.GenericUserRepository;
+import com.ad.admain.security.jwt.JwtDetailService;
 import com.ad.admain.service.AbstractBaseService;
 import com.ad.admain.service.GenericUserService;
-import com.ad.admain.service.JwtDetailService;
 import com.ad.admain.to.GenericUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,18 +52,14 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
         return super.save(object);
     }
 
-    @Override
-    @Transactional(rollbackFor=Exception.class)
-    public int modifyUserPassword(String username, String password) {
-        String newPasword=passwordEncoder.encode(password);
-        String secret=com.ad.admain.utils.StringUtils.getRandomString(50);
-        jwtDetailService.saveSecretByUsername(username, secret);
-        return genericUserRepository.updateUserPassword(username, newPasword);
-    }
 
     @Override
-    public int modifyUserPasswordById(Integer id, String password) {
+    @Transactional(rollbackFor=Exception.class)
+    public int modifyUserPasswordById(Integer id, String username, String password) {
         String newPasword=passwordEncoder.encode(password);
+        String secret=com.ad.admain.utils.StringUtils.getRandomString(50);
+//        todo:解耦
+        jwtDetailService.saveSecretByUsername(id, username, secret);
         return genericUserRepository.updateUserPassword(id, newPasword);
     }
 

@@ -1,4 +1,4 @@
-package com.ad.admain.security.filter;
+package com.ad.admain.security;
 
 import com.ad.admain.constants.JwtProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class MarkAntPathRequestMatcherExtractor implements RequestMatcher {
     /**
      * 储存当前登录用户是使用何种标识： requestMatchers.key
      */
-    protected static final ThreadLocal<String> MARK_CACHE=new ThreadLocal<>();
+    private static final ThreadLocal<String> MARK_CACHE=new ThreadLocal<>();
 
     /**
      * {@link JwtProperties#getLoginInterceptionInclude()}
@@ -44,6 +44,15 @@ public class MarkAntPathRequestMatcherExtractor implements RequestMatcher {
         }
     }
 
+    /**
+     * todo: 一个更好的解决方案
+     * 在{@link com.ad.admain.security.LoginAuthenticationFailureHandler} 和
+     * {@link com.ad.admain.security.LoginAuthenticationSuccessHandler} 中清除
+     */
+    public static void removeThreadLocal() {
+        MARK_CACHE.remove();
+    }
+
     @Override
     public boolean matches(HttpServletRequest request) {
         for (String mark : requestMarkMatchers.keySet()) {
@@ -54,5 +63,9 @@ public class MarkAntPathRequestMatcherExtractor implements RequestMatcher {
             }
         }
         return false;
+    }
+
+    public static ThreadLocal<String> getMarkCache() {
+        return MARK_CACHE;
     }
 }

@@ -1,7 +1,7 @@
 package com.ad.admain.service.impl;
 
 import com.ad.admain.repository.JwtUserSecretRepository;
-import com.ad.admain.service.JwtDetailService;
+import com.ad.admain.security.jwt.JwtDetailService;
 import com.ad.admain.to.JwtUserSecret;
 import org.springframework.stereotype.Service;
 
@@ -9,11 +9,14 @@ import org.springframework.stereotype.Service;
  * @author : wezhyn
  * @date : 2019/09/20
  * <p>
- *     将jwt 密钥保存在数据库中，使用时拿出来
+ * 将jwt 密钥保存在数据库中，使用时拿出来
+ * id: userId
+ * username: username
+ * secret: 用户登录时验证密钥
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class JwtMysqlDetailServiceImpl implements JwtDetailService{
+public class JwtMysqlDetailServiceImpl implements JwtDetailService {
 
     private final JwtUserSecretRepository userSecretRepository;
 
@@ -23,19 +26,19 @@ public class JwtMysqlDetailServiceImpl implements JwtDetailService{
 
 
     @Override
-    public String loadSecretByUsername(String username) {
-        JwtUserSecret userSecret=userSecretRepository.findById(username)
-                .orElse(JwtUserSecret.EMPTY_USER_SECRET);
-        return userSecret.getSecret();
+    public String loadSecretById(Integer userId) {
+        return userSecretRepository.findById(userId)
+                .map(JwtUserSecret::getSecret)
+                .orElse("");
     }
 
     @Override
-    public void saveSecretByUsername(String username, String secret) {
-        userSecretRepository.save(new JwtUserSecret(username,secret));
+    public void saveSecretByUsername(Integer id, String username, String secret) {
+        userSecretRepository.save(new JwtUserSecret(id, username, secret));
     }
 
     @Override
-    public void deleteSecretByUsername(String username) {
-        userSecretRepository.deleteById(username);
+    public void deleteSecretByUsername(Integer id) {
+        userSecretRepository.deleteById(id);
     }
 }
