@@ -4,6 +4,7 @@ import com.ad.admain.service.OrderService;
 import com.ad.admain.to.Order;
 import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api/order")
+@PreAuthorize("isAuthenticated()")
+
 public class OrderController {
 
 
@@ -21,6 +24,7 @@ public class OrderController {
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
+
 
     @RequestMapping("/create")
     public ResponseResult create(@RequestBody Order order) throws Exception {
