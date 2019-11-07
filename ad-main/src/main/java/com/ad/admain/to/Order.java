@@ -1,5 +1,10 @@
 package com.ad.admain.to;
 
+import com.ad.admain.utils.CustomJsonDateDeserializer;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +13,9 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 @Table(name = "ad_order")
 @Accessors(chain = true)
@@ -18,31 +25,35 @@ import java.util.Date;
 @NoArgsConstructor
 @DynamicUpdate
 public class Order{
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String valueList;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Value> valueList;
 
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private Date startTime;
-
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
     private Date endTime;
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private Date startDate;
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    private Date endDate;
 
     private Long price;
-
-    private boolean timeType;
-
-    private String timeList;
 
     private double latitude;
 
     private double longitude;
 
-    private double scope;
+    private int scope;
 
-    private double rate;
+    private int rate;
 
     private int uid;
+
 
 }

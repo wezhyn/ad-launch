@@ -30,8 +30,8 @@ public class GenericUserServiceTest {
     @Test
     public void saveGenericUser() {
         GenericUser genericUser=GenericUser.builder()
-                .username("wezhyn1")
-                .password(passwordEncoder.encode("zhaoo"))
+                .username("zlb")
+                .password(passwordEncoder.encode("zlb"))
                 .roles(AuthenticationEnum.CUSTOMER)
                 .email("zhaoo@zhaoo.com")
                 .sex(SexEnum.MALE)

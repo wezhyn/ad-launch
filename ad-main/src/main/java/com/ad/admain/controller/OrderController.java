@@ -28,6 +28,7 @@ public class OrderController {
 
     @RequestMapping("/create")
     public ResponseResult create(@RequestBody Order order) throws Exception {
+        System.out.println(order.toString());
         Optional<Order> optional = orderService.save(order);
         Order result = optional.orElse(null);
         if (result!=null){

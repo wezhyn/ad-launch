@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public class OrderServiceImplTest {
     @Test
     public void save() {
         Order order = new Order()
-                .setId(2)
+                .setStartTime(new Date(System.currentTimeMillis()))
                 ;
         Order order1 = orderReposity.save(order);
         System.out.println(Optional.ofNullable(order1).toString());
