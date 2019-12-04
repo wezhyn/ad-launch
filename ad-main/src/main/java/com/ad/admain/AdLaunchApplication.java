@@ -1,7 +1,7 @@
 package com.ad.admain;
 
-import com.ad.admain.constants.JwtProperties;
-import com.ad.admain.constants.QiNiuProperties;
+import com.ad.admain.config.QiNiuProperties;
+import com.ad.admain.config.web.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

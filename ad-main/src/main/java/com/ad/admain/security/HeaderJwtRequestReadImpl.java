@@ -1,6 +1,7 @@
 package com.ad.admain.security;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
  * @author : wezhyn
@@ -11,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 public class HeaderJwtRequestReadImpl implements IJwtRequestRead {
     @Override
     public String readJwt(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getHeader("X-Token");
+        String token=httpServletRequest.getHeader("X-Token");
+        if (token==null || Objects.equals("", token) || Objects.equals(token, "null")) {
+            return null;
+        }
+        return token;
     }
 }

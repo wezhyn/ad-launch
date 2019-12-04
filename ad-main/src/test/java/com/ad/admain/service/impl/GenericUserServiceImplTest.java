@@ -1,6 +1,6 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.service.GenericUserService;
+import com.ad.admain.controller.account.GenericUserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.ad.admain.config;
 
-import com.ad.admain.constants.JwtProperties;
+import com.ad.admain.config.web.JwtProperties;
 import com.ad.admain.security.*;
 import com.ad.admain.security.filter.AdJwtCheckAuthenticationFilter;
 import com.ad.admain.security.jwt.JwtDetailService;

@@ -54,10 +54,6 @@ public class ImgBed implements IBaseTo<Integer> {
      */
     private String address;
 
-    @Override
-    public String getUsername() {
-        return getId().toString();
-    }
 
     private ImgBed(Builder builder) {
         setId(builder.id);

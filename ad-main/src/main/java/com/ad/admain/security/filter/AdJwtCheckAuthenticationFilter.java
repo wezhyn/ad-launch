@@ -1,6 +1,6 @@
 package com.ad.admain.security.filter;
 
-import com.ad.admain.constants.JwtProperties;
+import com.ad.admain.config.web.JwtProperties;
 import com.ad.admain.security.IJwtRequestRead;
 import com.ad.admain.security.jwt.SecurityJwtProvider;
 import lombok.extern.slf4j.Slf4j;

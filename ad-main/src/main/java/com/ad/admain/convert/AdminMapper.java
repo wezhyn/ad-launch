@@ -1,10 +1,13 @@
 package com.ad.admain.convert;
 
+import com.ad.admain.config.QiNiuProperties;
 import com.ad.admain.dto.AdminDto;
 import com.ad.admain.to.Admin;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author wezhyn
@@ -14,7 +17,10 @@ import org.mapstruct.ReportingPolicy;
  */
 @Mapper(config=CentralMapperConfig.class,
         unmappedTargetPolicy=ReportingPolicy.IGNORE)
-public interface AdminMapper extends AbstractMapper<Admin, AdminDto> {
+public abstract class AdminMapper implements AbstractMapper<Admin, AdminDto> {
+
+    @Autowired
+    protected QiNiuProperties qiNiuProperties;
 
     /**
      * 实现 to -> dto 的转变
@@ -25,6 +31,8 @@ public interface AdminMapper extends AbstractMapper<Admin, AdminDto> {
      */
     @Override
     @Mappings({
+            @Mapping(target="avatar",
+                    expression="java(qiNiuProperties.getHostName() + \"/\" + admin.getAvatar() )")
     })
-    AdminDto toDto(Admin admin);
+    public abstract AdminDto toDto(Admin admin);
 }

@@ -46,10 +46,6 @@ public class EasemobUser implements IBaseTo<Integer> {
         return easemobId;
     }
 
-    @Override
-    public String getUsername() {
-        return getId().toString();
-    }
 
     public static User toRegisterUser(EasemobUser easemobUser) {
         return new User().password(easemobUser.getPassword())

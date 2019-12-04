@@ -1,6 +1,6 @@
 package com.ad.admain.security;
 
-import com.ad.admain.constants.JwtProperties;
+import com.ad.admain.config.web.JwtProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;

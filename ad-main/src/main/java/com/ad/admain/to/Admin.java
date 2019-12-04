@@ -3,15 +3,13 @@ package com.ad.admain.to;
 import com.ad.admain.annotation.UpdateIgnore;
 import com.ad.admain.enumate.AuthenticationEnum;
 import com.ad.admain.enumate.SexEnum;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.*;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -27,6 +25,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Entity
 @DynamicUpdate
+@DynamicInsert
 public class Admin implements IAdmin {
 
     @Id
@@ -40,18 +39,19 @@ public class Admin implements IAdmin {
 
     private String nickName;
 
-    @JsonProperty(access=JsonProperty.Access.WRITE_ONLY)
     @UpdateIgnore
     private String password;
 
     private String idCard;
 
+    @UpdateIgnore
     private String avatar;
 
-    @Enumerated(value=EnumType.STRING)
     @ColumnDefault("'UNKNOWN'")
+    @Enumerated(value=EnumType.STRING)
     private SexEnum sex;
 
+    @ColumnDefault("''")
     private String email;
 
 

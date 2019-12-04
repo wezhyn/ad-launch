@@ -1,14 +1,12 @@
 package com.ad.admain.to;
 
 import com.ad.admain.annotation.UpdateIgnore;
+import com.ad.admain.common.BaseEnum;
 import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.enumate.BaseEnum;
 import com.ad.admain.enumate.SexEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenerationTime;
 import org.springframework.security.core.userdetails.User;
@@ -30,6 +28,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @DynamicUpdate
+@DynamicInsert
+@Builder
 public class GenericUser implements IUser {
 
     @Id
@@ -54,6 +54,7 @@ public class GenericUser implements IUser {
 
 
     @Enumerated(value=EnumType.STRING)
+    @ColumnDefault("'UNKNOWN'")
     private SexEnum sex;
 
 
@@ -65,7 +66,9 @@ public class GenericUser implements IUser {
     private String wechat;
     @ColumnDefault("''")
     private String intro;
+
     @ColumnDefault("''")
+    @UpdateIgnore
     private String avatar;
     private LocalDate birthDay;
 
@@ -88,6 +91,7 @@ public class GenericUser implements IUser {
     @org.hibernate.annotations.Generated(
             value=GenerationTime.ALWAYS
     )
+    @ColumnDefault("current_timestamp")
     private LocalDateTime lastModified;
 
 
@@ -98,48 +102,22 @@ public class GenericUser implements IUser {
     @ColumnDefault("'NORMAL'")
     private UserEnable enable;
 
-    @ColumnDefault("true")
-    private boolean accountNonExpired;
-    @ColumnDefault("true")
-    private boolean credentialsNonExpired;
+    @ColumnDefault("b'1'")
+    private Boolean accountNonExpired;
+    @ColumnDefault("b'1'")
+    private Boolean credentialsNonExpired;
     /**
      * 是否被锁定
      */
-    @ColumnDefault("true")
-    private boolean accountNonLocked;
+    @ColumnDefault("b'1'")
+    private Boolean accountNonLocked;
 
     /**
      * 未清楚
      */
-    @ColumnDefault("false")
-    private boolean certification;
+    @ColumnDefault("b'1'")
+    private Boolean certification;
 
-    private GenericUser(Builder builder) {
-        setId(builder.id);
-        setUsername(builder.username);
-        setNickName(builder.nickName);
-        setRealName(builder.realName);
-        setIdCard(builder.idCard);
-        setPassword(builder.password);
-        setSex(builder.sex==null ? SexEnum.UNKNOWN : builder.sex);
-        setMobilePhone(builder.mobilePhone);
-        setEmail(builder.email);
-        setWechat(builder.wechat);
-        setIntro(builder.intro);
-        setAvatar(builder.avatar);
-        setBirthDay(builder.birthDay);
-        setRoles(builder.roles==null ? AuthenticationEnum.CUSTOMER : builder.roles);
-        setRegTime(builder.regTime);
-        setLoginTime(builder.loginTime);
-        setLastModified(builder.lastModified);
-        setEnable(builder.enable);
-        setAccountNonExpired(builder.accountNonExpired);
-        setCredentialsNonExpired(builder.credentialsNonExpired);
-        setAccountNonLocked(builder.accountNonLocked);
-        setCertification(builder.certification);
-    }
-
-//    private LocalDateTime settledTime;
 
     @Override
     public String getSex() {
@@ -161,11 +139,11 @@ public class GenericUser implements IUser {
                 accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities());
     }
 
-    /*
-        /**********************************************************
-        /* 构造函数
-        /**********************************************************
-    */
+            /*
+                /**********************************************************
+                /* 构造函数
+                /**********************************************************
+            */
 
 
     /*
@@ -179,10 +157,6 @@ public class GenericUser implements IUser {
     @Override
     public String getStatus() {
         return enable.getEnableStatus();
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     @Getter
@@ -209,178 +183,5 @@ public class GenericUser implements IUser {
         }
 
 
-    }
-
-
-    public static final class Builder {
-        private Integer id;
-        private String username;
-        private String nickName;
-        private String realName;
-        private String idCard;
-        private String password;
-        private SexEnum sex;
-        private String mobilePhone;
-        private String email;
-        private String wechat;
-        private String intro;
-        private String avatar;
-        private LocalDate birthDay;
-        private AuthenticationEnum roles;
-        private LocalDateTime regTime;
-        private LocalDateTime loginTime;
-        private LocalDateTime lastModified;
-        private UserEnable enable;
-        private boolean accountNonExpired;
-        private boolean credentialsNonExpired;
-        private boolean accountNonLocked;
-        private boolean certification;
-
-        public Builder() {
-        }
-
-        public Builder id(Integer val) {
-            id=val;
-            return this;
-        }
-
-        public Builder username(String val) {
-            username=val;
-            return this;
-        }
-
-        public Builder nickName(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            nickName=val;
-            return this;
-        }
-
-        public Builder realName(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            realName=val;
-            return this;
-        }
-
-        public Builder idCard(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            idCard=val;
-            return this;
-        }
-
-        public Builder password(String val) {
-            password=val;
-            return this;
-        }
-
-        public Builder sex(SexEnum val) {
-            if (val==null) {
-                sex=SexEnum.UNKNOWN;
-            }
-            sex=val;
-            return this;
-        }
-
-        public Builder mobilePhone(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            mobilePhone=val;
-            return this;
-        }
-
-        public Builder email(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            email=val;
-            return this;
-        }
-
-        public Builder wechat(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            wechat=val;
-            return this;
-        }
-
-        public Builder intro(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            intro=val;
-            return this;
-        }
-
-        public Builder avatar(String val) {
-            if (val==null) {
-                val=" ";
-            }
-            avatar=val;
-            return this;
-        }
-
-        public Builder birthDay(LocalDate val) {
-            birthDay=val;
-            return this;
-        }
-
-        public Builder roles(AuthenticationEnum val) {
-            if (val==null) {
-                val=AuthenticationEnum.USER;
-            }
-            roles=val;
-            return this;
-        }
-
-        public Builder regTime(LocalDateTime val) {
-            regTime=val;
-            return this;
-        }
-
-        public Builder loginTime(LocalDateTime val) {
-            loginTime=val;
-            return this;
-        }
-
-        public Builder lastModified(LocalDateTime val) {
-            lastModified=val;
-            return this;
-        }
-
-        public Builder enable(UserEnable val) {
-            enable=val;
-            return this;
-        }
-
-        public Builder accountNonExpired(boolean val) {
-            accountNonExpired=val;
-            return this;
-        }
-
-        public Builder credentialsNonExpired(boolean val) {
-            credentialsNonExpired=val;
-            return this;
-        }
-
-        public Builder accountNonLocked(boolean val) {
-            accountNonLocked=val;
-            return this;
-        }
-
-        public Builder certification(boolean val) {
-            certification=val;
-            return this;
-        }
-
-        public GenericUser build() {
-            return new GenericUser(this);
-        }
     }
 }

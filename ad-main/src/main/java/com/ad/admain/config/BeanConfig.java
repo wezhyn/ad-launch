@@ -1,9 +1,8 @@
 package com.ad.admain.config;
 
-import com.ad.admain.constants.QiNiuProperties;
-import com.ad.admain.service.FileUploadService;
-import com.ad.admain.service.GenericUserService;
-import com.ad.admain.service.impl.QiNiuFileUploadServiceImpl;
+import com.ad.admain.controller.FileUploadService;
+import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.impl.QiNiuFileUploadServiceImpl;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

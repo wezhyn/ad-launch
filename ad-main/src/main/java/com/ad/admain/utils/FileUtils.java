@@ -1,12 +1,10 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.constants.ResourceConstant;
-import com.ad.admain.enumate.FileType;
+import com.ad.admain.config.web.ResourceConstant;
 import com.ad.admain.enumate.StringEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -20,7 +18,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
- * 默认保存地址 {@link com.ad.admain.constants.ResourceConstant#RESOURCE_SAVE_LOCATION}
+ * 默认保存地址 {@link ResourceConstant#RESOURCE_SAVE_LOCATION}
  *
  * @author : wezhyn
  * @date : 2019/09/20
@@ -41,7 +39,7 @@ public class FileUtils {
     }
 
 
-    public static String saveImage(MultipartFile file,  boolean isCompress) throws Exception {
+    /*public static String saveImage(MultipartFile file,  boolean isCompress) throws Exception {
         FileWrap fileWrap=getBaseInfo(file, FileType.IMAGE, "");
         Thumbnails
                 .of(new InputStream[]{file.getInputStream()}).scale(1.0D).toFile(fileWrap.getDest());
@@ -65,14 +63,14 @@ public class FileUtils {
         }
 
         return resultPath;
-    }
+    }*/
 
     /**
      * 包装文件基本信息
      *
      * @param file              上传文件流
      * @param fileType          文件类型 ：图片，其他
-     * @param relativeDirectory 相对于{@link com.ad.admain.constants.ResourceConstant#RESOURCE_SAVE_LOCATION}
+     * @param relativeDirectory 相对于{@link ResourceConstant#RESOURCE_SAVE_LOCATION}
      *                          ->    E:/res/{type}/relativeDirectory/fileName,若无,则 /res/{type}
      * @return FileWrap
      */

@@ -1,5 +1,6 @@
 package com.ad.admain.enumate;
 
+import com.ad.admain.common.BaseEnum;
 import com.ad.admain.utils.EnumUtils;
 
 /**

@@ -1,16 +1,17 @@
 server:
-  port: 8080
+  port: 8188
   address: 0.0.0.0
-
+  tomcat:
+    max-threads: 8
 
 spring:
   profiles:
-    active: dev
+    active: zhaoo
   #    active: pro
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
-    username: root
+    username: ${custom.mysql.username}
     password: ${custom.mysql.password}
   jpa:
     show-sql: true
@@ -18,7 +19,6 @@ spring:
       ddl-auto: update
 
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-
 
 
   jackson:

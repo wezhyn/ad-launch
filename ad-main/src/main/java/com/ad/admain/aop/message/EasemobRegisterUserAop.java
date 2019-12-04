@@ -1,6 +1,6 @@
 package com.ad.admain.aop.message;
 
-import com.ad.admain.service.EasemobService;
+import com.ad.admain.message.EasemobService;
 import com.ad.admain.to.EasemobUser;
 import com.ad.admain.to.GenericUser;
 import com.ad.admain.to.IUser;
@@ -30,7 +30,7 @@ public class EasemobRegisterUserAop {
         this.easemobService=easemobService;
     }
 
-    @Pointcut("execution(public * com.ad.admain.service.impl.GenericUserServiceImpl.save(..))" +
+    @Pointcut("execution(public * com.ad.admain.controller.account.impl.GenericUserServiceImpl.save(..))" +
             "&&args(user)")
     public void registerEasemobUser(GenericUser user) {
     }

@@ -1,7 +1,7 @@
 package com.ad.admain.service.impl;
 
+import com.ad.admain.controller.account.AdminService;
 import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.service.AdminService;
 import com.ad.admain.to.Admin;
 import org.junit.Test;
 import org.junit.runner.RunWith;

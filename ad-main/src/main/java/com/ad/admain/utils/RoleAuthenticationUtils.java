@@ -66,6 +66,16 @@ public final class RoleAuthenticationUtils {
                 .getValue();
     }
 
+    public static boolean isAuthentication(Collection<GrantedAuthority> authorities) {
+
+        return Stream.of(AuthenticationEnum.values())
+//                按照 {getOrdinal }降序
+                .sorted(Comparator.comparingInt(AuthenticationEnum::getOrdinal).reversed())
+                .filter(a->a.getOrdinal() >= AuthenticationEnum.ADMIN.getOrdinal())
+                .anyMatch(a->authorities.contains(authenticationEnum2GrantedAuthority(a)));
+
+    }
+
 
     /**
      * 返回 权限的集合[去掉 ROLE_ 前缀]

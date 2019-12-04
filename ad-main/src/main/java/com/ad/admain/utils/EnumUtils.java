@@ -1,6 +1,6 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.enumate.BaseEnum;
+import com.ad.admain.common.BaseEnum;
 import com.ad.admain.enumate.StringEnum;
 
 import java.util.Arrays;

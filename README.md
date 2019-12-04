@@ -2,7 +2,7 @@
 > 闸种开发小组出品：闸种广告投放
 
 ### 代办
-jpa 默认值无效
+* jpa 默认值无效
 
 ### 新增
 * 在Controller中使用 `@AuthenticationPrincipal AdAuthentication authentication`

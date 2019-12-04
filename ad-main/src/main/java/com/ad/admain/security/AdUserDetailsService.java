@@ -1,6 +1,6 @@
 package com.ad.admain.security;
 
-import com.ad.admain.constants.JwtProperties;
+import com.ad.admain.config.web.JwtProperties;
 import com.ad.admain.utils.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;

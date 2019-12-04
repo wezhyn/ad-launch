@@ -1,17 +1,18 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.constants.QiNiuProperties;
+import com.ad.admain.config.QiNiuProperties;
 import com.ad.admain.dto.IFileUpload;
 import com.ad.admain.enumate.ImgBedType;
 import com.ad.admain.exception.FileUploadException;
-import com.ad.admain.service.FileUploadService;
-import com.ad.admain.service.ImgBedService;
+import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.to.ImgBed;
 import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/file")
+@PreAuthorize("isAuthenticated()")
 public class FileController {
 
     private final FileUploadService fileUploadService;
@@ -39,8 +41,8 @@ public class FileController {
     }
 
     @PostMapping("/avatar")
-    public ResponseResult modifyUserAvatar(@RequestParam(value="img") MultipartFile file) throws FileUploadException {
-        IFileUpload fileUpload=fileUploadService.modifyAvatarImg(file);
+    public ResponseResult modifyUserAvatar(@RequestParam(value="img") MultipartFile file, @AuthenticationPrincipal AdAuthentication adAuthentication) throws FileUploadException {
+        IFileUpload fileUpload=fileUploadService.modifyAvatarImg(file, adAuthentication);
         return ResponseResult.forSuccessBuilder()
                 .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
                 .withData("host", qiNiuProperties.getHostName())

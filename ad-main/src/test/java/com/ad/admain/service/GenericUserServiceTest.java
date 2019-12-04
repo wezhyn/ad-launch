@@ -1,7 +1,7 @@
 package com.ad.admain.service;
 
+import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.enumate.SexEnum;
 import com.ad.admain.to.GenericUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +30,10 @@ public class GenericUserServiceTest {
     @Test
     public void saveGenericUser() {
         GenericUser genericUser=GenericUser.builder()
-                .username("zlb")
-                .password(passwordEncoder.encode("zlb"))
+                .username("zhaoo11")
+                .password(passwordEncoder.encode("zhaoo"))
                 .roles(AuthenticationEnum.CUSTOMER)
                 .email("zhaoo@zhaoo.com")
-                .sex(SexEnum.MALE)
                 .build();
         genericUserService.save(genericUser);
     }

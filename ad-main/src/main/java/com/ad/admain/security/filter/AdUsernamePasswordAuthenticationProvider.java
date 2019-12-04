@@ -43,7 +43,7 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         final AdUserDetails adUserDetails=(AdUserDetails) userDetails;
 //        check id
-        if (adUserDetails.getId()==null || Integer.valueOf(1).equals(adUserDetails.getId())) {
+        if (adUserDetails.getId()==null) {
             throw new AdUsernamePasswordException("用户信息异常");
         }
 //        check password

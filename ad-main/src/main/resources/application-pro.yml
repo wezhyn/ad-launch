@@ -5,5 +5,6 @@ custom:
     password: root
     port: 3306
     database: ad
+    username: root
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true
 

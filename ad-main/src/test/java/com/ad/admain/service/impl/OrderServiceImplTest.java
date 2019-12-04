@@ -1,15 +1,13 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.AdLaunchApplication;
-import com.ad.admain.repository.OrderReposity;
-import com.ad.admain.to.Order;
+import com.ad.admain.controller.pay.repository.OrderReposity;
+import com.ad.admain.controller.pay.to.Order;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Optional;
 
