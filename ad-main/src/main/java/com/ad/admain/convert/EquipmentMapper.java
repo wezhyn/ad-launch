@@ -1,7 +1,7 @@
 package com.ad.admain.convert;
 
-import com.ad.admain.dto.EquipmentDto;
-import com.ad.admain.to.Equipment;
+import com.ad.admain.controller.equipment.dto.EquipmentDto;
+import com.ad.admain.controller.equipment.entity.Equipment;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

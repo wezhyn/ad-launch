@@ -1,8 +1,8 @@
 package com.ad.admain.config.web;
 
-import com.ad.admain.common.BaseEnum;
-import com.ad.admain.enumate.StringEnum;
-import com.ad.admain.utils.EnumUtils;
+import com.wezhyn.project.BaseEnum;
+import com.wezhyn.project.StringEnum;
+import com.wezhyn.project.utils.EnumUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.util.StringUtils;
@@ -29,7 +29,7 @@ public class GenericStringEnumConvert implements ConverterFactory<String, String
         return new StringToBaseEnum(enumType);
     }
 
-    private static class StringToBaseEnum<T extends Enum & BaseEnum> implements Converter<String, T> {
+    private static class StringToBaseEnum<T extends Enum<T> & BaseEnum> implements Converter<String, T> {
 
         private final Class<T> enumType;
 
@@ -42,7 +42,7 @@ public class GenericStringEnumConvert implements ConverterFactory<String, String
             if (StringUtils.isEmpty(s)) {
                 return null;
             }
-            return EnumUtils.valueOfBaseEnumIgnoreCase(enumType, s);
+            return EnumUtils.valueOfStringEnumIgnoreCase(enumType, s);
         }
     }
 }

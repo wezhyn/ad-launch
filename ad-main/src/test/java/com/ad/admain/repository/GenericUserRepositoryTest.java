@@ -1,7 +1,7 @@
 package com.ad.admain.repository;
 
+import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.account.repository.GenericUserRepository;
-import com.ad.admain.to.GenericUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

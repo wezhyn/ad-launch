@@ -1,7 +1,7 @@
 package com.ad.admain.controller.account.repository;
 
-import com.ad.admain.dto.IFileUpload;
-import com.ad.admain.to.GenericUser;
+import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.impl.IFileUpload;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

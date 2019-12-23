@@ -1,11 +1,11 @@
 package com.ad.admain.controller.account;
 
+import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.controller.SimpleResponseResult;
+import com.ad.admain.controller.account.dto.AdminDto;
+import com.ad.admain.controller.account.entity.Admin;
 import com.ad.admain.convert.AdminMapper;
-import com.ad.admain.dto.AdminDto;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.to.Admin;
-import com.ad.admain.to.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

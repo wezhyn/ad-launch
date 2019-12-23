@@ -1,7 +1,7 @@
 package com.ad.admain.controller.message;
 
+import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.message.common.TargetTypeEnum;
-import com.ad.admain.to.ResponseResult;
 import io.swagger.client.model.Msg;
 import io.swagger.client.model.UserName;
 import org.springframework.security.access.prepost.PreAuthorize;

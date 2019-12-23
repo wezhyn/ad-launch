@@ -1,6 +1,6 @@
 package com.ad.admain.message.response;
 
-import com.ad.admain.to.EasemobUser;
+import com.ad.admain.message.EasemobUser;
 import lombok.Data;
 
 import java.util.ArrayList;

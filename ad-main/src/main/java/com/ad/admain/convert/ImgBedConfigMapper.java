@@ -1,8 +1,8 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.config.QiNiuProperties;
-import com.ad.admain.dto.ConfigDto;
-import com.ad.admain.to.ImgBed;
+import com.ad.admain.controller.impl.ImgBed;
+import com.ad.admain.controller.other.ConfigDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

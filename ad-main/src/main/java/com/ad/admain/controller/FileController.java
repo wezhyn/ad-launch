@@ -1,12 +1,11 @@
 package com.ad.admain.controller;
 
 import com.ad.admain.config.QiNiuProperties;
-import com.ad.admain.dto.IFileUpload;
-import com.ad.admain.enumate.ImgBedType;
+import com.ad.admain.controller.impl.IFileUpload;
+import com.ad.admain.controller.impl.ImgBed;
+import com.ad.admain.controller.impl.ImgBedType;
 import com.ad.admain.exception.FileUploadException;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.to.ImgBed;
-import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

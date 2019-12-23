@@ -1,7 +1,7 @@
 package com.ad.admain.convert;
 
 
-import com.ad.admain.utils.PropertyUtils;
+import com.wezhyn.project.utils.PropertyUtils;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.MappingTarget;
 

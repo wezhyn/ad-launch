@@ -3,7 +3,7 @@ package com.ad.admain.controller.pay.impl;
 import com.ad.admain.controller.pay.OrderInfoService;
 import com.ad.admain.controller.pay.TradeStatus;
 import com.ad.admain.controller.pay.repository.OrderInfoRepository;
-import com.ad.admain.controller.pay.to.OrderInfo;
+import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
 import com.ad.admain.pay.ZfbTradeI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class ZfbTradeCheck implements ZfbTradeI {
         if (tradeId <= 0) {
             return TradeStatus.TRADE_CANCEL_OTHER;
         }
-        Optional<OrderInfo> orderInfo=orderInfoRepository.findById(tradeId);
+        Optional<BillInfo> orderInfo=orderInfoRepository.findById(tradeId);
         return orderInfo.map(o->{
             Double savedAmount=o.getTotalAmount();
             TradeStatus savedStatus=o.getTradeStatus();
@@ -48,9 +48,9 @@ public class ZfbTradeCheck implements ZfbTradeI {
     @Transactional(rollbackFor=Exception.class)
     public boolean successNotificationAware(AlipayAsyncNotificationGetterI alipayAsyncNotification) {
         int tradeId=Integer.parseInt(alipayAsyncNotification.getOutTradeNo());
-        Optional<OrderInfo> savedOrderInfo=orderInfoRepository.findById(tradeId);
+        Optional<BillInfo> savedOrderInfo=orderInfoRepository.findById(tradeId);
         if (savedOrderInfo.isPresent()) {
-            OrderInfo oInfo=savedOrderInfo.get();
+            BillInfo oInfo=savedOrderInfo.get();
             oInfo.setTradeStatus(TradeStatus.TRADE_SUCCESS);
             oInfo.setBuyerId(alipayAsyncNotification.getBuyerId());
             oInfo.setSellerId(alipayAsyncNotification.getSellerId());

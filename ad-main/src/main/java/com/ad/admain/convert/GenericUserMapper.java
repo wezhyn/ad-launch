@@ -1,8 +1,8 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.config.QiNiuProperties;
-import com.ad.admain.dto.UserDto;
-import com.ad.admain.to.GenericUser;
+import com.ad.admain.controller.account.dto.UserDto;
+import com.ad.admain.controller.account.entity.GenericUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

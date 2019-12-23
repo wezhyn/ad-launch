@@ -1,6 +1,6 @@
 package com.ad.admain.controller.message;
 
-import com.ad.admain.to.EasemobUser;
+import com.ad.admain.message.EasemobUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

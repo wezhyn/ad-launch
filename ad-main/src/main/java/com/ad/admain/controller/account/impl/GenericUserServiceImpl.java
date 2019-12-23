@@ -1,10 +1,10 @@
 package com.ad.admain.controller.account.impl;
 
-import com.ad.admain.common.AbstractBaseService;
 import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.account.repository.GenericUserRepository;
 import com.ad.admain.security.jwt.JwtDetailService;
-import com.ad.admain.to.GenericUser;
+import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

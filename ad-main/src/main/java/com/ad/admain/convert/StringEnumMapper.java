@@ -1,7 +1,7 @@
 package com.ad.admain.convert;
 
-import com.ad.admain.enumate.StringEnum;
-import com.ad.admain.utils.EnumUtils;
+import com.wezhyn.project.StringEnum;
+import com.wezhyn.project.utils.EnumUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.TargetType;
 
@@ -16,7 +16,7 @@ import org.mapstruct.TargetType;
 class StringEnumMapper {
 
     /**
-     * 用于在 {@link com.ad.admain.enumate.StringEnum} 与 {@link String}
+     * 用于在 {@link StringEnum} 与 {@link String}
      * 之间进行转换
      *
      * @param value  {@link StringEnum#getValue()}
@@ -24,11 +24,11 @@ class StringEnumMapper {
      * @param <T>    tClass
      * @return Enum<?>
      */
-    <T extends Enum<?> & StringEnum> T stringEnum(String value, @TargetType Class<T> tClass) {
+    <T extends Enum<T> & StringEnum> T stringEnum(String value, @TargetType Class<T> tClass) {
         if (value==null) {
             return null;
         }
-        return EnumUtils.valueOfBaseEnumIgnoreCase(tClass, value);
+        return EnumUtils.valueOfStringEnumIgnoreCase(tClass, value);
     }
 
     <T extends Enum<?> & StringEnum> String getStringEnumValue(T stringEnum) {

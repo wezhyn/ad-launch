@@ -1,6 +1,6 @@
 package com.ad.admain.security.jwt;
 
-import com.ad.admain.to.IUser;
+import com.ad.admain.controller.account.entity.IUser;
 
 /**
  * @author : wezhyn

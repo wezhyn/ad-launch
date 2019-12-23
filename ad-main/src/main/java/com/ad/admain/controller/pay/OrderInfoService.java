@@ -1,8 +1,8 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.common.BaseService;
+import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.controller.pay.to.OrderInfo;
+import com.wezhyn.project.BaseService;
 
 import java.util.Optional;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author wezhyn
  * @since 12.01.2019
  */
-public interface OrderInfoService extends BaseService<OrderInfo, Integer> {
+public interface OrderInfoService extends BaseService<BillInfo, Integer> {
 
 
     /**
@@ -19,5 +19,5 @@ public interface OrderInfoService extends BaseService<OrderInfo, Integer> {
      * @param order order
      * @return orderInfo
      */
-    Optional<OrderInfo> createOrder(Order order);
+    Optional<BillInfo> createOrder(Order order);
 }

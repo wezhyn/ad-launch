@@ -17,6 +17,13 @@
     <properties>
     </properties>
     <dependencies>
+
+        <!--Base Dependency-->
+        <dependency>
+            <groupId>com.wezhyn.project</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -99,6 +106,10 @@
             <groupId>com.alipay.sdk</groupId>
             <artifactId>alipay-sdk-java</artifactId>
             <version>4.7.1.ALL</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 

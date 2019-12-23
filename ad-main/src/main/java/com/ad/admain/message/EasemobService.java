@@ -1,7 +1,6 @@
 package com.ad.admain.message;
 
-import com.ad.admain.common.BaseService;
-import com.ad.admain.to.EasemobUser;
+import com.wezhyn.project.BaseService;
 
 import java.util.Optional;
 

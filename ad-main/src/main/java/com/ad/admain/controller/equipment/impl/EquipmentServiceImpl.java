@@ -1,9 +1,9 @@
 package com.ad.admain.controller.equipment.impl;
 
-import com.ad.admain.common.AbstractBaseService;
 import com.ad.admain.controller.equipment.EquipmentRepository;
 import com.ad.admain.controller.equipment.EquipmentService;
-import com.ad.admain.to.Equipment;
+import com.ad.admain.controller.equipment.entity.Equipment;
+import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;

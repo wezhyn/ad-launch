@@ -1,10 +1,10 @@
 package com.ad.admain.controller.equipment;
 
+import com.ad.admain.controller.ResponseResult;
+import com.ad.admain.controller.equipment.dto.EquipmentDto;
+import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.convert.EquipmentMapper;
-import com.ad.admain.dto.EquipmentDto;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.to.Equipment;
-import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

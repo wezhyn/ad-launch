@@ -1,6 +1,5 @@
 package com.ad.admain.security.repo;
 
-import com.ad.admain.to.JwtUserSecret;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

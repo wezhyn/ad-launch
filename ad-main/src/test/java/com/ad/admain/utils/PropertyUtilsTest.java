@@ -1,12 +1,12 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.enumate.SexEnum;
-import com.ad.admain.to.GenericUser;
+import com.ad.admain.controller.account.AuthenticationEnum;
+import com.ad.admain.controller.account.SexEnum;
+import com.ad.admain.controller.account.entity.GenericUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import static com.ad.admain.utils.PropertyUtils.copyProperties;
+import static com.wezhyn.project.utils.PropertyUtils.copyProperties;
 
 /**
  * @author wezhyn

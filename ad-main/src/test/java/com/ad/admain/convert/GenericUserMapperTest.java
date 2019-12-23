@@ -1,9 +1,9 @@
 package com.ad.admain.convert;
 
-import com.ad.admain.dto.UserDto;
-import com.ad.admain.enumate.AuthenticationEnum;
-import com.ad.admain.enumate.SexEnum;
-import com.ad.admain.to.GenericUser;
+import com.ad.admain.controller.account.AuthenticationEnum;
+import com.ad.admain.controller.account.SexEnum;
+import com.ad.admain.controller.account.dto.UserDto;
+import com.ad.admain.controller.account.entity.GenericUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

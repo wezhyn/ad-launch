@@ -1,7 +1,7 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.enumate.ImgBedType;
-import com.ad.admain.to.ImgBed;
+import com.ad.admain.controller.impl.ImgBed;
+import com.ad.admain.controller.impl.ImgBedType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

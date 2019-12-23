@@ -1,7 +1,7 @@
 package com.ad.admain.controller.equipment;
 
-import com.ad.admain.common.BaseService;
-import com.ad.admain.to.Equipment;
+import com.ad.admain.controller.equipment.entity.Equipment;
+import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,12 +1,12 @@
 package com.ad.admain.controller.account;
 
+import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.controller.SimpleResponseResult;
+import com.ad.admain.controller.account.dto.PasswordModifyWrap;
+import com.ad.admain.controller.account.dto.UserDto;
+import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.convert.GenericUserMapper;
-import com.ad.admain.dto.UserDto;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.to.GenericUser;
-import com.ad.admain.to.PasswordModifyWrap;
-import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

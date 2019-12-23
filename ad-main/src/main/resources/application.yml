@@ -6,7 +6,7 @@ server:
 
 spring:
   profiles:
-    active: zhaoo
+    active: dev
   #    active: pro
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

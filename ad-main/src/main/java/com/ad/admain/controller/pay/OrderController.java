@@ -1,10 +1,10 @@
 package com.ad.admain.controller.pay;
 
+import com.ad.admain.controller.ResponseResult;
+import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.controller.pay.to.OrderInfo;
 import com.ad.admain.controller.pay.to.Value;
 import com.ad.admain.pay.ZfbPayHolder;
-import com.ad.admain.to.ResponseResult;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +50,7 @@ public class OrderController {
      */
     @RequestMapping("/create")
     public ResponseResult create(@RequestBody Order order) throws Exception {
-        Optional<OrderInfo> savedOrder=orderInfoService.createOrder(order);
+        Optional<BillInfo> savedOrder=orderInfoService.createOrder(order);
         return savedOrder.map(o->{
             Order sOrder=orderService.getById(o.getId()).get();
             o.setOrder(sOrder);

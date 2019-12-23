@@ -1,13 +1,13 @@
 package com.ad.admain.message.impl;
 
-import com.ad.admain.common.AbstractBaseService;
 import com.ad.admain.controller.message.EasemobRepository;
 import com.ad.admain.message.EasemobService;
+import com.ad.admain.message.EasemobUser;
 import com.ad.admain.message.api.IMUserAPI;
 import com.ad.admain.message.api.impl.EasemobIMUsers;
 import com.ad.admain.message.response.EasemobUserResponse;
-import com.ad.admain.to.EasemobUser;
 import com.google.gson.Gson;
+import com.wezhyn.project.AbstractBaseService;
 import io.swagger.client.model.RegisterUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;

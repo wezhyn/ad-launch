@@ -1,6 +1,7 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.common.BaseEnum;
+import com.wezhyn.project.NumberEnum;
+import com.wezhyn.project.StringEnum;
 import lombok.AllArgsConstructor;
 
 /**
@@ -10,7 +11,7 @@ import lombok.AllArgsConstructor;
  * @since 12.01.2019
  */
 @AllArgsConstructor
-public enum TradeStatus implements BaseEnum {
+public enum TradeStatus implements NumberEnum, StringEnum {
 
 
     /**
@@ -56,13 +57,14 @@ public enum TradeStatus implements BaseEnum {
     private Integer tradeStatus;
     private String tradeMessage;
 
-    @Override
-    public int getOrdinal() {
-        return tradeStatus;
-    }
 
     @Override
     public String getValue() {
         return tradeMessage;
+    }
+
+    @Override
+    public Integer getNumber() {
+        return tradeStatus;
     }
 }

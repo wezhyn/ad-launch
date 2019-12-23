@@ -1,9 +1,9 @@
 package com.ad.admain.security.jwt;
 
 import com.ad.admain.config.web.JwtProperties;
+import com.ad.admain.controller.account.entity.IUser;
 import com.ad.admain.exception.JwtParseException;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.to.IUser;
 import com.ad.admain.utils.RoleAuthenticationUtils;
 import com.ad.admain.utils.StringUtils;
 import io.jsonwebtoken.*;

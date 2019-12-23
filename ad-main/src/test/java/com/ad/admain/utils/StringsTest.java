@@ -1,5 +1,6 @@
 package com.ad.admain.utils;
 
+import com.wezhyn.project.utils.Strings;
 import org.junit.Test;
 
 /**

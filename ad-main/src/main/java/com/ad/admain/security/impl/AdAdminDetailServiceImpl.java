@@ -1,10 +1,10 @@
 package com.ad.admain.security.impl;
 
 import com.ad.admain.controller.account.AdminService;
+import com.ad.admain.controller.account.entity.Admin;
+import com.ad.admain.controller.account.entity.IAdmin;
 import com.ad.admain.security.AdUserDetails;
 import com.ad.admain.security.AdUserDetailsService;
-import com.ad.admain.to.Admin;
-import com.ad.admain.to.IAdmin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;

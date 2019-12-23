@@ -14,14 +14,24 @@ import java.util.Optional;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class OrderServiceImplTest {
-@Autowired
+    @Autowired
     OrderReposity orderReposity;
+
+
+    @Test
+    public void get() {
+        System.out.println(orderReposity.findById(2).get());
+    }
+
     @Test
     public void save() {
-        Order order = new Order()
-                .setStartTime(new Date(System.currentTimeMillis()))
-                ;
-        Order order1 = orderReposity.save(order);
+        Order order=new Order()
+                .setVerify(Order.OrderVerify.WAIT_VERITY)
+                .setStartTime(new Date(System.currentTimeMillis()));
+
+        Order order1=orderReposity.save(order);
         System.out.println(Optional.ofNullable(order1).toString());
     }
+
+
 }

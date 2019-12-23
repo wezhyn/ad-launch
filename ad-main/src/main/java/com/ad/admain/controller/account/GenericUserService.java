@@ -1,8 +1,8 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.common.BaseService;
-import com.ad.admain.dto.IFileUpload;
-import com.ad.admain.to.GenericUser;
+import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.impl.IFileUpload;
+import com.wezhyn.project.BaseService;
 
 import java.util.Optional;
 

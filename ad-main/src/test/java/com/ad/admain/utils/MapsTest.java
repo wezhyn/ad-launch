@@ -2,6 +2,7 @@ package com.ad.admain.utils;
 
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.google.common.collect.ImmutableMap;
+import com.wezhyn.project.utils.Maps;
 import org.junit.Test;
 
 import java.util.Map;

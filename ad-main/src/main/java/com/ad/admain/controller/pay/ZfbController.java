@@ -1,13 +1,13 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.common.AbstractBaseMapAdapterModel;
+import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.controller.pay.dto.AppTradeNotification;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
 import com.ad.admain.pay.ZfbPayHolder;
 import com.ad.admain.pay.ZfbTradeI;
 import com.ad.admain.pay.ZfbTradeResolver;
-import com.ad.admain.to.ResponseResult;
-import com.ad.admain.utils.EnumUtils;
+import com.wezhyn.project.AbstractBaseMapAdapterModel;
+import com.wezhyn.project.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -100,7 +100,7 @@ public class ZfbController {
     private TradeStatus getTradeStatus(JSONObject object) {
         try {
             int resultStatus=object.getInt("resultStatus");
-            return EnumUtils.valueOfBaseEnum(TradeStatus.class, resultStatus);
+            return EnumUtils.valueOfNumberEnum(TradeStatus.class, resultStatus);
         } catch (JSONException e) {
             return TradeStatus.TRADE_CANCEL_OTHER;
         }

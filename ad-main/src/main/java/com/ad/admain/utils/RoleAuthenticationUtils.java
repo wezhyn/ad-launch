@@ -1,6 +1,7 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.enumate.AuthenticationEnum;
+import com.ad.admain.controller.account.AuthenticationEnum;
+import com.wezhyn.project.utils.EnumUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -47,7 +48,7 @@ public final class RoleAuthenticationUtils {
      * @return collection:has value;null:no value;
      */
     public static Collection<? extends GrantedAuthority> forGrantedAuthorities(String authentication) {
-        AuthenticationEnum authenticationEnum=EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, authentication);
+        AuthenticationEnum authenticationEnum=EnumUtils.valueOfStringEnumIgnoreCase(AuthenticationEnum.class, authentication);
         return forGrantedAuthorities(authenticationEnum);
     }
 
@@ -100,7 +101,7 @@ public final class RoleAuthenticationUtils {
     private static AuthenticationEnum grantedAuthority2AuthenticationEnum(String grantedAuthority) {
         if (grantedAuthority.startsWith(ROLE_PREFIX)) {
             String role=grantedAuthority.substring(ROLE_PREFIX.length());
-            return EnumUtils.valueOfBaseEnumIgnoreCase(AuthenticationEnum.class, role);
+            return EnumUtils.valueOfStringEnumIgnoreCase(AuthenticationEnum.class, role);
         }
         throw new EnumConstantNotPresentException(AuthenticationEnum.class, grantedAuthority);
     }

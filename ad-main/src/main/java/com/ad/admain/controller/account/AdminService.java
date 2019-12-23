@@ -1,7 +1,7 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.common.BaseService;
-import com.ad.admain.to.Admin;
+import com.ad.admain.controller.account.entity.Admin;
+import com.wezhyn.project.BaseService;
 
 import java.util.Optional;
 

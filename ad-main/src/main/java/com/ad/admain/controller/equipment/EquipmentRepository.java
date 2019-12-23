@@ -1,6 +1,6 @@
 package com.ad.admain.controller.equipment;
 
-import com.ad.admain.to.Equipment;
+import com.ad.admain.controller.equipment.entity.Equipment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

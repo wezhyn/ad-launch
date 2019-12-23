@@ -1,9 +1,9 @@
 package com.ad.admain.controller.account.impl;
 
-import com.ad.admain.common.AbstractBaseService;
 import com.ad.admain.controller.account.AdminService;
+import com.ad.admain.controller.account.entity.Admin;
 import com.ad.admain.controller.account.repository.AdminRepository;
-import com.ad.admain.to.Admin;
+import com.wezhyn.project.AbstractBaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

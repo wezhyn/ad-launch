@@ -1,7 +1,6 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.common.BaseService;
-import com.ad.admain.to.ResponseResult;
+import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -1,12 +1,9 @@
 package com.ad.admain.controller.impl;
 
-import com.ad.admain.common.AbstractBaseService;
 import com.ad.admain.controller.FileUploadService;
 import com.ad.admain.controller.ImgBedRepository;
 import com.ad.admain.controller.ImgBedService;
-import com.ad.admain.dto.QiNiuPutSet;
-import com.ad.admain.enumate.ImgBedType;
-import com.ad.admain.to.ImgBed;
+import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;

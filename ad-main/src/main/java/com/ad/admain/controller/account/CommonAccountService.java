@@ -1,6 +1,6 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.dto.IFileUpload;
+import com.ad.admain.controller.impl.IFileUpload;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,9 +1,9 @@
 package com.ad.admain.aop.message;
 
+import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.entity.IUser;
 import com.ad.admain.message.EasemobService;
-import com.ad.admain.to.EasemobUser;
-import com.ad.admain.to.GenericUser;
-import com.ad.admain.to.IUser;
+import com.ad.admain.message.EasemobUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Pointcut;

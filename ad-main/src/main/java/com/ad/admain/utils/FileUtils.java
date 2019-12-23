@@ -1,7 +1,7 @@
 package com.ad.admain.utils;
 
 import com.ad.admain.config.web.ResourceConstant;
-import com.ad.admain.enumate.StringEnum;
+import com.wezhyn.project.StringEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

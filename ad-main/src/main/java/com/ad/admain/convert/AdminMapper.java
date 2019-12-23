@@ -1,8 +1,8 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.config.QiNiuProperties;
-import com.ad.admain.dto.AdminDto;
-import com.ad.admain.to.Admin;
+import com.ad.admain.controller.account.dto.AdminDto;
+import com.ad.admain.controller.account.entity.Admin;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

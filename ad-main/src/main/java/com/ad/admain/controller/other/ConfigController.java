@@ -1,11 +1,10 @@
 package com.ad.admain.controller.other;
 
 import com.ad.admain.controller.ImgBedService;
+import com.ad.admain.controller.ResponseResult;
+import com.ad.admain.controller.impl.ImgBed;
+import com.ad.admain.controller.impl.ImgBedType;
 import com.ad.admain.convert.ImgBedConfigMapper;
-import com.ad.admain.dto.ConfigDto;
-import com.ad.admain.enumate.ImgBedType;
-import com.ad.admain.to.ImgBed;
-import com.ad.admain.to.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

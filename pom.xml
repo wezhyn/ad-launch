@@ -24,13 +24,7 @@
     </properties>
 
     <dependencies>
-        <!--        工具jar-->
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <!--自动映射 dto -> do -->
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -46,11 +40,17 @@
                 <artifactId>ad-main</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.wezhyn.project</groupId>
+                <artifactId>common</artifactId>
+                <version>1.0.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
         <module>ad-main</module>
+        <module>common</module>
     </modules>
 
     <build>
