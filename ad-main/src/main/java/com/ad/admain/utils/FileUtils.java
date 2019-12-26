@@ -3,7 +3,6 @@ package com.ad.admain.utils;
 import com.ad.admain.config.web.ResourceConstant;
 import com.wezhyn.project.StringEnum;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -73,6 +72,7 @@ public class FileUtils {
      *                          ->    E:/res/{type}/relativeDirectory/fileName,若无,则 /res/{type}
      * @return FileWrap
      */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private static FileWrap getBaseInfo(MultipartFile file, StringEnum fileType, String relativeDirectory) {
         String fileName=getFileName(file.getOriginalFilename());
         Path realPath=Paths.get(ResourceConstant.RESOURCE_SAVE_LOCATION, fileType.getValue(), relativeDirectory, fileName);
@@ -132,7 +132,6 @@ public class FileUtils {
     }
 
     @Data
-    @NoArgsConstructor
     private static class FileWrap {
         private String fileName;
         private Path realPath;
