@@ -12,7 +12,7 @@ import org.mapstruct.ReportingPolicy;
  */
 @MapperConfig(
         componentModel="spring",
-        uses={StringEnumMapper.class},
+        uses={StringEnumMapper.class, DateTimeMapper.class},
         unmappedSourcePolicy=ReportingPolicy.WARN,
         unmappedTargetPolicy=ReportingPolicy.ERROR,
 //        ,typeConversionPolicy=ReportingPolicy.WARN

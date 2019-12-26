@@ -24,11 +24,11 @@ import java.time.LocalDateTime;
 public class BillInfo implements IBaseTo<Integer> {
 
     @Id
-    @Column(name="order_id", insertable=false, updatable=false)
+    @Column(name="order_id")
     private Integer orderId;
 
     @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="order_id", referencedColumnName="id")
+    @JoinColumn(name="order_id", referencedColumnName="id", insertable=false, updatable=false)
     private Order order;
 
     @Enumerated(value=EnumType.STRING)

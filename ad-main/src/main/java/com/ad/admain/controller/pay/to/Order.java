@@ -13,7 +13,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name="ad_order")
@@ -30,13 +30,19 @@ public class Order implements IBaseTo<Integer> {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne(mappedBy="order")
+    private BillInfo billInfo;
+    @ManyToOne()
+    @JoinColumn(name="uid", insertable=false, updatable=false)
+    private GenericUser orderUser;
     @OneToMany(cascade=CascadeType.ALL)
     private List<Value> valueList;
 
-    private Date startTime;
-    private Date endTime;
-    private Date startDate;
-    private Date endDate;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+
 
     /**
      * 订单单价
@@ -48,26 +54,22 @@ public class Order implements IBaseTo<Integer> {
      */
     private Integer num;
 
-    private double latitude;
+    private Double latitude;
 
-    private double longitude;
+    private Double longitude;
 
     /**
      * 广告投放范围
      */
-    private int scope;
+    private Integer scope;
 
     /**
      * 广告投放频率
      */
-    private int rate;
+    private Integer rate;
 
-    private int uid;
+    private Integer uid;
 
-
-    @ManyToOne()
-    @JoinColumn(name="uid", insertable=false, updatable=false)
-    private GenericUser orderUser;
 
     /**
      * 代客服审核

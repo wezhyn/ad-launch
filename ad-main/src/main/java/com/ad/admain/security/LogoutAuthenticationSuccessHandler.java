@@ -29,7 +29,8 @@ public class LogoutAuthenticationSuccessHandler implements LogoutSuccessHandler 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String result="{\n" +
-                "    \"code\": 20000\n" +
+                "    \"code\": 20000,\n" +
+                " \"message \": \"退出成功 \" " +
                 "}";
         try (PrintWriter printWriter=response.getWriter()) {
 //            String name=authentication.getName();
@@ -39,7 +40,6 @@ public class LogoutAuthenticationSuccessHandler implements LogoutSuccessHandler 
             response.flushBuffer();
             SecurityContext context=SecurityContextHolder.getContext();
             context.setAuthentication(null);
-
         }
     }
 }

@@ -1,0 +1,4 @@
+GET http://{{url}}/api/order/list
+Accept: application/json
+
+###

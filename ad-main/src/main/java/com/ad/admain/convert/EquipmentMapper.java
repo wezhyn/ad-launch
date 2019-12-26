@@ -3,6 +3,8 @@ package com.ad.admain.convert;
 import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.ReportingPolicy;
 
 /**
@@ -14,4 +16,10 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(config=CentralMapperConfig.class,
         unmappedTargetPolicy=ReportingPolicy.IGNORE)
 public interface EquipmentMapper extends AbstractMapper<Equipment, EquipmentDto> {
+
+    @Override
+    @Mappings({
+            @Mapping(target="username", expression="java(equipment.getOrderUser().getUsername())")
+    })
+    EquipmentDto toDto(Equipment equipment);
 }

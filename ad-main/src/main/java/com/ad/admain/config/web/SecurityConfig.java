@@ -2,10 +2,7 @@ package com.ad.admain.config.web;
 
 import com.ad.admain.config.JwtConfig;
 import com.ad.admain.security.*;
-import com.ad.admain.security.filter.AdJwtCheckAuthenticationFilter;
-import com.ad.admain.security.filter.AdJwtLogoutAuthenticationFilter;
-import com.ad.admain.security.filter.AdUsernamePasswordAuthenticationFilter;
-import com.ad.admain.security.filter.AdUsernamePasswordAuthenticationProvider;
+import com.ad.admain.security.filter.*;
 import com.ad.admain.security.jwt.JwtDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.servlet.Filter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +36,6 @@ import java.util.Map;
 
 
 @Configuration
-//启用web安全性,若开发选择spring mvc技术则使用@EnableWebMvcSecurity
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -82,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         Map<String, String> matchs=jwtProperties.getLoginInterceptionInclude();
+        Filter authenticationFilter=new JwtAuthenticationFailFilter();
         AdUsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter=createUserNamePasswordAuthenticationFilter(
                 matchs, authenticationManager(), usernamePasswordConverts,
                 loginAuthenticationFailureHandler,
@@ -94,10 +92,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(usernamePasswordAuthenticationFilter, LogoutFilter.class)
                 .addFilterBefore(jwtCheckAuthenticationFilter, usernamePasswordAuthenticationFilter.getClass())
                 .addFilterAt(adJwtLogoutAuthenticationFilter(jwtProperties.getLogoutInterception(), jwtDetailService), LogoutFilter.class)
+                .addFilterBefore(authenticationFilter, AdJwtCheckAuthenticationFilter.class)
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
                 .antMatchers("/").permitAll();
 
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

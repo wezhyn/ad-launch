@@ -1,5 +1,6 @@
 package com.ad.admain.controller.equipment.entity;
 
+import com.ad.admain.controller.account.entity.GenericUser;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -35,6 +36,10 @@ public class Equipment implements IBaseTo<Integer> {
     private Integer id;
 
     private Integer uid;
+
+    @ManyToOne()
+    @JoinColumn(name="uid", insertable=false, updatable=false)
+    private GenericUser orderUser;
 
 
     @ColumnDefault("'暂无介绍'")

@@ -50,7 +50,7 @@ public class AdJwtCheckAuthenticationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest=(HttpServletRequest) request;
         SecurityContext securityContext=SecurityContextHolder.getContext();
-        //     当当前无权限时，尝试从jwt中获取Authentication
+        //     当前无权限时，尝试从jwt中获取Authentication
         if (!matches(request) && securityContext.getAuthentication()==null) {
             String jwt="";
             for (IJwtRequestRead re : jwtRequestReads) {

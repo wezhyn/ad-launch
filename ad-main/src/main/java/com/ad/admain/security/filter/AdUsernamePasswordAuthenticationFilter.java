@@ -3,6 +3,7 @@ package com.ad.admain.security.filter;
 import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.security.IUsernamePasswordConvert;
 import com.ad.admain.security.MarkAntPathRequestMatcherExtractor;
+import com.ad.admain.security.exception.AdUsernamePasswordException;
 import lombok.Data;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,10 +51,14 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
             }
         }
         if (definition==null) {
-            throw new IOException("从请求中读取账户信息出错");
+            throw new AdUsernamePasswordException("从请求中读取账户信息出错");
         }
         AdAuthentication authRequest=new AdAuthentication(definition.getUsername(), definition.getPassword());
-        return this.authenticationManager.authenticate(authRequest);
+        try {
+            return this.authenticationManager.authenticate(authRequest);
+        } catch (Exception e) {
+            throw new AdUsernamePasswordException(e.getMessage());
+        }
     }
 
 

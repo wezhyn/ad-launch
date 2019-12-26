@@ -1,6 +1,7 @@
 package com.ad.admain.security.filter;
 
 import com.ad.admain.security.AntPathRequestMatcherExtractor;
+import com.ad.admain.security.exception.JwtAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -43,6 +44,9 @@ public class AdJwtLogoutAuthenticationFilter extends GenericFilterBean {
         HttpServletResponse response=(HttpServletResponse) res;
         if (this.requiresLogout(request, response)) {
             Authentication auth=SecurityContextHolder.getContext().getAuthentication();
+            if (auth==null) {
+                throw new JwtAuthenticationException("退出无用户认证信息");
+            }
             if (this.logger.isDebugEnabled()) {
                 this.logger.debug("Logging out user '" + auth + "' and transferring to logout destination");
             }

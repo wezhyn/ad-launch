@@ -1,9 +1,7 @@
-package com.ad.admain.controller.pay.impl;
+package com.ad.admain.convert;
 
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.convert.AbstractMapper;
-import com.ad.admain.convert.CentralMapperConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -26,4 +24,6 @@ public abstract class OrderMapper implements AbstractMapper<Order, OrderDto> {
             @Mapping(target="username", expression="java(order.getOrderUser().getUsername())")
     })
     public abstract OrderDto toDto(Order order);
+
+
 }

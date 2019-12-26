@@ -64,7 +64,7 @@ public interface GenericUserRepository extends JpaRepository<GenericUser, Intege
      * @param password 密码
      * @return 1
      */
-    @Query("update GenericUser u set u.password=:password where u.username=:id")
+    @Query("update GenericUser u set u.password=:password where u.id=:id")
     @Modifying(clearAutomatically=true)
     @Transactional(rollbackFor=Exception.class)
     int updateUserPassword(@Param("id") Integer id,

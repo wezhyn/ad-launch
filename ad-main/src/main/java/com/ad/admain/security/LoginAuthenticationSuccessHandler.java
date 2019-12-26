@@ -32,6 +32,7 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         String token=securityJwtProvider.createToken(authentication, false, authentication.getName());
         ResponseResult result=ResponseResult.forSuccessBuilder()
+                .withMessage("登录成功")
                 .withData("token", token).build();
         write(result, request, response);
     }

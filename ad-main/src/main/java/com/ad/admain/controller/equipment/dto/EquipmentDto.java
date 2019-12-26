@@ -17,11 +17,13 @@ public class EquipmentDto {
 
     private Integer id;
 
+    private String username;
     private Integer uid;
     private String intro;
     private String img;
 
     private String name;
+
 
     private boolean status;
     private String verify;

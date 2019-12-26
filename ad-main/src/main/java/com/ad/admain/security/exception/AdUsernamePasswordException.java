@@ -1,6 +1,4 @@
-package com.ad.admain.exception;
-
-import org.springframework.security.core.AuthenticationException;
+package com.ad.admain.security.exception;
 
 /**
  * @author : wezhyn
@@ -8,7 +6,7 @@ import org.springframework.security.core.AuthenticationException;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public class AdUsernamePasswordException extends AuthenticationException {
+public class AdUsernamePasswordException extends JwtAuthenticationException {
 
 
     public AdUsernamePasswordException(String msg, Throwable t) {

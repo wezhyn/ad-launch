@@ -1,5 +1,6 @@
 package com.ad.admain.controller.pay.impl;
 
+import com.ad.admain.controller.pay.OrderSearchType;
 import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.repository.OrderReposity;
 import com.ad.admain.controller.pay.repository.ValueReposity;
@@ -7,11 +8,14 @@ import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.pay.to.Value;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +25,7 @@ public class OrderServiceImpl extends AbstractBaseService<Order, Integer> implem
 
     private OrderReposity orderReposity;
     private ValueReposity valueReposity;
+    private static final Page<Order> EMPTY_ORDER_PAGE=new PageImpl<Order>(Collections.unmodifiableList(Collections.EMPTY_LIST));
 
     @Autowired
     public OrderServiceImpl(OrderReposity orderReposity, ValueReposity valueReposity) {
@@ -47,13 +52,26 @@ public class OrderServiceImpl extends AbstractBaseService<Order, Integer> implem
         return Optional.of(order);
     }
 
-    @Override
-    public Page<Order> getList(Pageable pageable) {
-        return null;
-    }
 
     @Override
     public OrderReposity getRepository() {
         return orderReposity;
+    }
+
+    @Override
+    public Page<Order> search(OrderSearchType type, String context, Pageable pageable) {
+        Order searchOrder=new Order();
+        switch (type) {
+            case USER: {
+                Integer userId=Integer.parseInt(context);
+                searchOrder.setUid(userId);
+                break;
+            }
+            default: {
+                return EMPTY_ORDER_PAGE;
+            }
+        }
+        Page<Order> searchResult=getRepository().findAll(Example.of(searchOrder), pageable);
+        return searchResult.getSize()==0 ? EMPTY_ORDER_PAGE : searchResult;
     }
 }

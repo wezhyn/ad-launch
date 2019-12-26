@@ -32,7 +32,8 @@ public abstract class AdminMapper implements AbstractMapper<Admin, AdminDto> {
     @Override
     @Mappings({
             @Mapping(target="avatar",
-                    expression="java(qiNiuProperties.getHostName() + \"/\" + admin.getAvatar() )")
+                    expression="java(qiNiuProperties.getHostName() + \"/\" + admin.getAvatar() )"),
+//            @Mapping(source="enable", target="status"),
     })
     public abstract AdminDto toDto(Admin admin);
 }

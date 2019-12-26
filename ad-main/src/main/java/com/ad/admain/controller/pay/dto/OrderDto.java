@@ -1,19 +1,18 @@
 package com.ad.admain.controller.pay.dto;
 
 import com.ad.admain.controller.pay.to.Value;
-import com.ad.admain.utils.CustomJsonDateDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.util.Date;
 import java.util.List;
 
 @Accessors(chain=true)
 @Data
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class OrderDto {
 
@@ -22,14 +21,10 @@ public class OrderDto {
     private List<Value> valueList;
 
 
-    @JsonDeserialize(using=CustomJsonDateDeserializer.class)
-    private Date startTime;
-    @JsonDeserialize(using=CustomJsonDateDeserializer.class)
-    private Date endTime;
-    @JsonDeserialize(using=CustomJsonDateDeserializer.class)
-    private Date startDate;
-    @JsonDeserialize(using=CustomJsonDateDeserializer.class)
-    private Date endDate;
+    private String startTime;
+    private String endTime;
+    private String startDate;
+    private String endDate;
 
     /**
      * 订单单价

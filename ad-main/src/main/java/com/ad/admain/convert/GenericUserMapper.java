@@ -34,6 +34,7 @@ public abstract class GenericUserMapper implements AbstractMapper<GenericUser, U
             @Mapping(source="nickName", target="nickname"),
             @Mapping(source="realName", target="realname"),
             @Mapping(source="birthDay", target="birthday"),
+            @Mapping(source="enable", target="status"),
             @Mapping(source="sex", target="gender"),
             @Mapping(target="avatar",
                     expression="java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )")

@@ -44,7 +44,6 @@ public class ZfbController {
         boolean isVerify=notificationGetter.isVerify();
 
         boolean isHandle=isVerify ? new ZfbTradeResolver(zfbTrade).handle(notificationGetter) : isVerify;
-
         return isHandle ? "success" : "fail";
     }
 

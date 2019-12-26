@@ -43,7 +43,7 @@ public class UserDto implements IBaseTo<Integer> {
     private LocalDate birthday;
     private LocalDateTime regTime;
     private LocalDateTime lastModified;
-    private String enable;
+    private String status;
     private boolean accountNonExpired;
     private boolean credentialsNonExpired;
     private boolean accountNonLocked;
