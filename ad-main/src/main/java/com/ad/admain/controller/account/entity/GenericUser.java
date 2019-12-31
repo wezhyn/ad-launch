@@ -102,7 +102,7 @@ public class GenericUser implements IUser {
 
     @Override
     public String getSex() {
-        return this.sex.getValue();
+        return this.sex==null ? SexEnum.UNKNOWN.getValue() : this.sex.getValue();
     }
 
 
@@ -124,6 +124,7 @@ public class GenericUser implements IUser {
          */
         NORMAL(1, "normal"),
         NOT_AUTHENTICATION(0, "authentication"),
+        MODIFY_AUTHENTICATION(10, "modify"),
         FORBID(-1, "forbid");
 
         private int enableNum;

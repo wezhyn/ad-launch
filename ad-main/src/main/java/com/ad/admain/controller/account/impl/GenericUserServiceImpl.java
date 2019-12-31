@@ -1,6 +1,7 @@
 package com.ad.admain.controller.account.impl;
 
 import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.account.repository.GenericUserRepository;
 import com.ad.admain.security.jwt.JwtDetailService;
@@ -69,6 +70,20 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     @Override
     public int updateUserAvatar(String username, String avatarKey) {
         return getRepository().updateUserAvatar(username, avatarKey);
+    }
+
+
+    @Override
+    public Optional<GenericUser> updateUserAuthenticationInfo(UserDto userDto) {
+        final Optional<GenericUser> savedUser=getRepository().findById(userDto.getId());
+        return Optional.of(savedUser.map(u->{
+            if (u.getEnable().getEnableNum()==0) {
+                u.setRealName(userDto.getRealname());
+                u.setIdCard(userDto.getIdCard());
+                return save(u);
+            }
+            return null;
+        }).get());
     }
 
     @Override

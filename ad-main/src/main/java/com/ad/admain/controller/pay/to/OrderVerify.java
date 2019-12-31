@@ -19,7 +19,7 @@ public enum OrderVerify implements StringEnum, NumberEnum {
      * -2：订单代修改
      */
     WAIT_VERITY(0, "wait"), PASSING_VERIFY(1, "pass"),
-    FAILURE_VERIFY(-1, "failure"), MODIFY_VERIFY(-2, "modify");
+    FAILURE_VERIFY(-1, "fail"), MODIFY_VERIFY(-2, "modify");
 
     private Integer verifyNum;
     private String verify;

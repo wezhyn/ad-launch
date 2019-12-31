@@ -45,10 +45,7 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
     public ResponseResult listDto(int limit, int page) {
         final PageRequest pageable=PageRequest.of(page - 1, limit);
         final Page<U> list=getService().getList(pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withData("items", getConvertMapper().toDtoList(list.getContent()))
-                .withData("total", list.getTotalElements())
-                .build();
+        return doResponse(list);
     }
 
     @Override
@@ -57,21 +54,16 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
         to=preSave(to);
         U savedTo=getService().save(to);
         savedTo=afterSave(savedTo);
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("创建成功")
-                .withData("to", savedTo)
-                .build();
+        return doResponse(savedTo, "创建成功");
     }
 
     @Override
     public ResponseResult update(T entityDto) {
         U to=getConvertMapper().toTo(entityDto);
         U updateTo=doUpdate(to);
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("修改成功")
-                .withData("newTo", getConvertMapper().toDto(updateTo))
-                .build();
+        return doResponse(updateTo, "修改成功");
     }
+
 
     /**
      * 默认实现：根据Id删除实体类
@@ -80,6 +72,7 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      * @return ResponseResult
      */
     @Override
+
     public ResponseResult delete(T entityDto) {
         final Optional<ID> dtoId=getDtoId(entityDto);
         return dtoId.map(deleteByIdMapper)
@@ -96,20 +89,12 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      */
     public ResponseResult listsDto(int limit, int page, T searchExample) {
         final Page<U> list=getService().getList(PageRequest.of(page - 1, limit), getConvertMapper().toTo(searchExample));
-        return ResponseResult.forSuccessBuilder()
-                .withData("items", getConvertMapper().toDtoList(list.getContent()))
-                .withData("total", list.getTotalElements())
-                .build();
+        return doResponse(list);
     }
 
     public ResponseResult currentIdResult(ID currentId) {
         final Optional<U> idResult=getService().getById(currentId);
-        return idResult.map(id->{
-            return ResponseResult.forSuccessBuilder()
-                    .withData("item", id)
-                    .build();
-        }).orElseGet(()->ResponseResult.forFailureBuilder()
-                .withMessage("无当前 id 的信息").build());
+        return doResponse(idResult, "获取成功", "获取失败");
     }
 
     /**
@@ -170,10 +155,45 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
             log.error("{} 无主键id列 ", dtoClass);
             return Optional.empty();
         }
+        idField.setAccessible(true);
         final Object id=ReflectionUtils.getField(idField, entityDto);
         return id==null ? Optional.empty() : (Optional<ID>) Optional.of(id);
     }
 
+    protected ResponseResult doResponse(Page<U> toList) {
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("获取列表成功")
+                .withData("items", getConvertMapper().toDtoList(toList.getContent()))
+                .withData("total", toList.getTotalElements())
+                .build();
+    }
+
+    protected ResponseResult doResponse(Optional<U> entity, String successMsg, String failMessage) {
+        return entity.map(u->doResponse(u, successMsg))
+                .orElseGet(()->ResponseResult.forFailureBuilder()
+                        .withMessage(failMessage)
+                        .build());
+    }
+
+    /**
+     * 成功返回信息
+     *
+     * @param entity  entity
+     * @param message 成功信息
+     * @return response
+     */
+    protected ResponseResult doResponse(U entity, String message) {
+        return ResponseResult.forSuccessBuilder()
+                .withMessage(message)
+                .withData("to", getConvertMapper().toDto(entity))
+                .build();
+    }
+
+    protected ResponseResult doResponse(String message) {
+        return ResponseResult.forSuccessBuilder()
+                .withMessage(message)
+                .build();
+    }
 
     /**
      * get service

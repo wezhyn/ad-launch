@@ -50,7 +50,11 @@ public class PropertyUtils {
         Set<String> emptyNames=new HashSet<>();
         for (PropertyDescriptor propertyDescriptor : pds) {
             String fieldName=propertyDescriptor.getName();
-            Object srcValue=src.getPropertyValue(fieldName);
+            Object srcValue=null;
+            try {
+                srcValue=src.getPropertyValue(fieldName);
+            } catch (Exception ignore) {
+            }
 //            忽略 source中null值
             if (srcValue==null) {
                 emptyNames.add(fieldName);

@@ -7,7 +7,6 @@ import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.GenericUserMapper;
 import com.ad.admain.security.AdAuthentication;
-import com.wezhyn.project.BaseService;
 import com.wezhyn.project.controller.NoNestResponseResult;
 import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.exception.UpdateOperationException;
@@ -78,7 +77,6 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
                     .withCode(20000)
                     .build();
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseResult.forFailureBuilder()
                     .withMessage("密码修改失败")
                     .withCode(50000).build();
@@ -93,16 +91,18 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
 
     @PostMapping("/update")
     public ResponseResult editUser(@RequestBody UserDto userDto) {
+        userDto.setIdCard(null);
+        userDto.setRealname(null);
+        userDto.setPassword(null);
+        userDto.setStatus(null);
         return update(userDto);
     }
 
     @PostMapping("/verify")
-    public ResponseResult verifyRealNameAuthentication(@RequestBody UserDto userDto) {
-        UserDto verifyDto=UserDto.builder()
-                .idCard(userDto.getIdCard())
-                .realname(userDto.getRealname())
-                .build();
-        return update(verifyDto);
+    public ResponseResult verifyRealNameAuthentication(@RequestBody UserDto userDto, @AuthenticationPrincipal AdAuthentication authentication) {
+        userDto.setId(authentication.getId());
+        final Optional<GenericUser> updateUser=getService().updateUserAuthenticationInfo(userDto);
+        return doResponse(updateUser, "更新成功", "更新失败");
     }
 
     @Override
@@ -116,7 +116,7 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
     }
 
     @Override
-    public BaseService<GenericUser, Integer> getService() {
+    public GenericUserService getService() {
         return genericUserService;
     }
 

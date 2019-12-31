@@ -1,5 +1,6 @@
 package com.ad.admain.controller.account;
 
+import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.wezhyn.project.BaseService;
@@ -28,5 +29,14 @@ public interface GenericUserService extends BaseService<GenericUser, Integer>, C
      * @return int
      */
     int updateUserAvatar(String username, String avatarKey);
+
+
+    /**
+     * 仅当 {@link GenericUser#getEnable()}  == {@code NOT_AUTHENTICATION} 时，才更新实名信息
+     *
+     * @param userDto userDto
+     * @return user
+     */
+    Optional<GenericUser> updateUserAuthenticationInfo(UserDto userDto);
 
 }

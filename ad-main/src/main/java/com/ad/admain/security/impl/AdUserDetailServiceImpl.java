@@ -29,7 +29,7 @@ public class AdUserDetailServiceImpl extends AdUserDetailsService {
         if (log.isDebugEnabled()) {
             log.debug("找到用户 : " + user);
         }
-        return new AdUser(user.getId(), user.getUsername(), user.getPassword(), user.isLock(), user.getAuthorities());
+        return new AdUser(user.getId(), user.getUsername(), user.getPassword(), !user.isLock(), user.getAuthorities());
     }
 
     @Override

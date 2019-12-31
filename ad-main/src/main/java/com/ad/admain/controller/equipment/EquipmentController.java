@@ -98,8 +98,6 @@ public class EquipmentController extends AbstractBaseController<EquipmentDto, In
         int uid=authentication.getId();
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<Equipment> equipmentList=getService().getListByUid(uid, pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withList(getConvertMapper().toDtoList(equipmentList.getContent()), equipmentList.getTotalElements())
-                .build();
+        return doResponse(equipmentList);
     }
 }
