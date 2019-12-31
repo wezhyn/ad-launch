@@ -39,7 +39,7 @@ public class OrderServiceImpl extends AbstractBaseService<Order, Integer> implem
     }
 
     @Override
-    public Optional<Order> save(Order object) {
+    public Order save(Order object) {
         Assert.notNull(object.getPrice(), "无单价");
         Assert.notNull(object.getNum(), "无商品数量");
         Order order=orderReposity.save(object);
@@ -49,7 +49,7 @@ public class OrderServiceImpl extends AbstractBaseService<Order, Integer> implem
             Value val=iterator.next();
             valueReposity.save(val);
         }
-        return Optional.of(order);
+        return order;
     }
 
 

@@ -1,4 +1,4 @@
-package com.ad.admain.utils;
+package com.wezhyn.project.utils;
 
 import java.util.Random;
 

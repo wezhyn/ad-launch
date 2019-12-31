@@ -1,5 +1,6 @@
 package com.ad.admain.controller;
 
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
@@ -25,7 +26,6 @@ public class ExceptionController implements ErrorController {
         String message=this.getAttribute(webRequest, "javax.servlet.error.message");
         String path=this.getAttribute(webRequest, "javax.servlet.error.request_uri");
         Exception exception=this.getAttribute(webRequest, "javax.servlet.error.exception");
-//        int code=this.getAttribute(webRequest, "com.wezhyn.error.code");
         if (StringUtils.isEmpty(message) && exception!=null) {
             String detailMessage=exception.getCause()==null ? null : exception.getCause().getMessage();
             message=exception.getMessage()==null ? "" : (detailMessage!=null ? detailMessage : exception.getMessage());

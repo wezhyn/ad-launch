@@ -34,7 +34,7 @@ public class BillInfoTest {
                 .setPrice(100D)
                 .setValueList(Collections.singletonList(value))
                 .setRate(5);
-        order=orderService.save(order).get();
+        order=orderService.save(order);
         BillInfo orderInfo=BillInfo.builder()
                 .orderId(order.getId())
                 .build();

@@ -1,4 +1,4 @@
-package com.ad.admain.controller;
+package com.wezhyn.project.controller;
 
 import lombok.Data;
 
@@ -73,6 +73,11 @@ public class ResponseResult {
         public Builder withCode(int code) {
             this.code=code;
             return this;
+        }
+
+        public Builder withList(Object value, long itemNum) {
+            return withData("items", value)
+                    .withData("total", itemNum);
         }
 
         public Builder withMessage(String message) {

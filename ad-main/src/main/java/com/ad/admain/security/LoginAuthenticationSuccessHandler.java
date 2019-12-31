@@ -1,8 +1,8 @@
 package com.ad.admain.security;
 
-import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.security.jwt.SecurityJwtProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;

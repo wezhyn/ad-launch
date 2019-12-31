@@ -3,43 +3,23 @@ package com.ad.admain.controller.pay.impl;
 import com.ad.admain.controller.pay.ValueService;
 import com.ad.admain.controller.pay.repository.ValueReposity;
 import com.ad.admain.controller.pay.to.Value;
+import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+/**
+ * @author : lb
+ * @date : 2019/12/31
+ */
 @Service
-public class ValueServiceImpl implements ValueService {
+public class ValueServiceImpl extends AbstractBaseService<Value, Integer> implements ValueService {
 
     @Autowired
     private ValueReposity valueReposity;
 
 
     @Override
-    public Optional<Value> getById(Integer integer) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Value> save(Value object) {
-        Value value=valueReposity.save(object);
-        return Optional.ofNullable(value);
-    }
-
-    @Override
-    public Optional<Value> update(Value newObject) {
-        return Optional.empty();
-    }
-
-    @Override
-    public void delete(Integer integer) {
-
-    }
-
-    @Override
-    public Page<Value> getList(Pageable pageable) {
-        return null;
+    public ValueReposity getRepository() {
+        return valueReposity;
     }
 }

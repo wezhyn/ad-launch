@@ -28,7 +28,7 @@ public interface BaseService<T, ID> {
      * @param object 储存的对象
      * @return 储存后的对象
      */
-    Optional<T> save(T object);
+    T save(T object);
 
 
     /**
@@ -37,7 +37,7 @@ public interface BaseService<T, ID> {
      * @param newObject 新的完整参数
      * @return T
      */
-    Optional<T> update(T newObject);
+    T update(T newObject);
 
     /**
      * 根据主键删除对象
@@ -48,12 +48,22 @@ public interface BaseService<T, ID> {
 
 
     /**
+     * 无条件查询
      * 根据传进来 limit 和 page组成 pageable的进行分页
      *
      * @param pageable pageable {@link new Pageable}
      * @return 分页
      */
     Page<T> getList(Pageable pageable);
+
+    /**
+     * 条件查询：假设要查询 id =1 ,name ="xxx" 的列表，则 searchField 只有 id 与 name 两个属性，负责将出现异常
+     *
+     * @param pageable    分页
+     * @param searchField 要查询的字段
+     * @return page
+     */
+    Page<T> getList(Pageable pageable, T searchField);
 
 
 }

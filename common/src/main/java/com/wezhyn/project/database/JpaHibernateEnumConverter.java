@@ -154,6 +154,7 @@ public class JpaHibernateEnumConverter<T extends Enum<T>> implements DynamicPara
         if (enumMapper==null) {
             throw new AssertionFailure("EnumType (" + enumClass.getName() + ") not properly, fully configured");
         }
+
         enumMapper.setValue(st, value, index);
     }
 
@@ -206,6 +207,14 @@ public class JpaHibernateEnumConverter<T extends Enum<T>> implements DynamicPara
     }
 
     private interface ResultSetToPrimitive<R> {
+        /**
+         * 获取 ResultSet 对应列的值
+         *
+         * @param rs    set
+         * @param names 列名
+         * @return int 类型 or String 类型
+         * @throws SQLException exception
+         */
         R apply(ResultSet rs, String[] names) throws SQLException;
     }
 

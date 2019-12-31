@@ -15,6 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <mapstruct.version>1.3.1.Final</mapstruct.version>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
@@ -24,6 +25,13 @@
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+        <!--自动映射 dto -> do -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-jdk8</artifactId>
+            <version>${mapstruct.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -98,6 +106,7 @@
             <artifactId>spring-core</artifactId>
             <version>5.2.0.RELEASE</version>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

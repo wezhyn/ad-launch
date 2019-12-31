@@ -42,7 +42,7 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     */
 
     @Override
-    public Optional<GenericUser> save(GenericUser object) {
+    public GenericUser save(GenericUser object) {
         return super.save(object);
     }
 
@@ -55,7 +55,7 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     @Transactional(rollbackFor=Exception.class)
     public int modifyUserPasswordById(Integer id, String username, String password) {
         String newPasword=passwordEncoder.encode(password);
-        String secret=com.ad.admain.utils.StringUtils.getRandomString(50);
+        String secret=com.wezhyn.project.utils.StringUtils.getRandomString(50);
 //        todo:解耦
         jwtDetailService.saveSecretByUsername(id, username, secret);
         return genericUserRepository.updateUserPassword(id, newPasword);

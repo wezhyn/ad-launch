@@ -1,6 +1,6 @@
 package com.ad.admain.security;
 
-import com.ad.admain.utils.StringUtils;
+import com.wezhyn.project.utils.StringUtils;
 import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

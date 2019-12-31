@@ -5,7 +5,7 @@ import com.ad.admain.controller.account.entity.IUser;
 import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.security.exception.JwtParseException;
 import com.ad.admain.utils.RoleAuthenticationUtils;
-import com.ad.admain.utils.StringUtils;
+import com.wezhyn.project.utils.StringUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.io.Decoders;
@@ -19,7 +19,7 @@ import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
 
-import static com.ad.admain.utils.StringUtils.getRandomString;
+import static com.wezhyn.project.utils.StringUtils.getRandomString;
 
 /**
  * 系统中只支持 AdNamePasswordAuthenticationToken

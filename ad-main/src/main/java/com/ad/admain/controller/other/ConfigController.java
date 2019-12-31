@@ -1,10 +1,10 @@
 package com.ad.admain.controller.other;
 
 import com.ad.admain.controller.ImgBedService;
-import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.controller.impl.ImgBed;
 import com.ad.admain.controller.impl.ImgBedType;
 import com.ad.admain.convert.ImgBedConfigMapper;
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

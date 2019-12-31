@@ -1,7 +1,7 @@
 package com.ad.admain.security;
 
-import com.ad.admain.controller.ResponseResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 

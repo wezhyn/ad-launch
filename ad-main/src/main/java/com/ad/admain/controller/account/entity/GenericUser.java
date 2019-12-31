@@ -9,8 +9,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenerationTime;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -49,10 +47,7 @@ public class GenericUser implements IUser {
     private String username;
     @ColumnDefault("''")
     private String nickName;
-    @ColumnDefault("''")
-    private String realName;
-    @ColumnDefault("''")
-    private String idCard;
+
     @UpdateIgnore
     @Column(nullable=false)
     private String password;
@@ -74,6 +69,21 @@ public class GenericUser implements IUser {
     @Enumerated(value=EnumType.STRING)
     @ColumnDefault(value="'USER'")
     private AuthenticationEnum roles;
+
+    /**
+     * 控制用户登录状态，默认：未认证，但可以登录
+     * 当 {@link UserEnable#getValue()} <0 时，代表用户状态异常,限制登录
+     */
+    @Enumerated(value=EnumType.STRING)
+    @ColumnDefault("'NOT_AUTHENTICATION'")
+    private UserEnable enable;
+
+    @ColumnDefault("''")
+    private String realName;
+    @ColumnDefault("''")
+    private String idCard;
+
+
     @org.hibernate.annotations.Generated(value=GenerationTime.INSERT)
     @Column(insertable=false, updatable=false)
     @ColumnDefault("current_timestamp")
@@ -88,57 +98,19 @@ public class GenericUser implements IUser {
     )
     @ColumnDefault("current_timestamp")
     private LocalDateTime lastModified;
-    /**
-     * 控制用户登录状态
-     */
-    @Enumerated(value=EnumType.STRING)
-    @ColumnDefault("'NORMAL'")
-    private UserEnable enable;
-    @ColumnDefault("b'1'")
-    private Boolean accountNonExpired;
-    @ColumnDefault("b'1'")
-    private Boolean credentialsNonExpired;
-    /**
-     * 是否被锁定
-     */
-    @ColumnDefault("b'1'")
-    private Boolean accountNonLocked;
-    /**
-     * 未清楚
-     */
-    @ColumnDefault("b'1'")
-    private Boolean certification;
+
 
     @Override
     public String getSex() {
         return this.sex.getValue();
     }
 
-            /*
-                /**********************************************************
-                /* 构造函数
-                /**********************************************************
-            */
 
     @Override
     public String getStatus() {
         return enable.getEnableStatus();
     }
 
-    public User createAuthenticationUser(PasswordEncoder passwordEncoder) {
-        boolean enableUser;
-        switch (this.enable) {
-            case FORBID: {
-                enableUser=false;
-                break;
-            }
-            default: {
-                enableUser=true;
-            }
-        }
-        return new User(username, passwordEncoder.encode(password), enableUser,
-                accountNonExpired, credentialsNonExpired, accountNonLocked, getAuthorities());
-    }
 
     @Getter
     @AllArgsConstructor
@@ -147,7 +119,8 @@ public class GenericUser implements IUser {
          * 用户状态
          */
         NORMAL(1, "normal"),
-        FORBID(-1, "forbed");
+        NOT_AUTHENTICATION(0, "authentication"),
+        FORBID(-1, "forbid");
 
         private int enableNum;
         private String enableStatus;

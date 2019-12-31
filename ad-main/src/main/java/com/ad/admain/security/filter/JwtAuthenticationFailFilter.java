@@ -1,8 +1,8 @@
 package com.ad.admain.security.filter;
 
-import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.security.exception.JwtAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.utils.HttpServletRequests;
 import org.springframework.web.filter.GenericFilterBean;
 

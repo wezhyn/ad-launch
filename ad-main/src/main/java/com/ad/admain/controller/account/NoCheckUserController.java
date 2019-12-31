@@ -1,17 +1,17 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.controller.ResponseResult;
+import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.GenericUserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wezhyn.project.BaseService;
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 /**
  * @author wezhyn
@@ -21,21 +21,36 @@ import java.util.Optional;
  */
 @RequestMapping("/api/user")
 @RestController
-public class NoCheckUserController {
+public class NoCheckUserController extends AbstractBaseController<UserDto, Integer, GenericUser> {
 
-    @Autowired
-    private GenericUserService genericUserService;
-    @Autowired
-    private GenericUserMapper genericUserMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final GenericUserService genericUserService;
+    private final GenericUserMapper genericUserMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    public NoCheckUserController(GenericUserService genericUserService, GenericUserMapper genericUserMapper, PasswordEncoder passwordEncoder) {
+        this.genericUserService=genericUserService;
+        this.genericUserMapper=genericUserMapper;
+        this.passwordEncoder=passwordEncoder;
+    }
 
     @PostMapping(value={"/register", "/create"})
     public ResponseResult register(@RequestBody UserDto userDto) {
-        GenericUser requestUser=genericUserMapper.toTo(userDto);
-        requestUser.setPassword(passwordEncoder.encode(requestUser.getPassword()));
-        Optional<GenericUser> genericUser=genericUserService.save(requestUser);
-        return genericUser.map(u->ResponseResult.forSuccessBuilder().withMessage("注册成功").build())
-                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
+        return createTo(userDto);
+    }
+
+    @Override
+    protected GenericUser preSave(GenericUser to) {
+        to.setPassword(passwordEncoder.encode(to.getPassword()));
+        return super.preSave(to);
+    }
+
+    @Override
+    public BaseService<GenericUser, Integer> getService() {
+        return genericUserService;
+    }
+
+    @Override
+    public AbstractMapper<GenericUser, UserDto> getConvertMapper() {
+        return genericUserMapper;
     }
 }

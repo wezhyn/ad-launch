@@ -20,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-public class BaseControllerTest {
+public class AbstractBaseControllerTest {
     protected MockMvc mockMvc;
 
     @Autowired

@@ -1,18 +1,19 @@
 package com.ad.admain.controller.equipment;
 
-import com.ad.admain.controller.ResponseResult;
+import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.EquipmentMapper;
 import com.ad.admain.security.AdAuthentication;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wezhyn.project.controller.ResponseResult;
+import com.wezhyn.project.exception.UpdateOperationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 /**
  * @author wezhyn
@@ -22,44 +23,72 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/equipment")
-public class EquipmentController {
+public class EquipmentController extends AbstractBaseController<EquipmentDto, Integer, Equipment> {
 
-    @Autowired
-    private EquipmentMapper equipmentMapper;
-    @Autowired
+    private final EquipmentMapper equipmentMapper;
     private EquipmentService equipmentService;
 
 
-    @PostMapping("/create")
-    public ResponseResult register(@RequestBody EquipmentDto equipmentDto, @AuthenticationPrincipal AdAuthentication authentication) {
-        Equipment equipment=equipmentMapper.toTo(equipmentDto);
-        equipment.setUid(authentication.getId());
-        Optional<Equipment> genericUser=getService().save(equipment);
-        return genericUser.map(u->ResponseResult.forSuccessBuilder().withMessage("设备添加成功").build())
-                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("设备添加失败").build());
+    public EquipmentController(EquipmentMapper equipmentMapper, EquipmentService equipmentService) {
+        this.equipmentMapper=equipmentMapper;
+        this.equipmentService=equipmentService;
     }
 
     @PostMapping("/verify")
     public ResponseResult verifyEquipment(@RequestBody EquipmentDto equipmentDto) {
         Equipment equipment=equipmentMapper.toTo(equipmentDto);
-        Optional<Equipment> verifyEquipment=getService().update(equipment);
-        return verifyEquipment.map(
-                e->{
-                    return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
-                }
-        ).orElseGet(()->{
-            return ResponseResult.forFailureBuilder().withMessage("修改失败").build();
-        });
+        Equipment updateEquipment=Equipment.builder()
+                .verify(equipment.getVerify())
+                .id(equipment.getId()).build();
+        final Equipment savedEquipment=doUpdate(updateEquipment);
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("验证成功")
+                .withData("newTo", getConvertMapper().toDto(savedEquipment))
+                .build();
     }
 
     @GetMapping("/list")
-    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<Equipment> equipmentList=getService().getList(pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withData("items", equipmentMapper.toDtoList(equipmentList.getContent()))
-                .withData("total", equipmentList.getTotalElements())
-                .build();
+    @Override
+    public ResponseResult listDto(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
+        return super.listDto(limit, page);
+    }
+
+    @Override
+    @PostMapping("/create")
+    public ResponseResult createTo(EquipmentDto entityDto) {
+        return super.createTo(entityDto);
+    }
+
+    /**
+     * 设置Equipment 所属的User
+     *
+     * @param to 要存储的实体类
+     * @return equipment
+     */
+    @Override
+    protected Equipment preSave(Equipment to) {
+        final AdAuthentication authentication=(AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        if (authentication==null) {
+            throw new UpdateOperationException("当前用户未认证");
+        }
+        to.setUid(authentication.getId());
+        return to;
+    }
+
+    @PostMapping("/delete")
+    @Override
+    public ResponseResult delete(@RequestBody EquipmentDto entityDto) {
+        return super.delete(entityDto);
+    }
+
+    @Override
+    public EquipmentService getService() {
+        return equipmentService;
+    }
+
+    @Override
+    public AbstractMapper<Equipment, EquipmentDto> getConvertMapper() {
+        return equipmentMapper;
     }
 
     @GetMapping("/listByUid")
@@ -70,19 +99,7 @@ public class EquipmentController {
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<Equipment> equipmentList=getService().getListByUid(uid, pageable);
         return ResponseResult.forSuccessBuilder()
-                .withData("items", equipmentMapper.toDtoList(equipmentList.getContent()))
-                .withData("total", equipmentList.getTotalElements())
+                .withList(getConvertMapper().toDtoList(equipmentList.getContent()), equipmentList.getTotalElements())
                 .build();
-    }
-
-    @PostMapping("/delete")
-    public ResponseResult deleteUser(@RequestBody EquipmentDto equipmentDto) {
-        getService().delete(equipmentDto.getId());
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("删除成功").build();
-    }
-
-    public EquipmentService getService() {
-        return equipmentService;
     }
 }

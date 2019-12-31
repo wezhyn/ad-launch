@@ -1,17 +1,19 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.controller.ResponseResult;
-import com.ad.admain.controller.SimpleResponseResult;
+import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.account.dto.AdminDto;
 import com.ad.admain.controller.account.entity.Admin;
+import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.AdminMapper;
 import com.ad.admain.security.AdAuthentication;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import com.wezhyn.project.BaseService;
+import com.wezhyn.project.controller.NoNestResponseResult;
+import com.wezhyn.project.controller.ResponseResult;
+import com.wezhyn.project.exception.UpdateOperationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -25,7 +27,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
-public class AdminController {
+public class AdminController extends AbstractBaseController<AdminDto, Integer, Admin> {
 
     private final AdminService adminService;
 
@@ -38,57 +40,46 @@ public class AdminController {
 
 
     @GetMapping("/info")
-    public SimpleResponseResult<AdminDto> info(@AuthenticationPrincipal Authentication authentication) {
+    public NoNestResponseResult<AdminDto> info(@AuthenticationPrincipal Authentication authentication) {
         String name=authentication.getName();
         Optional<Admin> admin=adminService.getByUsername(name);
-        return admin.map(a->SimpleResponseResult.successResponseResult("", adminMapper.toDto(a)))
-                .orElseGet(()->SimpleResponseResult.failureResponseResult("获取用户信息失败"));
+        return admin.map(a->NoNestResponseResult.successResponseResult("", adminMapper.toDto(a)))
+                .orElseGet(()->NoNestResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
     @GetMapping("/list")
     public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<Admin> admins=adminService.getList(pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withData("items", adminMapper.toDtoList(admins.getContent()))
-                .withData("total", admins.getTotalElements())
-                .build();
+        return listDto(limit, page);
     }
 
+    @Override
     @PostMapping("/create")
-    public ResponseResult register(@RequestBody AdminDto adminDto) {
-        Admin requestAdmin=adminMapper.toTo(adminDto);
-        Optional<Admin> savedAdmin=adminService.save(requestAdmin);
-        return savedAdmin.map(a->ResponseResult.forSuccessBuilder().withMessage("注册成功").build())
-                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("注册失败").build());
+    public ResponseResult createTo(@RequestBody AdminDto entityDto) {
+        return super.createTo(entityDto);
     }
 
-    /**
-     * 更新个人资料
-     *
-     * @param adminDto admin
-     * @return
-     */
+    @Override
     @PostMapping("/update")
-    public ResponseResult editUser(@RequestBody AdminDto adminDto, @AuthenticationPrincipal AdAuthentication adAuthentication) {
-        Admin oldUser=adminMapper.toTo(adminDto);
-        oldUser.setId(adAuthentication.getId());
-        Optional<Admin> newUser=adminService.update(oldUser);
-        return newUser.map(a->ResponseResult.forSuccessBuilder()
-                .withMessage("修改成功")
-                .withData("newUser", adminMapper.toDto(newUser.get()))
-                .build())
-                .orElse(ResponseResult.forFailureBuilder()
-                        .withMessage("修改失败").build());
+    public ResponseResult update(@RequestBody AdminDto entityDto) {
+        return super.update(entityDto);
     }
 
-    @PostMapping("/delete")
-    public ResponseResult deleteUser(@RequestBody AdminDto adminDto, @AuthenticationPrincipal AdAuthentication authentication) {
-        Integer id=authentication.getId();
-        adminService.delete(id);
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("删除成功").build();
+    @Override
+    protected Admin preUpdate(Admin to) {
+        final AdAuthentication authentication=(AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        if (authentication==null) {
+            throw new UpdateOperationException("当前用户未认证");
+        }
+        to.setId(authentication.getId());
+        return to;
     }
+
+    @Override
+    @PostMapping("/delete")
+    public ResponseResult delete(@RequestBody AdminDto entityDto) {
+        return super.delete(entityDto);
+    }
+
 
     @ExceptionHandler
     public ResponseResult handleError(Exception e) {
@@ -98,4 +89,13 @@ public class AdminController {
                 .build();
     }
 
+    @Override
+    public BaseService<Admin, Integer> getService() {
+        return adminService;
+    }
+
+    @Override
+    public AbstractMapper<Admin, AdminDto> getConvertMapper() {
+        return adminMapper;
+    }
 }

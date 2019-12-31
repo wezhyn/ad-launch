@@ -6,7 +6,7 @@ import com.ad.admain.controller.impl.ImgBed;
 import com.ad.admain.controller.impl.ImgBedType;
 import com.ad.admain.exception.FileUploadException;
 import com.ad.admain.security.AdAuthentication;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 文件上传相关 api
@@ -32,12 +31,12 @@ public class FileController {
     private final FileUploadService fileUploadService;
     private final QiNiuProperties qiNiuProperties;
 
-    @Autowired
-    private ImgBedService imgBedService;
+    private final ImgBedService imgBedService;
 
-    public FileController(FileUploadService fileUploadService, QiNiuProperties qiNiuProperties) {
+    public FileController(FileUploadService fileUploadService, QiNiuProperties qiNiuProperties, ImgBedService imgBedService) {
         this.fileUploadService=fileUploadService;
         this.qiNiuProperties=qiNiuProperties;
+        this.imgBedService=imgBedService;
     }
 
     @PostMapping("/avatar")
@@ -105,15 +104,13 @@ public class FileController {
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
-        Optional<ImgBed> bed=imgBedService.save(imgBed);
+        ImgBed bed=imgBedService.save(imgBed);
         final IFileUpload savedBed=fileUpload;
-        return bed.map(b->ResponseResult.forSuccessBuilder()
+        return ResponseResult.forSuccessBuilder()
                 .withMessage("上传：" + type.getValue() + " 成功")
                 .withData("address", qiNiuProperties.getHostName() + "/" + savedBed.getRelativeName())
                 .withData("host", qiNiuProperties.getHostName())
-                .withData("relativeAddress", savedBed.getRelativeName()).build())
-                .orElse(ResponseResult.forFailureBuilder()
-                        .withMessage("上传: " + type.getValue() + "失败").build());
+                .withData("relativeAddress", savedBed.getRelativeName()).build();
 
     }
 

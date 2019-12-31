@@ -1,18 +1,20 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.controller.ResponseResult;
-import com.ad.admain.controller.SimpleResponseResult;
+import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.account.dto.PasswordModifyWrap;
 import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.GenericUserMapper;
 import com.ad.admain.security.AdAuthentication;
+import com.wezhyn.project.BaseService;
+import com.wezhyn.project.controller.NoNestResponseResult;
+import com.wezhyn.project.controller.ResponseResult;
+import com.wezhyn.project.exception.UpdateOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +30,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user")
 @PreAuthorize("isAuthenticated()")
-public class UserController {
+public class UserController extends AbstractBaseController<UserDto, Integer, GenericUser> {
 
 
     private final GenericUserService genericUserService;
@@ -43,23 +45,13 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    public SimpleResponseResult<UserDto> info(@AuthenticationPrincipal AdAuthentication authentication) {
+    public NoNestResponseResult<UserDto> info(@AuthenticationPrincipal AdAuthentication authentication) {
         String name=authentication.getName();
-//        Optional<GenericUser> user=genericUserService.getById(name);
         Optional<GenericUser> user=genericUserService.getUserByUsername(name);
-        return user.map(u->SimpleResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
-                .orElse(SimpleResponseResult.failureResponseResult("获取用户信息失败"));
+        return user.map(u->NoNestResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
+                .orElse(NoNestResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
-    @GetMapping("/list")
-    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<GenericUser> genericUsers=genericUserService.getList(pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withData("items", genericUserMapper.toDtoList(genericUsers.getContent()))
-                .withData("total", genericUsers.getTotalElements())
-                .build();
-    }
 
     @PostMapping("/password")
     public ResponseResult editPassword(
@@ -69,11 +61,6 @@ public class UserController {
         Integer id=authentication.getId();
         String newPwd=passwordModifyWrap.getNewPwd();
         String oldPwd=passwordModifyWrap.getOldPwd();
-/*
-        if (!Objects.equals(newPwd, againPwd)) {
-            throw new IllegalArgumentException("二次密码不一样");
-        }
-*/
         int result=-1;
         GenericUser genericUser=genericUserService.getById(id)
 //        GenericUser genericUser=genericUserService.getUserByUsername(username)
@@ -99,25 +86,38 @@ public class UserController {
         }
     }
 
+    @GetMapping("/list")
+    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
+        return listDto(limit, page);
+    }
 
     @PostMapping("/update")
     public ResponseResult editUser(@RequestBody UserDto userDto) {
-        GenericUser targetUser=genericUserMapper.toTo(userDto);
-        Optional<GenericUser> newUser=genericUserService.update(targetUser);
-        return newUser.map(u->ResponseResult.forSuccessBuilder()
-                .withMessage("修改成功")
-                .withData("newUser", genericUserMapper.toDto(u))
-                .build())
-                .orElse(ResponseResult.forFailureBuilder()
-                        .withMessage("修改失败").build());
+        return update(userDto);
     }
 
-    @PostMapping("/delete")
-    public ResponseResult deleteUser(@RequestBody UserDto userDto) {
-        String username=userDto.getUsername();
-        genericUserService.delete(userDto.getId());
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("删除成功").build();
+    @PostMapping("/verify")
+    public ResponseResult verifyRealNameAuthentication(@RequestBody UserDto userDto) {
+        UserDto verifyDto=UserDto.builder()
+                .idCard(userDto.getIdCard())
+                .realname(userDto.getRealname())
+                .build();
+        return update(verifyDto);
+    }
+
+    @Override
+    protected GenericUser preUpdate(GenericUser to) {
+        final AdAuthentication authentication=(AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        if (authentication==null) {
+            throw new UpdateOperationException("当前用户未认证");
+        }
+        to.setId(authentication.getId());
+        return to;
+    }
+
+    @Override
+    public BaseService<GenericUser, Integer> getService() {
+        return genericUserService;
     }
 
     @ExceptionHandler
@@ -128,15 +128,13 @@ public class UserController {
                 .build();
     }
 
-    private ResponseResult outputResult(String dm, String fm, GenericUser genericUser) {
-
-        if (genericUser!=null) {
-            return ResponseResult.forSuccessBuilder()
-                    .withMessage(dm).build();
-        }
-        return ResponseResult.forFailureBuilder()
-                .withMessage(fm).build();
+    @Override
+    public AbstractMapper<GenericUser, UserDto> getConvertMapper() {
+        return genericUserMapper;
     }
 
-
+    @PostMapping("/delete")
+    public ResponseResult deleteUser(@RequestBody UserDto userDto) {
+        return delete(userDto);
+    }
 }

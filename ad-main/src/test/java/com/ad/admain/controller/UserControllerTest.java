@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-public class UserControllerTest extends BaseControllerTest {
+public class UserControllerTest extends AbstractBaseControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;

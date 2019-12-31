@@ -1,12 +1,12 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.controller.ResponseResult;
 import com.ad.admain.controller.pay.dto.AppTradeNotification;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
 import com.ad.admain.pay.ZfbPayHolder;
 import com.ad.admain.pay.ZfbTradeI;
 import com.ad.admain.pay.ZfbTradeResolver;
 import com.wezhyn.project.AbstractBaseMapAdapterModel;
+import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.utils.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;

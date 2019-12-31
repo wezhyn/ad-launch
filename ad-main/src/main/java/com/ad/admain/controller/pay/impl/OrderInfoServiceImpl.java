@@ -9,8 +9,6 @@ import com.ad.admain.controller.pay.to.Order;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @author wezhyn
  * @since 12.01.2019
@@ -33,15 +31,15 @@ public class OrderInfoServiceImpl extends AbstractBaseService<BillInfo, Integer>
     }
 
     @Override
-    public Optional<BillInfo> createOrder(Order order) {
-        Optional<Order> createdOrder=orderService.save(order);
-        return createdOrder.map(o->{
-            BillInfo orderInfo=BillInfo.builder()
-                    .orderId(order.getId())
-                    .totalAmount(order.getPrice()*order.getNum())
-                    .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
-                    .build();
-            return orderInfoRepository.save(orderInfo);
-        });
+    public BillInfo createOrder(Order order) {
+        Order createdOrder=orderService.save(order);
+
+        BillInfo orderInfo=BillInfo.builder()
+                .orderId(order.getId())
+                .totalAmount(order.getPrice()*order.getNum())
+                .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
+                .build();
+        return orderInfoRepository.save(orderInfo);
+
     }
 }

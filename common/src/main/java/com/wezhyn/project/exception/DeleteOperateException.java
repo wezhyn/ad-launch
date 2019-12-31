@@ -18,4 +18,13 @@ public class DeleteOperateException extends RuntimeException {
     public DeleteOperateException(String message) {
         super(message);
     }
+
+
+    public DeleteOperateException(Throwable cause) {
+        super(cause);
+    }
+
+    public DeleteOperateException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

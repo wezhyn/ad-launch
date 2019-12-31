@@ -36,7 +36,7 @@ public class ImgBedServiceImpl extends AbstractBaseService<ImgBed, Integer> impl
      * @return imgBed
      */
     @Override
-    public Optional<ImgBed> save(ImgBed object) {
+    public ImgBed save(ImgBed object) {
         if (object.getIndex()!=null && object.getType()!=null) {
             Example<ImgBed> imgCondition=Example.of(ImgBed.builder()
                     .type(object.getType())
