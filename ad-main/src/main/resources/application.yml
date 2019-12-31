@@ -1,5 +1,5 @@
 server:
-  port: 18080
+  port: 8080
   address: 0.0.0.0
   tomcat:
     max-threads: 8
@@ -17,9 +17,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-
 
   jackson:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ

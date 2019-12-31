@@ -85,19 +85,25 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
         return listDto(limit, page);
     }
 
+    @GetMapping("/mylist")
+    public ResponseResult getUserList(@AuthenticationPrincipal AdAuthentication adAuthentication,
+                                      @RequestParam(name="limit", defaultValue="10") int limit,
+                                      @RequestParam(name="page", defaultValue="1") int page
+    ) {
+        final Page<Order> search=getService().search(OrderSearchType.USER, adAuthentication.getId().toString(), PageRequest.of(page - 1, limit));
+        return doResponse(search);
+    }
+
 
     @PostMapping("/search/{type}")
-    public ResponseResult searchOrder(@RequestParam(name="limit", defaultValue="10") int limit,
-                                      @RequestParam(name="page", defaultValue="1") int page,
-                                      @PathVariable("type") OrderSearchType searchType,
-                                      @RequestParam("context") String context) {
+    public ResponseResult searchOrder(
+            @RequestParam(name="limit", defaultValue="10") int limit,
+            @RequestParam(name="page", defaultValue="1") int page,
+            @PathVariable("type") OrderSearchType searchType,
+            @RequestParam("context") String context) {
         Pageable pageable=PageRequest.of(page - 1, limit);
         Page<Order> searchResult=getService().search(searchType, context, pageable);
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("searchType: " + searchType.getValue())
-                .withData("items", getConvertMapper().toDtoList(searchResult.getContent()))
-                .withData("total", searchResult.getTotalElements())
-                .build();
+        return doResponse(searchResult);
     }
 
     @PostMapping("/verify")

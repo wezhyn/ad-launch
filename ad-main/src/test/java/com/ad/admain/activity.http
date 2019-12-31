@@ -1,0 +1,23 @@
+GET http://{{url}}/api/activity/list
+Accept: application/json
+
+###
+
+POST http://{{url}}/api/activity/create
+Content-Type: application/json
+
+{
+  "publishTime": "",
+  "context": "<html> <body>xxx </body></html>",
+  "title": "title",
+  "aid": 2,
+  "admin": "wezhyn",
+  "publish": true
+}
+
+###
+
+GET http://{{url}}/api/activity/2
+Accept: application/json
+
+###

@@ -80,7 +80,6 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
             return ResponseResult.forFailureBuilder()
                     .withMessage("密码修改失败")
                     .withCode(50000).build();
-
         }
     }
 
