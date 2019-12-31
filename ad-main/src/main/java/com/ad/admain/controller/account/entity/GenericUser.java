@@ -111,6 +111,10 @@ public class GenericUser implements IUser {
         return enable.getEnableStatus();
     }
 
+    @Override
+    public Boolean isLock() {
+        return enable.getEnableNum() > 0;
+    }
 
     @Getter
     @AllArgsConstructor

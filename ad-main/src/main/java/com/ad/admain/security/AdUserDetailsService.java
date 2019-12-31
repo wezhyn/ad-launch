@@ -57,6 +57,12 @@ public abstract class AdUserDetailsService implements UserDetailsService {
             this.id=id;
         }
 
+        public AdUser(Integer id, String username, String password, boolean enabled, Collection<? extends GrantedAuthority> authorities) {
+            super(username, password, true, true, true, enabled, authorities);
+            this.id=id;
+        }
+
+
         public AdUser(Integer id, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
             super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
             this.id=id;

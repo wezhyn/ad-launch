@@ -99,6 +99,13 @@ public interface IUser extends IUserTo<Integer> {
     String getStatus();
 
     /**
+     * 账户是否被锁定： 锁定的账户无法登录
+     *
+     * @return 默认：false
+     */
+    Boolean isLock();
+
+    /**
      * 获取用户的权限
      *
      * @return {@link RoleAuthenticationUtils#forGrantedAuthorities}

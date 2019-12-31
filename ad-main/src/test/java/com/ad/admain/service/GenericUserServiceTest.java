@@ -30,9 +30,10 @@ public class GenericUserServiceTest {
     @Test
     public void saveGenericUser() {
         GenericUser genericUser=GenericUser.builder()
-                .username("zhaoo11")
+                .username("zhaoo111")
                 .password(passwordEncoder.encode("zhaoo"))
                 .roles(AuthenticationEnum.CUSTOMER)
+                .enable(GenericUser.UserEnable.FORBID)
                 .email("zhaoo@zhaoo.com")
                 .build();
         genericUserService.save(genericUser);

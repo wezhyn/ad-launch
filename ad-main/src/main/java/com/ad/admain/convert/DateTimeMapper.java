@@ -25,7 +25,7 @@ public class DateTimeMapper {
     private static DateTimeFormatter SYSTEM_DATE_TIME_FORMAT;
 
     static {
-        try (InputStream inputStream=new ClassPathResource("classpath*:config.properties").getInputStream()) {
+        try (InputStream inputStream=new ClassPathResource("config.properties").getInputStream()) {
             Properties configProperty=new Properties();
             configProperty.load(inputStream);
             String dateFormat=configProperty.getProperty(DEFAULT_SYSTEM_DATE_TIME_PATTERN_NAME);
