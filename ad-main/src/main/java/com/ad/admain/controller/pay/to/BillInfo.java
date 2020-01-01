@@ -3,7 +3,9 @@ package com.ad.admain.controller.pay.to;
 import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.TradeStatus;
 import com.wezhyn.project.IBaseTo;
+import com.wezhyn.project.annotation.StrategyEnum;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,9 +25,15 @@ import java.time.LocalDateTime;
 @Setter
 public class BillInfo implements IBaseTo<Integer> {
 
+
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private Integer id;
+
+
     @Column(name="order_id")
     private Integer orderId;
+
 
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="order_id", referencedColumnName="id", insertable=false, updatable=false)
@@ -36,11 +44,15 @@ public class BillInfo implements IBaseTo<Integer> {
 
     private Double totalAmount;
 
+    @Type(type="strategyEnum")
+    @StrategyEnum(value=com.wezhyn.project.database.EnumType.NUMBER)
+    private PayType payType;
+
 
     /**
      * 支付宝回调字段
      */
-    private LocalDateTime gmtCreate=LocalDateTime.now();
+    private LocalDateTime gmtCreate;
     private LocalDateTime gmtPayment;
     private String alipayTradeNo;
     private String outBizNo;

@@ -4,6 +4,7 @@ package com.wezhyn.project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -45,6 +46,14 @@ public interface BaseService<T, ID> {
      * @param id 主键
      */
     void delete(ID id);
+
+
+    /**
+     * 批量删除id
+     *
+     * @param idCollection id 列表
+     */
+    void batchDelete(Collection<T> idCollection);
 
 
     /**

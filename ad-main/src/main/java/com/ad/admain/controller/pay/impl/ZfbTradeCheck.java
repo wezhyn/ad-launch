@@ -1,8 +1,8 @@
 package com.ad.admain.controller.pay.impl;
 
-import com.ad.admain.controller.pay.OrderInfoService;
+import com.ad.admain.controller.pay.BillInfoService;
 import com.ad.admain.controller.pay.TradeStatus;
-import com.ad.admain.controller.pay.repository.OrderInfoRepository;
+import com.ad.admain.controller.pay.repository.BillInfoRepository;
 import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
 import com.ad.admain.pay.ZfbTradeI;
@@ -21,10 +21,10 @@ import java.util.Optional;
 public class ZfbTradeCheck implements ZfbTradeI {
 
     @Autowired
-    private OrderInfoService orderInfoService;
+    private BillInfoService orderInfoService;
 
     @Autowired
-    private OrderInfoRepository orderInfoRepository;
+    private BillInfoRepository orderInfoRepository;
 
     @Override
     @Transactional(rollbackFor=Exception.class)
@@ -34,7 +34,7 @@ public class ZfbTradeCheck implements ZfbTradeI {
         if (tradeId <= 0) {
             return TradeStatus.TRADE_CANCEL_OTHER;
         }
-        Optional<BillInfo> orderInfo=orderInfoRepository.findById(tradeId);
+        Optional<BillInfo> orderInfo=orderInfoRepository.findByOrderId(tradeId);
         return orderInfo.map(o->{
             Double savedAmount=o.getTotalAmount();
             TradeStatus savedStatus=o.getTradeStatus();
@@ -48,15 +48,16 @@ public class ZfbTradeCheck implements ZfbTradeI {
     @Transactional(rollbackFor=Exception.class)
     public boolean successNotificationAware(AlipayAsyncNotificationGetterI alipayAsyncNotification) {
         int tradeId=Integer.parseInt(alipayAsyncNotification.getOutTradeNo());
-        Optional<BillInfo> savedOrderInfo=orderInfoRepository.findById(tradeId);
+        Optional<BillInfo> savedOrderInfo=orderInfoRepository.findByOrderId(tradeId);
         if (savedOrderInfo.isPresent()) {
             BillInfo oInfo=savedOrderInfo.get();
             oInfo.setTradeStatus(TradeStatus.TRADE_SUCCESS);
             oInfo.setBuyerId(alipayAsyncNotification.getBuyerId());
             oInfo.setSellerId(alipayAsyncNotification.getSellerId());
             oInfo.setAlipayTradeNo(alipayAsyncNotification.getTradeNo());
-            oInfo.setGmtPayment(alipayAsyncNotification.getPayment());
-            orderInfoService.update(oInfo);
+            oInfo.setGmtPayment(alipayAsyncNotification.getGmtPayment());
+            oInfo.setGmtCreate(alipayAsyncNotification.getGmtCreate());
+            orderInfoService.save(oInfo);
             return true;
         }
         return false;

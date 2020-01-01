@@ -242,6 +242,7 @@ public class JpaHibernateEnumConverter<T extends Enum<T>> implements DynamicPara
         @Override
         public void setValue(PreparedStatement st, Object value, int index) throws SQLException {
             T v=(T) value;
+
             final Object jdbcValue=value==null ? null : extractJdbcValue(v);
             if (jdbcValue==null) {
                 st.setNull(index, sqlType);

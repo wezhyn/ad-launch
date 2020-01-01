@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class OrderInfoServiceImplTest {
+public class BillInfoServiceImplTest {
 
     @Autowired
     private OrderService orderService;

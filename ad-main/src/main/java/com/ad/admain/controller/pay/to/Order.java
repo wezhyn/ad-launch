@@ -30,17 +30,22 @@ public class Order implements IBaseTo<Integer> {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(mappedBy="order")
-    private BillInfo billInfo;
+
     @ManyToOne()
     @JoinColumn(name="uid", insertable=false, updatable=false)
     private GenericUser orderUser;
+
+
     @OneToMany(cascade=CascadeType.ALL)
     private List<Value> valueList;
 
+    @Column(nullable=false)
     private LocalDateTime startTime;
+    @Column(nullable=false)
     private LocalDateTime endTime;
+    @Column(nullable=false)
     private LocalDateTime startDate;
+    @Column(nullable=false)
     private LocalDateTime endDate;
 
 

@@ -1,0 +1,11 @@
+POST http://{{url}}/api/admin/order/queryDelete
+Content-Type:  application/json
+
+{
+  "idList": [
+    39,
+    40
+  ]
+}
+
+###

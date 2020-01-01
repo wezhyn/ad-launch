@@ -23,7 +23,7 @@ public interface AlipayAsyncNotificationGetterI {
 
     LocalDateTime getGmtCreate();
 
-    LocalDateTime getPayment();
+    LocalDateTime getGmtPayment();
 
     /**
      * 通知的类型

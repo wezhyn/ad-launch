@@ -1,6 +1,6 @@
 package com.ad.admain.to;
 
-import com.ad.admain.controller.pay.OrderInfoService;
+import com.ad.admain.controller.pay.BillInfoService;
 import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.controller.pay.to.Order;
@@ -25,7 +25,7 @@ public class BillInfoTest {
     @Autowired
     private OrderService orderService;
     @Autowired
-    private OrderInfoService orderInfoService;
+    private BillInfoService orderInfoService;
 
     @Test
     public void saveOrderInfo() {

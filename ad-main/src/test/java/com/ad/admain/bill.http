@@ -1,0 +1,4 @@
+GET http://{{url}}/api/billinfo/list
+Accept: application/json
+
+###

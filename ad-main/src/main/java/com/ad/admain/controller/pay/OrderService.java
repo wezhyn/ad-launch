@@ -20,4 +20,5 @@ public interface OrderService extends BaseService<Order, Integer> {
      */
     Page<Order> search(OrderSearchType type, String context, Pageable pageable);
 
+
 }

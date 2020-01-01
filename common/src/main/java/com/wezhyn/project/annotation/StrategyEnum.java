@@ -24,4 +24,5 @@ public @interface StrategyEnum {
      * @return EnumType
      */
     EnumType value() default EnumType.STRING;
+
 }

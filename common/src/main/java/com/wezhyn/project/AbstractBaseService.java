@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -44,6 +45,16 @@ public abstract class AbstractBaseService<T extends IBaseTo<ID>, ID> implements 
     public void delete(ID id) {
         try {
             getRepository().deleteById(id);
+        } catch (Exception e) {
+            throw new DeleteOperateException(e);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor=DeleteOperateException.class)
+    public void batchDelete(Collection<T> idCollection) {
+        try {
+            getRepository().deleteAll(idCollection);
         } catch (Exception e) {
             throw new DeleteOperateException(e);
         }

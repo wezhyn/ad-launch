@@ -5,6 +5,7 @@ import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.BillInfo;
 import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.PayType;
 import com.ad.admain.controller.pay.to.Value;
 import com.ad.admain.convert.OrderMapper;
 import com.ad.admain.pay.ZfbPayHolder;
@@ -41,15 +42,15 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
                 .collect(Collectors.joining(","));
         model.setBody(body);
         model.setSubject("ad-order-" + o.getId() + o.getLatitude() + ":" + o.getLongitude());
-        model.setTotalAmount(String.valueOf(o.getPrice()));
+        model.setTotalAmount(String.valueOf(o.getPrice()*o.getNum()));
         model.setOutTradeNo(String.valueOf(o.getId()));
         model.setProductCode("QUICK_MSECURITY_PAY");
         return model;
     };
     private final OrderService orderService;
-    private final OrderInfoService orderInfoService;
+    private final BillInfoService orderInfoService;
 
-    public OrderController(OrderService orderService, OrderInfoService orderInfoService, OrderMapper orderMapper) {
+    public OrderController(OrderService orderService, BillInfoService orderInfoService, OrderMapper orderMapper) {
         this.orderService=orderService;
         this.orderInfoService=orderInfoService;
         this.orderMapper=orderMapper;
@@ -58,16 +59,16 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
     /**
      * 创建订单，并返回订单信息用于支付宝支付：orderInfo
      *
-     * @param order 订单创建内容
+     * @param orderDto 订单创建内容
      * @return orderInfo
      * @throws Exception order
      */
     @RequestMapping("/create")
-    public ResponseResult create(@RequestBody Order order, @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
+    public ResponseResult create(@RequestBody OrderDto orderDto, @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
 //        设置当前用户id
-        order.setUid(authentication.getId());
-        BillInfo savedOrder=orderInfoService.createOrder(order);
-
+        orderDto.setUid(authentication.getId());
+        final Order order=getConvertMapper().toTo(orderDto);
+        BillInfo savedOrder=orderInfoService.createOrder(order, PayType.ALIPAY);
         Order sOrder=orderService.getById(savedOrder.getId()).get();
         savedOrder.setOrder(sOrder);
         String orderInfoSign=ZfbPayHolder.signZfb(savedOrder.getOrder(), ORDER_ALIPAY_MAPPER);
