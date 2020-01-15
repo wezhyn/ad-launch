@@ -1,4 +1,4 @@
-package com.ad.admain.exception;
+package com.ad.admain.controller.exception;
 
 /**
  * 文件上传失败

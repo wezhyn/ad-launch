@@ -1,13 +1,13 @@
 server:
-  port: 18080
+  port: 28080
   address: 0.0.0.0
   tomcat:
     max-threads: 8
 
 spring:
   profiles:
-    active: dev
-  #    active: pro
+    active: zhaoo
+    # active: pro
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}

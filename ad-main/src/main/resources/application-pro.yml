@@ -1,10 +1,10 @@
 #custom
 custom:
   mysql:
-    address: ad_mysql
-    password: root
+    address: 127.0.0.1
+    password: fkz
     port: 3306
-    database: ad
-    username: root
+    database: fkz
+    username: fkz
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true
 

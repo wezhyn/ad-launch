@@ -5,7 +5,7 @@ import com.ad.admain.controller.FileUploadService;
 import com.ad.admain.controller.account.AdminService;
 import com.ad.admain.controller.account.CommonAccountService;
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.exception.FileUploadException;
+import com.ad.admain.controller.exception.FileUploadException;
 import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.utils.RoleAuthenticationUtils;
 import com.qiniu.common.QiniuException;

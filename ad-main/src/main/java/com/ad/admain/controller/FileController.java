@@ -1,10 +1,10 @@
 package com.ad.admain.controller;
 
 import com.ad.admain.config.QiNiuProperties;
+import com.ad.admain.controller.exception.FileUploadException;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.ad.admain.controller.impl.ImgBed;
 import com.ad.admain.controller.impl.ImgBedType;
-import com.ad.admain.exception.FileUploadException;
 import com.ad.admain.security.AdAuthentication;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.data.domain.Page;
