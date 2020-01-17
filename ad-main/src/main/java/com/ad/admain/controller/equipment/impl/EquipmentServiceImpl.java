@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer> implements EquipmentService {
+    private static final int earthRadius = 6371; //地球半径
+
 
     @Autowired
     private EquipmentRepository equipmentRepository;
@@ -31,8 +33,22 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     }
 
     @Override
-    public EquipmentRepository getRepository() {
-        return equipmentRepository;
-    }
+    public Long getEquipmentByRegion(Double longitude, Double latitude, Double square) {
+        Double dlng = 2*Math.asin(Math.sin(square/(2*earthRadius))/Math.cos(latitude*Math.PI/180));
+        dlng = dlng*180/Math.PI; //角度转换为弧度
+        Double dlat = square/earthRadius;
+        dlat = dlat*180/Math.PI; //角度转换为弧度
 
-}
+    Double minlat = latitude - dlat; //最小经度
+    Double maxlat = latitude + dlat; //最大经度
+    Double minlgt = longitude -dlng; //最小纬度
+    Double maxlgt = longitude + dlng; //最大纬度
+        return equipmentRepository.countAllByLongitudeBetweenAndLatitudeBetween(minlgt,maxlgt,minlat,maxlat);
+                }
+
+@Override
+public EquipmentRepository getRepository() {
+        return equipmentRepository;
+        }
+
+        }

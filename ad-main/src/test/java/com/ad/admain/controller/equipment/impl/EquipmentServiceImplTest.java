@@ -29,4 +29,10 @@ public class EquipmentServiceImplTest {
         equipmentService.save(feed);
 
     }
+
+    @Test
+    public void getEquipmentByRegion() {
+
+        System.out.println(equipmentService.getEquipmentByRegion(120.58D,30.01D,100D));
+    }
 }

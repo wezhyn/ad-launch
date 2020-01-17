@@ -13,4 +13,5 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
 
 //    Page<Equipment> findAllByUid(Integer uid);
 
+    Long countAllByLongitudeBetweenAndLatitudeBetween(Double minlgt,Double maxlgt,Double minlat,Double maxlat);
 }
