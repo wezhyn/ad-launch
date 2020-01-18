@@ -4,6 +4,7 @@ import com.ad.admain.controller.assignment.AssignmentRepository;
 import com.ad.admain.controller.assignment.AssignmentService;
 import com.ad.admain.controller.assignment.entity.Assignment;
 import com.ad.admain.controller.equipment.EquipmentService;
+import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.pay.repository.OrderReposity;
 import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.pay.to.Value;
@@ -48,15 +49,21 @@ public class AssignmentServiceImpl extends AbstractBaseService<Assignment, Integ
         List<Assignment> assignmentList = new ArrayList<>();
         String content = "";
         Integer nums = order.getNum();
+        Integer assignRate= order.getRate();
+        Long assignEquipNums =order.getDeliverNum();
+        Long assginNumsPerEquip = nums/assignEquipNums;
         // 查找出目标投放范围内的车辆数目
-        Long equipNums = equipmentService.getEquipmentByRegion(order.getLongitude(),order.getLatitude(),order.getScope()); //查找订单的区域内的车辆数
-        if (equipNums<order.getDeliverNum()){
+        Long onlineEquips = equipmentService.countByStatusAndRegion(order.getRate(),1,order.getLongitude(),order.getLatitude(),order.getScope()); //查找订单的区域内的车辆数
+        if (onlineEquips<order.getDeliverNum()){
             return false;
         }
         try {
+            //获取订单内中的广告内容
             List<Value> valueList = order.getValueList();
-            Long taskNums = order.getNum()/(adNumsPerCar*order.getDeliverNum());
-
+            //分配任务数目计算
+            Integer carNums = Math.toIntExact(order.getNum() / (adNumsPerCar * order.getDeliverNum()));
+            //查找出可用目标车辆
+            List<Equipment> equipmentList = equipmentService.findAllAvailableEquips(order.getRate(),1,order.getLongitude(),order.getLatitude(),order.getScope(), carNums);
             Iterator<Value> iterator = valueList.iterator();
             while (iterator.hasNext()){
                 Value value = iterator.next();
@@ -66,13 +73,16 @@ public class AssignmentServiceImpl extends AbstractBaseService<Assignment, Integ
                 else
                     content +=value.getVal();
             }
-            for (int i = 0; i < taskNums; i++) {
-                Assignment assignment = new Assignment();
-                assignment.setNum(order.getNum()/taskNums);
-                assignment.setContent(content);
-                assignment.setTriggerTime(order.getStartTime());
-                assignment.setOrder(order);
-                assignmentRepository.save(assignment);
+            Assignment assignment = new Assignment();
+            assignment.setContent(content);
+            assignment.setNum(assginNumsPerEquip);
+            assignment.setOrder(order);
+            assignment.setStatus(false);
+            assignment.setTriggerTime(order.getStartTime());
+
+            for (Equipment equipment :equipmentList) {
+               assignment.setEquipment(equipment);
+               assignmentRepository.save(assignment);
             }
             return true;
         } catch (Exception e) {

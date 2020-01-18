@@ -1,11 +1,11 @@
 #custom
 custom:
   mysql:
-    address: ecs.izhaoo.com
-    password: fkz
+    address: localhost
+    password: root
     port: 3306
-    database: fkz
-    username: fkz
+    database: ad_test
+    username: root
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
 
 #用于显示绑定的参数具体值

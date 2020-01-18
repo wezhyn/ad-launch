@@ -84,6 +84,9 @@ public class Equipment implements IBaseTo<Integer> {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "equipment")
     private List<Assignment> assignments;
 
+    @Column(name = "remain")
+    @ColumnDefault("20")
+    private Integer remain;
     public static Equipment createFromUid(Integer uid) {
         return Equipment.builder().uid(uid)
                 .build();
