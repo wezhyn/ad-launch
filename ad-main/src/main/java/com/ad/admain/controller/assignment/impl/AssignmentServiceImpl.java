@@ -1,8 +1,8 @@
-package com.ad.admain.controller.distribute.impl;
+package com.ad.admain.controller.assignment.impl;
 
-import com.ad.admain.controller.distribute.AssignmentRepository;
-import com.ad.admain.controller.distribute.AssignmentService;
-import com.ad.admain.controller.distribute.entity.Assignment;
+import com.ad.admain.controller.assignment.AssignmentRepository;
+import com.ad.admain.controller.assignment.AssignmentService;
+import com.ad.admain.controller.assignment.entity.Assignment;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.pay.repository.OrderReposity;
 import com.ad.admain.controller.pay.to.Order;
@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Service
 public class AssignmentServiceImpl extends AbstractBaseService<Assignment, Integer> implements AssignmentService {
-    private static final int adNums = 20;//每辆车每5分钟可以处理的广告条数
+    private static final int adNumsPerCar = 20;//每辆车每5分钟可以处理的广告条数
     @Autowired
     AssignmentRepository assignmentRepository;
     @Autowired
@@ -55,7 +55,7 @@ public class AssignmentServiceImpl extends AbstractBaseService<Assignment, Integ
         }
         try {
             List<Value> valueList = order.getValueList();
-            Long taskNums = order.getNum()/(adNums*order.getDeliverNum());
+            Long taskNums = order.getNum()/(adNumsPerCar*order.getDeliverNum());
 
             Iterator<Value> iterator = valueList.iterator();
             while (iterator.hasNext()){

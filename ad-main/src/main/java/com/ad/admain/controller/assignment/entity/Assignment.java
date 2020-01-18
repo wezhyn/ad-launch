@@ -1,4 +1,4 @@
-package com.ad.admain.controller.distribute.entity;
+package com.ad.admain.controller.assignment.entity;
 
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.pay.to.Order;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -57,4 +56,7 @@ public class Assignment implements IBaseTo<Integer> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id",referencedColumnName = "id")
     private Order order;
+
+    @Column(name = "status")
+    private Boolean status;
 }

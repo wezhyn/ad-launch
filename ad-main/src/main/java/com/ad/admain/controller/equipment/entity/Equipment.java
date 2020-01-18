@@ -1,7 +1,7 @@
 package com.ad.admain.controller.equipment.entity;
 
 import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.distribute.entity.Assignment;
+import com.ad.admain.controller.assignment.entity.Assignment;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;

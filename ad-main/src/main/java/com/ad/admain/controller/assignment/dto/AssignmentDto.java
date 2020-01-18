@@ -1,4 +1,4 @@
-package com.ad.admain.controller.distribute.dto;
+package com.ad.admain.controller.assignment.dto;
 
 import lombok.Data;
 
