@@ -1,6 +1,7 @@
 package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.distribute.entity.Assignment;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -16,13 +17,13 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Table(name="ad_order")
-@Accessors(chain=true)
-@Entity
+
+@Entity(name="ad_order")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate
+@Accessors(chain=true)
 public class Order implements IBaseTo<Integer> {
 
     @Id
@@ -31,10 +32,9 @@ public class Order implements IBaseTo<Integer> {
     private Integer id;
 
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="uid", insertable=false, updatable=false)
     private GenericUser orderUser;
-
 
     @OneToMany(cascade=CascadeType.ALL)
     private List<Value> valueList;
@@ -48,6 +48,10 @@ public class Order implements IBaseTo<Integer> {
     @Column(nullable=false)
     private LocalDateTime endDate;
 
+    /**
+     * 要求广告投放到车上的数量
+     */
+    private Long deliverNum;
 
     /**
      * 订单单价
@@ -66,7 +70,8 @@ public class Order implements IBaseTo<Integer> {
     /**
      * 广告投放范围
      */
-    private Integer scope;
+
+    private Double scope;
 
     /**
      * 广告投放频率
@@ -78,7 +83,7 @@ public class Order implements IBaseTo<Integer> {
 
     /**
      * 代客服审核
-     * 0: 代审核
+     * 0: 待审核
      * 1:审核通过
      * -1：审核不通过
      * -2：订单代修改
@@ -87,7 +92,8 @@ public class Order implements IBaseTo<Integer> {
     @Type(type="strategyEnum")
     @StrategyEnum(value=EnumType.NUMBER)
     private OrderVerify verify;
-
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "order")
+    private List<Assignment> assignments;
     @Override
     public String toString() {
         return "Order{" +

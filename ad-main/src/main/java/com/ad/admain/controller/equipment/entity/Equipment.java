@@ -1,6 +1,7 @@
 package com.ad.admain.controller.equipment.entity;
 
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.distribute.entity.Assignment;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -15,6 +16,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author wezhyn
@@ -79,6 +81,8 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("''")
     private String feedback;
 
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "equipment")
+    private List<Assignment> assignments;
 
     public static Equipment createFromUid(Integer uid) {
         return Equipment.builder().uid(uid)

@@ -15,8 +15,8 @@ import javax.persistence.*;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-@Entity
-@Table(name="ad_img_bed")
+@Entity(name="ad_img_bed")
+
 @Data
 @Builder(builderClassName="Builder")
 @AllArgsConstructor
