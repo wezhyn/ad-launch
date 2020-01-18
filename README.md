@@ -5,14 +5,14 @@
 * Security 认证失败返回50008
 
 ### 新增
-* 在Controller中使用 `@AuthenticationPrincipal AdAuthentication authentication`
-代替 `@AuthenticationPrincipal Authentication authentication`,
-`authentication.getName()` 返回当前用户名，`authentication.getId` 返回用户自增Id
-
+* 项目文件下配置sql：`sdf`
 
 
 ### 旧
 
+* 在Controller中使用 `@AuthenticationPrincipal AdAuthentication authentication`
+代替 `@AuthenticationPrincipal Authentication authentication`,
+`authentication.getName()` 返回当前用户名，`authentication.getId` 返回用户自增Id
 * jpa 默认值
 * /api/file/avatar
 * 使用[mapStruct](https://mapstruct.org/documentation/stable/reference/html/#defining-mapper) 映射 to <-> dto
