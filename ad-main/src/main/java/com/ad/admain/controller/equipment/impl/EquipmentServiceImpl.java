@@ -31,6 +31,11 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
 
 
     @Override
+    public void quartzTest() {
+        System.out.println("quartz test");
+    }
+
+    @Override
     public Page<Equipment> getListByUid(Integer uid, Pageable pageable) {
         Equipment equipment=Equipment.createFromUid(uid);
         Example<Equipment> queryCondition=Example.of(equipment);

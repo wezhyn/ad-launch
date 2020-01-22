@@ -1,15 +1,12 @@
 package com.ad.admain.controller.quartz.test;
 
-import com.ad.admain.controller.assignment.entity.Assignment;
+import com.ad.admain.controller.quartz.test.job.HelloJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 //静态导入DSL
 import static org.quartz.JobBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
-import static org.quartz.CronScheduleBuilder.*;
-import static org.quartz.CalendarIntervalScheduleBuilder.*;
 import static org.quartz.TriggerBuilder.*;
-import static org.quartz.DateBuilder.*;
+
 /**
  * @ClassName QuartzTest
  * @Description quartz测试文件
@@ -37,11 +34,10 @@ public class QuartzTest {
                     .startNow()
                     .withSchedule(SimpleScheduleBuilder
                     .simpleSchedule()
-                    .withIntervalInSeconds(40)
+                    .withIntervalInSeconds(5)
                     .repeatForever()
                     ).build();
             scheduler.scheduleJob(job,trigger);
-            scheduler.shutdown();
 
         } catch (SchedulerException e) {
             e.printStackTrace();

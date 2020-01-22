@@ -1,8 +1,7 @@
-package com.ad.admain.controller.quartz.test;
+package com.ad.admain.controller.quartz.test.job;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import lombok.NoArgsConstructor;
+import org.quartz.*;
 
 /**
  * @ClassName HelloJob
@@ -13,8 +12,11 @@ import org.quartz.JobExecutionException;
  * @Version 1.0
  */
 public class HelloJob implements Job {
+    public HelloJob(){
+
+    }
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        System.out.println("fuck you");
+        System.out.println("this is a test");
     }
 }
