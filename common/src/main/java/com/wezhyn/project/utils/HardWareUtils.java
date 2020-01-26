@@ -10,6 +10,7 @@ package com.wezhyn.project.utils;
  */
 public class HardWareUtils {
     public static void distribute(){
+        System.err.println("分配执行");
         return;
     }
 }

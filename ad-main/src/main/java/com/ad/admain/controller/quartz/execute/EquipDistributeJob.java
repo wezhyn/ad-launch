@@ -1,5 +1,6 @@
 package com.ad.admain.controller.quartz.execute;
 
+import com.wezhyn.project.utils.HardWareUtils;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -15,6 +16,6 @@ import org.quartz.JobExecutionException;
 public class EquipDistributeJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-
+        HardWareUtils.distribute();
     }
 }

@@ -1,5 +1,7 @@
 package com.ad.admain.utils;
 
+import java.util.List;
+
 /**
  * @ClassName StringUtils
  * @Description TODO
@@ -16,6 +18,15 @@ public class StringUtils {
             content+=part[i];
         }
         return content;
+    }
+
+    //获取List参数值
+    public static String getListString(List<String> list) {
+        StringBuilder result = new StringBuilder();
+        for (String s : list) {
+            result.append(s).append(" ");
+        }
+        return result.toString();
     }
 
     public static void main(String[] args) {
