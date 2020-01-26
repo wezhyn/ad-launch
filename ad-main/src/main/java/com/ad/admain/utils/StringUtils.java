@@ -11,6 +11,9 @@ import java.util.List;
  * @Version 1.0
  */
 public class StringUtils {
+    public static final String rawCron = "0 0/5 * * *？";
+    public static final int carRate =10;
+
     public static String getContent(String rawContent){
         String content = "";
         String[] part = rawContent.split("#");
@@ -28,6 +31,7 @@ public class StringUtils {
         }
         return result.toString();
     }
+
 
     public static void main(String[] args) {
         System.out.println(getContent("hello#world#new#test"));

@@ -36,7 +36,12 @@ public interface EquipmentService extends BaseService<Equipment, Integer> {
     */
     Long getAllOnlineEquipmentByRegion(Double longitude,Double latitude,Double square);
 
-    Long countByStatusAndRegion(Integer need,Integer status,Double longitude,Double latitude,Double square);
+    //统计目标区域内所有通过验证的在线车辆数目
+    Long countByStatusAndRegion(Boolean status,Integer need,Double longitude,Double latitude,Double square);
 
-    List<Equipment> findAllAvailableEquips(Integer need,Integer status,Double longitude,Double latitude,Double square,Integer size);
+    //统计目标区域内所有通过验证符合订单需求的在线车辆数目
+    Long countAllAvailableEquips(Boolean status,Integer need,Double longitude,Double latitude,Double square);
+
+    //统计目标区域内符合订单需求的车辆
+    List<Equipment> findAllAvailableEquips(Boolean status,Integer rate,Double longitude,Double latitude,Double square);
 }

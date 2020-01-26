@@ -2,6 +2,7 @@ package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.assignment.entity.Assignment;
+import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -51,7 +52,7 @@ public class Order implements IBaseTo<Integer> {
     /**
      * 要求广告投放到车上的数量
      */
-    private Long deliverNum;
+    private Integer deliverNum;
 
     /**
      * 订单单价
@@ -79,6 +80,10 @@ public class Order implements IBaseTo<Integer> {
     private Integer rate;
 
     private Integer uid;
+
+    @OneToMany(mappedBy = "order",targetEntity = JobEntity.class)
+    private List<JobEntity> jobEntities;
+
 
 
     /**

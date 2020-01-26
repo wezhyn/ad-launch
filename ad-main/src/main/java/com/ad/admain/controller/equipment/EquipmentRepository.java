@@ -1,6 +1,7 @@
 package com.ad.admain.controller.equipment;
 
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.controller.equipment.entity.EquipmentVerify;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -22,7 +23,13 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
 
     Long countAllByStatusEquals(Integer status);
 
-    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetween(Integer need,Integer status,Double minlgt,Double maxlgt,Double minlat,Double maxlat);
+    //统计到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆数目
+    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenandAndVerifyEquals(Boolean status,Integer need,Double minlgt,Double maxlgt,Double minlat,Double maxlat,EquipmentVerify verify);
 
-    List<Equipment> findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetween(Integer need, Integer status, Double minlgt, Double maxlgt, Double minlat, Double maxlat, Pageable pageable);
+    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Integer need,Double minlgt, Double maxlgt, Double minlat, Double maxlat,EquipmentVerify verity);
+
+    //找出到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆
+    List<Equipment> findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(Boolean status, Integer need, Double minlgt, Double maxlgt, Double minlat, Double maxlat, EquipmentVerify verity);
+
+
 }
