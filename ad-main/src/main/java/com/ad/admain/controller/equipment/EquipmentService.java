@@ -1,6 +1,7 @@
 package com.ad.admain.controller.equipment;
 
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.controller.equipment.entity.EquipmentVerify;
 import com.ad.admain.controller.pay.to.Order;
 import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
@@ -34,10 +35,11 @@ public interface EquipmentService extends BaseService<Equipment, Integer> {
     * @updateTime 2020/1/18 16:24
     * @throws
     */
-    Long getAllOnlineEquipmentByRegion(Double longitude,Double latitude,Double square);
+    //根据区域和在线状态统计车的数量
+    Long countAllOnlineByRegionAndStatus(Boolean status,Double longitude,Double latitude,Double square);
 
     //统计目标区域内所有通过验证的在线车辆数目
-    Long countByStatusAndRegion(Boolean status,Integer need,Double longitude,Double latitude,Double square);
+    Long countAllByVerifyAndStatusAndRegion(Boolean status, Integer need, Double longitude, Double latitude, Double square,  EquipmentVerify equipmentVerify);
 
     //统计目标区域内所有通过验证符合订单需求的在线车辆数目
     Long countAllAvailableEquips(Boolean status,Integer need,Double longitude,Double latitude,Double square);

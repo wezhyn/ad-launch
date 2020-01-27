@@ -1,7 +1,6 @@
 package com.ad.admain.controller.equipment.entity;
 
 import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.assignment.entity.Assignment;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
@@ -53,10 +52,10 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("'暂无'")
     private String name;
 
-    @ColumnDefault("0")
+    @ColumnDefault("0.00")
     private Double latitude;
 
-    @ColumnDefault("0")
+    @ColumnDefault("0.00")
     private Double longitude;
 
     @Column(name="`key`")
@@ -83,8 +82,6 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("''")
     private String feedback;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "equipment")
-    private List<Assignment> assignments;
 
     @Column(name = "remain")
     @ColumnDefault("10")

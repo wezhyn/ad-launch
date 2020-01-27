@@ -1,7 +1,6 @@
 package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.assignment.entity.Assignment;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
@@ -97,8 +96,6 @@ public class Order implements IBaseTo<Integer> {
     @Type(type="strategyEnum")
     @StrategyEnum(value=EnumType.NUMBER)
     private OrderVerify verify;
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "order")
-    private List<Assignment> assignments;
     @Override
     public String toString() {
         return "Order{" +

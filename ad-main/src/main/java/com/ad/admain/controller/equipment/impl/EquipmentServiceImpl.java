@@ -58,7 +58,7 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
                 }
 
     @Override
-    public Long getAllOnlineEquipmentByRegion(Double longitude, Double latitude, Double square) {
+    public Long countAllByVerifyAndStatusAndRegion(Boolean status, Integer need, Double longitude, Double latitude, Double square,  EquipmentVerify equipmentVerify){
         double dlng = 2*Math.asin(Math.sin(square/(2*earthRadius))/Math.cos(latitude*Math.PI/180));
         dlng = dlng*180/Math.PI; //角度转换为弧度
         double dlat = square/earthRadius;
@@ -68,10 +68,10 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
         double maxlat = latitude + dlat; //最大经度
         double minlgt = longitude -dlng; //最小纬度
         double maxlgt = longitude + dlng; //最大纬度
-        return equipmentRepository.countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenandAndVerifyEquals(true,0,minlgt,maxlgt,minlat,maxlat,EquipmentVerify.PASSING_VERIFY);    }
+        return equipmentRepository.countAllByStatusEqualsAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(true,minlgt,maxlgt,minlat,maxlat,EquipmentVerify.PASSING_VERIFY);    }
 
     @Override
-    public Long countByStatusAndRegion( Boolean status,Integer need, Double longitude, Double latitude, Double square) {
+    public Long countAllOnlineByRegionAndStatus (Boolean status, Double longitude, Double latitude, Double square) {
         double dlng = 2*Math.asin(Math.sin(square/(2*earthRadius))/Math.cos(latitude*Math.PI/180));
         dlng = dlng*180/Math.PI; //角度转换为弧度
         Double dlat = square/earthRadius;
@@ -81,7 +81,7 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
         double maxlat = latitude + dlat; //最大经度
         double minlgt = longitude -dlng; //最小纬度
         double maxlgt = longitude + dlng; //最大纬度
-        Long nums = equipmentRepository.countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenandAndVerifyEquals(status,need,minlgt,maxlgt,minlat,maxlat,EquipmentVerify.PASSING_VERIFY);
+        Long nums = equipmentRepository.countAllByLongitudeBetweenAndLatitudeBetweenAndStatusEquals(minlgt,maxlgt,minlat,maxlat,status);
 
         return nums;
     }

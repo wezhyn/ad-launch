@@ -1,6 +1,7 @@
 package com.ad.admain.controller.quartz;
 
 import com.ad.admain.controller.quartz.execute.EquipSearchJob;
+import com.ad.admain.controller.quartz.test.job.HelloJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class Scheduler {
     public static void main(String[] args) throws SchedulerException {
        org.quartz.Scheduler scheduler =  StdSchedulerFactory.getDefaultScheduler();
-        JobDetail testJob = JobBuilder.newJob(EquipSearchJob.class)
+        JobDetail testJob = JobBuilder.newJob(HelloJob.class)
                 .withIdentity("testJob","group1")
                 .build();
 

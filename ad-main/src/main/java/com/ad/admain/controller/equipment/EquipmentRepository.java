@@ -19,14 +19,15 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
 
     Long countAllByLongitudeBetweenAndLatitudeBetween(Double minlgt,Double maxlgt,Double minlat,Double maxlat);
 
-    Long countAllByLongitudeBetweenAndLatitudeBetweenAndStatusEquals(Double minlgt,Double maxlgt,Double minlat,Double maxlat,Integer status);
+    Long countAllByLongitudeBetweenAndLatitudeBetweenAndStatusEquals(Double minlgt,Double maxlgt,Double minlat,Double maxlat,Boolean status);
 
     Long countAllByStatusEquals(Integer status);
 
-    //统计到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆数目
-    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenandAndVerifyEquals(Boolean status,Integer need,Double minlgt,Double maxlgt,Double minlat,Double maxlat,EquipmentVerify verify);
+    //统计区域内所有通过验证的在线车辆数目
+    Long countAllByStatusEqualsAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Double minlgt, Double maxlgt, Double minlat, Double maxlat,EquipmentVerify equipmentVerify);
 
-    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Integer need,Double minlgt, Double maxlgt, Double minlat, Double maxlat,EquipmentVerify verity);
+    //统计到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆数目
+    Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Integer need,Double minlgt,Double maxlgt,Double minlat,Double maxlat,EquipmentVerify verify);
 
     //找出到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆
     List<Equipment> findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(Boolean status, Integer need, Double minlgt, Double maxlgt, Double minlat, Double maxlat, EquipmentVerify verity);

@@ -103,7 +103,7 @@ public class DynamicServiceImpl implements DynamicJobService{
         Double lgti = order.getLongitude();
         Double scope = order.getScope();
         //订单要求的车辆数大于范围内可用的车辆数或投放的广告总数不是投放车辆数的整数倍
-        Long available = equipmentService.countByStatusAndRegion(true,rate,lgti,lati,scope);
+        Long available = equipmentService.countAllAvailableEquips(true,rate,lgti,lati,scope);
         if (available<deliverNum||num%deliverNum!=0){
             return ;
         }
