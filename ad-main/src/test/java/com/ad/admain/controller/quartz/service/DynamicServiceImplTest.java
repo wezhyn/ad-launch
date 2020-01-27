@@ -41,8 +41,7 @@ public class DynamicServiceImplTest {
                 .setName("test")
                 .setJobGroup(order.getId().toString())
                 .setDescription(order.getId()+":"+order.getId())
-                .setAmount(10)
-                .setId(2);
+                .setAmount(10);
         dynamicJobService.insertOneJob(jobEntity);
     }
 

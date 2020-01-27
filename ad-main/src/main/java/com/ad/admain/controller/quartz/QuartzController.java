@@ -10,6 +10,7 @@ import org.quartz.Scheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ public class QuartzController {
     @PostConstruct
     public void initialize() {
         try {
-            reStartAllJobs();
+            startJobPerFiveMins();
             log.info("init success");
         } catch (SchedulerException e) {
             log.error("printStackTrace ", e);
@@ -111,25 +112,14 @@ public class QuartzController {
             }
         }
     }
-
+    //每经5min将数据库中为执行的任务取出执行
     private void startJobPerFiveMins() throws SchedulerException {
-        synchronized (log) {                                                         //只允许一个线程进入操作
-            org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
-            Set<JobKey> set = scheduler.getJobKeys(GroupMatcher.anyGroup());
-            scheduler.pauseJobs(GroupMatcher.anyGroup());                               //暂停所有JOB
-            for (JobKey jobKey : set) {                                                 //删除从数据库中注册的所有JOB
-                scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
-                scheduler.deleteJob(jobKey);
-            }
-            for (JobEntity job : jobService.loadJobs()) {                               //从数据库中注册的所有JOB
-                log.info("Job register name : {} , group : {} , cron : {}", job.getName(), job.getJobGroup(), job.getCron());
-                JobDataMap map = jobService.getJobDataMap(job);
-                JobKey jobKey = jobService.getJobKey(job);
-                JobDetail jobDetail = jobService.getJobDetail(jobKey, job.getDescription(), map);
-                if (job.getStatus().equals("OPEN")) scheduler.scheduleJob(jobDetail, jobService.getTrigger(job));
-                else
-                    log.info("Job jump name : {} , Because {} status is {}", job.getName(), job.getName(), job.getStatus());
-            }
+        synchronized (log) {
+            //只允许一个线程进入操作
+          org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
+          JobDetail jobDetail = jobService.getInitialJobDetail();
+          Trigger trigger = jobService.getInitialTrigger();
+           scheduler.scheduleJob(jobDetail,trigger);
         }
     }
 

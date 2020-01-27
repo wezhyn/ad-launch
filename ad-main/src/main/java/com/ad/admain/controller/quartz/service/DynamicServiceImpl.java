@@ -2,13 +2,11 @@ package com.ad.admain.controller.quartz.service;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.controller.equipment.entity.EquipmentVerify;
-import com.ad.admain.controller.equipment.impl.EquipmentServiceImpl;
 import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.quartz.dao.JobEntityRepository;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.job.DynamicJob;
-import com.ad.admain.utils.StringUtils;
+import com.ad.admain.controller.quartz.job.InitializeJob;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,7 +71,8 @@ public class DynamicServiceImpl implements DynamicJobService{
                 .withDescription(description)
                 .setJobData(map)
                 //即使没有与trigger关联 也要将改job保留起来
-                .storeDurably()
+                .storeDurably(true)
+                .requestRecovery(true)
                 .build();
     }
 
@@ -85,7 +84,8 @@ public class DynamicServiceImpl implements DynamicJobService{
                     .withIdentity(job.getName(), job.getJobGroup())
 //                .withSchedule(CronScheduleBuilder.cronSchedule(job.getCron())
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInSeconds(300/StringUtils.carRate)
+//                            .withIntervalInSeconds(300/StringUtils.carRate)
+                            .withIntervalInSeconds(5)
                             .withRepeatCount(job.getAmount()))
                     .build();
         } catch (Exception e) {
@@ -129,6 +129,44 @@ public class DynamicServiceImpl implements DynamicJobService{
         }
         }
 
+    @Override
+    public Trigger getInitialTrigger() {
+        try {
+            return TriggerBuilder.newTrigger()
+                    .withIdentity("initializeJob", "initializeJob")
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+//                            .withIntervalInMinutes(5)
+                            .withIntervalInSeconds(5)
+                            .repeatForever()
+                            )
+                    .startNow()
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;    }
+
+    @Override
+    public JobDetail getInitialJobDetail() {
+        String des = "to load job every 5 mins";
+        JobDetail jobDetail = JobBuilder.newJob(InitializeJob.class)
+                .withIdentity("initialJob","initialJob")
+                .withDescription(des)
+                .storeDurably(true)
+                .requestRecovery(true)
+                .build();
+        return jobDetail;
+    }
+
+    @Override
+    public List<JobEntity> loadJobsByStatus(String status) {
+        return repository.findAllByStatusEquals(status);
+    }
+
+    @Override
+    public JobEntity updateJobEntity(JobEntity jobEntity) {
+        return repository.save(jobEntity);
+    }
 
 
 }

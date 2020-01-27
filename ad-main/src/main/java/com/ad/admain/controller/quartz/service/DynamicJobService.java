@@ -28,6 +28,13 @@ public interface DynamicJobService {
 
      void insertJobEntity(Order order);
 
+     Trigger getInitialTrigger();
+
+     JobDetail getInitialJobDetail();
+
+     List<JobEntity> loadJobsByStatus(String status);
+
+     JobEntity updateJobEntity(JobEntity jobEntity);
 
 
 }
