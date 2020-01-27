@@ -30,6 +30,12 @@ public class DynamicServiceImpl implements DynamicJobService{
     private JobEntityRepository repository;
     @Autowired
     private EquipmentService equipmentService;
+
+    @Override
+    public JobEntity insertOneJob(JobEntity jobEntity) {
+        return repository.save(jobEntity);
+    }
+
     //通过Id获取Job
     @Override
     public JobEntity getJobEntityById(Integer id) {
@@ -55,6 +61,7 @@ public class DynamicServiceImpl implements DynamicJobService{
         map.put("status", job.getStatus());
         map.put("order_id",job.getOrder().getId());
         map.put("equip_id",job.getEquip().getId());
+        map.put("amount",job.getAmount());
         return map;
     }
 

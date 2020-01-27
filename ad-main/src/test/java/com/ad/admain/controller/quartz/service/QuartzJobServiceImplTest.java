@@ -1,6 +1,5 @@
 package com.ad.admain.controller.quartz.service;
 
-import com.ad.admain.controller.quartz.execute.EquipSearchJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.JobKey;

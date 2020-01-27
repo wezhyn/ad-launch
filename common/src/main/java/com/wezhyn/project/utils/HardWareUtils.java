@@ -1,5 +1,7 @@
 package com.wezhyn.project.utils;
 
+import org.hibernate.criterion.Order;
+
 /**
  * @ClassName HardWareUtils
  * @Description TODO
@@ -10,7 +12,7 @@ package com.wezhyn.project.utils;
  */
 public class HardWareUtils {
     public static void distribute(){
-        System.err.println("分配执行");
+        System.err.println("发送广告");
         return;
     }
 }

@@ -4,13 +4,10 @@ import com.ad.admain.controller.equipment.EquipmentRepository;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.equipment.entity.EquipmentVerify;
-import com.ad.admain.controller.pay.to.Order;
-import com.fasterxml.jackson.databind.node.LongNode;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 

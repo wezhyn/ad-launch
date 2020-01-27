@@ -1,5 +1,6 @@
 package com.ad.admain.controller.quartz.job;
 
+import com.wezhyn.project.utils.HardWareUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Component;
@@ -34,39 +35,19 @@ public class DynamicJob implements Job {
     public void execute(JobExecutionContext executorContext) throws JobExecutionException {
         //JobDetail中的JobDataMap是共用的,从getMergedJobDataMap获取的JobDataMap是全新的对象
         JobDataMap map = executorContext.getMergedJobDataMap();
-        String jarPath = map.getString("jarPath");
         String parameter = map.getString("parameter");
         String vmParam = map.getString("vmParam");
         log.info("Running Job name : {} ", map.getString("name"));
         log.info("Running Job description : {}", map.getString("jobDescription"));
         log.info("Running Job group: {} ", map.getString("group"));
-        log.info(String.format("Running Job cron : %s", map.getString("cronExpression")));
-        log.info("Running Job jar path : {} ", jarPath);
-        log.info("Running Job parameter : {} ", parameter);
-        log.info("Running Job vmParam : {} ", vmParam);
+        log.info("分配到的订单号:"+map.getInt("order_id"));
+        log.info("分配到的设备号"+map.getInt("equip_id"));
+        log.info("任务的执行次数:"+map.getInt("amount"));
+        HardWareUtils.distribute();
+//        log.info(String.format("Running Job cron : %s", map.getString("cronExpression")));
+//        log.info("Running Job parameter : {} ", parameter);
+//        log.info("Running Job vmParam : {} ", vmParam);
         long startTime = System.currentTimeMillis();
-        if (!StringUtils.isEmpty(jarPath)) {
-            File jar = new File(jarPath);
-            if (jar.exists()) {
-                ProcessBuilder processBuilder = new ProcessBuilder();
-                processBuilder.directory(jar.getParentFile());
-                List<String> commands = new ArrayList<>();
-                commands.add("java");
-                if (!StringUtils.isEmpty(vmParam)) commands.add(vmParam);
-                commands.add("-jar");
-                commands.add(jarPath);
-                if (!StringUtils.isEmpty(parameter)) commands.add(parameter);
-                processBuilder.command(commands);
-                log.info("Running Job details as follows >>>>>>>>>>>>>>>>>>>>: ");
-                log.info("Running Job commands : {}  ", com.ad.admain.utils.StringUtils.getListString(commands));
-                try {
-                    Process process = processBuilder.start();
-                    logProcess(process.getInputStream(), process.getErrorStream());
-                } catch (IOException e) {
-                    throw new JobExecutionException(e);
-                }
-            } else throw new JobExecutionException("Job Jar not found >>  " + jarPath);
-        }
         long endTime = System.currentTimeMillis();
         log.info(">>>>>>>>>>>>> Running Job has been completed , cost time : {}ms\n ", (endTime - startTime));
     }

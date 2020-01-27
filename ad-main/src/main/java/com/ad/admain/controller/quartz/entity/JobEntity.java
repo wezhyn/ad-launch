@@ -39,10 +39,10 @@ public class JobEntity implements Serializable {
     private String vmParam;       //vm参数
     @Column(name = "status")
     private String status;        //job的执行状态,这里我设置为OPEN/CLOSE且只有该值为OPEN才会执行该Job
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id",referencedColumnName = "id")
     private Order order;      //与订单进行关联
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equip_id",referencedColumnName = "id")
     private Equipment equip;
     @Column(name = "amount")

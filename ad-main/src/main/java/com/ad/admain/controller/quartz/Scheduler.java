@@ -1,6 +1,5 @@
 package com.ad.admain.controller.quartz;
 
-import com.ad.admain.controller.quartz.execute.EquipSearchJob;
 import com.ad.admain.controller.quartz.test.job.HelloJob;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

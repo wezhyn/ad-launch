@@ -7,6 +7,7 @@ import org.quartz.*;
 import java.util.List;
 
 public interface DynamicJobService {
+     JobEntity insertOneJob(JobEntity jobEntity);
      //通过Id获取Job
      JobEntity getJobEntityById(Integer id);
 
