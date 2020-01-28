@@ -1,5 +1,6 @@
 package com.wezhyn.project.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.criterion.Order;
 
 /**
@@ -10,9 +11,10 @@ import org.hibernate.criterion.Order;
  * @Date 2020/1/16 19:14
  * @Version 1.0
  */
+@Slf4j
 public class HardWareUtils {
     public static void distribute(){
-        System.err.println("发送广告");
+        log.info("发送广告");
         return;
     }
 }

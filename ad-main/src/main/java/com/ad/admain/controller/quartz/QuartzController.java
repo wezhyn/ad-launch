@@ -10,7 +10,6 @@ import org.quartz.Scheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -116,13 +115,22 @@ public class QuartzController {
     private void startJobPerFiveMins() throws SchedulerException {
         synchronized (log) {
             //只允许一个线程进入操作
-            JobKey jobKey = JobKey.jobKey("initialJob","initialJob");
+          JobKey jobKey = JobKey.jobKey("initializeJob","initializeJob");
+          TriggerKey triggerKey = TriggerKey.triggerKey("initializeJob","initializeJob");
           org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
-          scheduler.pauseJob(jobKey);
-          scheduler.deleteJob(jobKey);
-          JobDetail jobDetail = jobService.getInitialJobDetail();
-          Trigger trigger = jobService.getInitialTrigger();
-           scheduler.scheduleJob(jobDetail,trigger);
+          try {
+             JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
+             if (jobDetail!=null){
+                 scheduler.pauseJob(jobKey);
+                 scheduler.deleteJob(jobKey);
+             }
+          } catch (SchedulerException e) {
+              e.printStackTrace();
+          }
+
+            JobDetail jobDetail = jobService.getInitialJobDetail();
+            Trigger trigger = jobService.getInitialTrigger();
+            scheduler.scheduleJob(jobDetail,trigger);
         }
     }
 

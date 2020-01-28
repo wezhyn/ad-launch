@@ -29,6 +29,7 @@ public class DynamicServiceImpl implements DynamicJobService{
     @Autowired
     private EquipmentService equipmentService;
 
+
     @Override
     public JobEntity insertOneJob(JobEntity jobEntity) {
         return repository.save(jobEntity);
@@ -53,13 +54,13 @@ public class DynamicServiceImpl implements DynamicJobService{
         map.put("name", job.getName());
         map.put("jobGroup", job.getJobGroup());
         map.put("cronExpression", job.getCron());
-        map.put("parameter", job.getParameter());
         map.put("jobDescription", job.getDescription());
-        map.put("vmParam", job.getVmParam());
         map.put("status", job.getStatus());
+        map.put("isFinished",job.getIsFinished());
         map.put("order_id",job.getOrder().getId());
         map.put("equip_id",job.getEquip().getId());
         map.put("amount",job.getAmount());
+        map.put("job_id",job.getId());
         return map;
     }
 
@@ -71,7 +72,7 @@ public class DynamicServiceImpl implements DynamicJobService{
                 .withDescription(description)
                 .setJobData(map)
                 //即使没有与trigger关联 也要将改job保留起来
-                .storeDurably(true)
+//                .storeDurably(true)
                 .requestRecovery(true)
                 .build();
     }
@@ -87,6 +88,7 @@ public class DynamicServiceImpl implements DynamicJobService{
 //                            .withIntervalInSeconds(300/StringUtils.carRate)
                             .withIntervalInSeconds(5)
                             .withRepeatCount(job.getAmount()))
+                    .usingJobData(getJobDataMap(job))
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,8 +103,8 @@ public class DynamicServiceImpl implements DynamicJobService{
     }
 
     @Override
-    @Transactional
-    public void insertJobEntity(Order order) {
+    @Transactional(rollbackFor = Exception.class)
+    public void generateJobs(Order order) {
         Integer rate = order.getRate();
         Integer deliverNum = order.getDeliverNum();
         Integer num = order.getNum();
@@ -118,13 +120,17 @@ public class DynamicServiceImpl implements DynamicJobService{
         Integer amount = num/deliverNum;
         List<Equipment> equipmentList = equipmentService.findAllAvailableEquips(true,rate,lgti,lati,scope);
         for (int i = 1; i <= deliverNum; i++) {
+            Equipment equipment  = equipmentList.get(i);
             JobEntity jobEntity = new JobEntity();
             jobEntity.setAmount(amount)
-                    .setDescription(order.getId()+":"+i)
                     .setJobGroup(order.getId().toString())
+                    .setName(order.getId().toString())
+                    .setDescription("order_id:"+order.getId()+"task:"+i)
+                    .setStatus("CLOSE")
                     .setOrder(order)
-                    .setStatus("OPEN")
-                    .setEquip(equipmentList.get(i));
+                    .setEquip(equipment);
+            equipment.setRemain(equipment.getRemain()-rate);
+            equipmentService.save(equipment);
             repository.save(jobEntity);
         }
         }
@@ -150,7 +156,7 @@ public class DynamicServiceImpl implements DynamicJobService{
     public JobDetail getInitialJobDetail() {
         String des = "to load job every 5 mins";
         JobDetail jobDetail = JobBuilder.newJob(InitializeJob.class)
-                .withIdentity("initialJob","initialJob")
+                .withIdentity("initializeJob","initializeJob")
                 .withDescription(des)
                 .storeDurably(true)
                 .requestRecovery(true)

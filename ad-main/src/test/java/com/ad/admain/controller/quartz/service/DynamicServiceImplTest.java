@@ -34,18 +34,29 @@ public class DynamicServiceImplTest {
     }
     @Test
     public void insertOneJob() {
-        JobEntity jobEntity = new JobEntity();
-        jobEntity.setEquip(equipment)
-                .setStatus("OPEN")
-                .setOrder(order)
-                .setName("test")
-                .setJobGroup(order.getId().toString())
-                .setDescription(order.getId()+":"+order.getId())
-                .setAmount(10);
-        dynamicJobService.insertOneJob(jobEntity);
+//        for (int i = 0; i <10 ; i++) {
+            JobEntity jobEntity = new JobEntity();
+            jobEntity.setEquip(equipment)
+                    .setStatus("CLOSE")
+                    .setOrder(order)
+                    .setJobGroup(order.getId().toString())
+                    .setName("test")
+                    .setDescription("test")
+//                    .setName(new StringBuilder().append(i).toString())
+//                    .setDescription(new StringBuilder().append(i).toString())
+                    .setAmount(1);
+
+            dynamicJobService.insertOneJob(jobEntity);
+//        }
+
     }
 
     @Test
     public void insertJobEntity() {
+    }
+
+    @Test
+    public void generateJobs() {
+        dynamicJobService.generateJobs(order);
     }
 }

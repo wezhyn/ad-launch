@@ -26,7 +26,7 @@ public interface DynamicJobService {
     //获取JobKey,包含Name和Group
      JobKey getJobKey(JobEntity job);
 
-     void insertJobEntity(Order order);
+     void generateJobs(Order order);
 
      Trigger getInitialTrigger();
 
