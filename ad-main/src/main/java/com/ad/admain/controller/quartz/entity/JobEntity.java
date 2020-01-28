@@ -46,5 +46,7 @@ public class JobEntity implements Serializable {
     private Equipment equip;
     @Column(name = "amount")
     private Integer amount;
+//    @Column(name = "content")
+//    private String content;
 
 }

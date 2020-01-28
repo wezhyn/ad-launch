@@ -2,6 +2,7 @@ package com.ad.admain.controller.quartz.service;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.quartz.dao.JobEntityRepository;
 import com.ad.admain.controller.quartz.entity.JobEntity;
@@ -28,7 +29,8 @@ public class DynamicServiceImpl implements DynamicJobService{
     private JobEntityRepository repository;
     @Autowired
     private EquipmentService equipmentService;
-
+    @Autowired
+    OrderService orderService;
 
     @Override
     public JobEntity insertOneJob(JobEntity jobEntity) {

@@ -1,9 +1,14 @@
 package com.ad.admain.controller.quartz.listener;
 
+import com.ad.admain.controller.equipment.EquipmentService;
+import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.controller.pay.OrderService;
+import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.quartz.dao.JobEntityRepository;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.service.DynamicJobService;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,9 +28,11 @@ import javax.annotation.PostConstruct;
 @Slf4j
 public class DynamicSchedulerListener implements SchedulerListener {
     @Autowired
-
-    JobEntityRepository jobEntityRepository;
+    OrderService orderService;
+    DynamicJobService dynamicJobService;
 //    DynamicJobService dynamicJobService;
+    @Autowired
+    EquipmentService equipmentService;
     @Override
     public void jobScheduled(Trigger trigger) {
 
@@ -41,11 +48,18 @@ public class DynamicSchedulerListener implements SchedulerListener {
     public void triggerFinalized(Trigger trigger) {
         JobDataMap jobDataMap = trigger.getJobDataMap();
         int jobId = jobDataMap.getInt("job_id");
+
         log.info(""+jobId);
+        Integer orderId = jobDataMap.getInt("order_id");
+        Integer equipId = jobDataMap.getInt("equip_id");
 //        JobEntity jobEntity = dynamicJobService.getJobEntityById(jobId);
-        JobEntity jobEntity = jobEntityRepository.findById(jobId).orElse(null);
+        JobEntity jobEntity = dynamicJobService.getJobEntityById(jobId);
         jobEntity.setIsFinished(true);
-        jobEntityRepository.save(jobEntity);
+        Order order = orderService.getById(orderId).orElse(null);
+        Equipment equipment = equipmentService.getById(equipId).orElse(null);
+        equipment.setRemain(equipment.getRemain()+order.getRate());
+        dynamicJobService.updateJobEntity(jobEntity);
+        equipmentService.save(equipment);
         log.info("job_id:"+jobId+"已完成");
     }
 
