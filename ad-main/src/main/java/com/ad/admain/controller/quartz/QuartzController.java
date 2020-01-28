@@ -116,7 +116,10 @@ public class QuartzController {
     private void startJobPerFiveMins() throws SchedulerException {
         synchronized (log) {
             //只允许一个线程进入操作
+            JobKey jobKey = JobKey.jobKey("initialJob","initialJob");
           org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
+          scheduler.pauseJob(jobKey);
+          scheduler.deleteJob(jobKey);
           JobDetail jobDetail = jobService.getInitialJobDetail();
           Trigger trigger = jobService.getInitialTrigger();
            scheduler.scheduleJob(jobDetail,trigger);
