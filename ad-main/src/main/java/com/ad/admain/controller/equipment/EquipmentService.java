@@ -39,10 +39,10 @@ public interface EquipmentService extends BaseService<Equipment, Integer> {
     Long countAllOnlineByRegionAndStatus(Boolean status,Double longitude,Double latitude,Double square);
 
     //统计目标区域内所有通过验证的在线车辆数目
-    Long countAllByVerifyAndStatusAndRegion(Boolean status, Integer need, Double longitude, Double latitude, Double square,  EquipmentVerify equipmentVerify);
+    Long countAllByVerifyAndStatusAndRegion(EquipmentVerify equipmentVerify,Boolean status, Double longitude, Double latitude, Double square);
 
     //统计目标区域内所有通过验证符合订单需求的在线车辆数目
-    Long countAllAvailableEquips(Boolean status,Integer need,Double longitude,Double latitude,Double square);
+    Long countAllAvailableEquips(Boolean status,Integer rate,Double longitude,Double latitude,Double square);
 
     //统计目标区域内符合订单需求的车辆
     List<Equipment> findAllAvailableEquips(Boolean status,Integer rate,Double longitude,Double latitude,Double square);

@@ -17,14 +17,14 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
 
 //    Page<Equipment> findAllByUid(Integer uid);
 
-    Long countAllByLongitudeBetweenAndLatitudeBetween(Double minlgt,Double maxlgt,Double minlat,Double maxlat);
+    Long countByLongitudeBetweenAndLatitudeBetween(Double minlgt,Double maxlgt,Double minlat,Double maxlat);
 
-    Long countAllByLongitudeBetweenAndLatitudeBetweenAndStatusEquals(Double minlgt,Double maxlgt,Double minlat,Double maxlat,Boolean status);
+    Long countByStatusEqualsAndLongitudeBetweenAndLatitudeBetween(Boolean status,Double minlgt,Double maxlgt,Double minlat,Double maxlat);
 
     Long countAllByStatusEquals(Integer status);
 
     //统计区域内所有通过验证的在线车辆数目
-    Long countAllByStatusEqualsAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Double minlgt, Double maxlgt, Double minlat, Double maxlat,EquipmentVerify equipmentVerify);
+    Long countByVerifyEqualsAndStatusEqualsAndLongitudeBetweenAndLatitudeBetween(EquipmentVerify equipmentVerify,Boolean status,Double minlgt, Double maxlgt, Double minlat, Double maxlat);
 
     //统计到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆数目
     Long countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(Boolean status,Integer need,Double minlgt,Double maxlgt,Double minlat,Double maxlat,EquipmentVerify verify);

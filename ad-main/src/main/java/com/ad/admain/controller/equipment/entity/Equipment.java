@@ -87,7 +87,7 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("10")
     private Integer remain;
 
-    @OneToMany(mappedBy = "equip",targetEntity = JobEntity.class)
+    @OneToMany(mappedBy = "equip",targetEntity = JobEntity.class,fetch = FetchType.EAGER)
     private List<Job> jobs;
 
     public static Equipment createFromUid(Integer uid) {

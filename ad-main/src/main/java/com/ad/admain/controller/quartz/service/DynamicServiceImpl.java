@@ -117,15 +117,15 @@ public class DynamicServiceImpl implements DynamicJobService{
             return ;
         }
 
-        Integer amount = num/deliverNum;
+        int amount = num/deliverNum;
         List<Equipment> equipmentList = equipmentService.findAllAvailableEquips(true,rate,lgti,lati,scope);
-        for (int i = 1; i <= deliverNum; i++) {
+        for (int i = 0; i < deliverNum; i++) {
             Equipment equipment  = equipmentList.get(i);
             JobEntity jobEntity = new JobEntity();
             jobEntity.setAmount(amount)
                     .setJobGroup(order.getId().toString())
                     .setName(order.getId().toString())
-                    .setDescription("order_id:"+order.getId()+"task:"+i)
+                    .setDescription("order_id:"+order.getId()+"-task_num:"+i)
                     .setStatus("CLOSE")
                     .setOrder(order)
                     .setEquip(equipment);

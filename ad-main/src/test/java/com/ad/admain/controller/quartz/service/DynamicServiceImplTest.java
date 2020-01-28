@@ -51,9 +51,7 @@ public class DynamicServiceImplTest {
 
     }
 
-    @Test
-    public void insertJobEntity() {
-    }
+
 
     @Test
     public void generateJobs() {

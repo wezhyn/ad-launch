@@ -41,18 +41,19 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     @Override
     public Long getEquipmentByRegion(Double longitude, Double latitude, Double square) {
       Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.countAllByLongitudeBetweenAndLatitudeBetween(info[0],info[1],info[2],info[3]);
+        return equipmentRepository.countByLongitudeBetweenAndLatitudeBetween(info[0],info[1],info[2],info[3]);
                 }
 
     @Override
-    public Long countAllByVerifyAndStatusAndRegion(Boolean status, Integer need, Double longitude, Double latitude, Double square,  EquipmentVerify equipmentVerify){
+    public Long countAllByVerifyAndStatusAndRegion(EquipmentVerify equipmentVerify,Boolean status, Double longitude, Double latitude, Double square){
         Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.countAllByStatusEqualsAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(true,info[0],info[1],info[2],info[3],EquipmentVerify.PASSING_VERIFY);    }
+        return equipmentRepository.countByVerifyEqualsAndStatusEqualsAndLongitudeBetweenAndLatitudeBetween(EquipmentVerify.PASSING_VERIFY,true,info[0],info[1],info[2],info[3]);
+    }
 
     @Override
     public Long countAllOnlineByRegionAndStatus (Boolean status, Double longitude, Double latitude, Double square) {
         Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        Long nums = equipmentRepository.countAllByLongitudeBetweenAndLatitudeBetweenAndStatusEquals(info[0],info[1],info[2],info[3],status);
+        Long nums = equipmentRepository.countByStatusEqualsAndLongitudeBetweenAndLatitudeBetween(status,info[0],info[1],info[2],info[3]);
 
         return nums;
     }
@@ -74,6 +75,4 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     public EquipmentRepository getRepository() {
         return equipmentRepository;
     }
-
-
         }
