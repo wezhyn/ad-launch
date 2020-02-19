@@ -1,6 +1,7 @@
 package com.ad.admain.controller.equipment.entity;
 
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -12,9 +13,11 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
+import org.quartz.Job;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author wezhyn
@@ -49,10 +52,10 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("'暂无'")
     private String name;
 
-    @ColumnDefault("0")
+    @ColumnDefault("0.00")
     private Double latitude;
 
-    @ColumnDefault("0")
+    @ColumnDefault("0.00")
     private Double longitude;
 
     @Column(name="`key`")
@@ -79,6 +82,13 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("''")
     private String feedback;
 
+
+    @Column(name = "remain")
+    @ColumnDefault("10")
+    private Integer remain;
+
+    @OneToMany(mappedBy = "equip",targetEntity = JobEntity.class,fetch = FetchType.EAGER)
+    private List<Job> jobs;
 
     public static Equipment createFromUid(Integer uid) {
         return Equipment.builder().uid(uid)

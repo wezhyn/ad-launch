@@ -1,13 +1,15 @@
 server:
-  port: 28080
+  port: 8080
   address: 0.0.0.0
   tomcat:
     max-threads: 8
-
+management:
+  security:
+    enabled: false
 spring:
   profiles:
-    active: zhaoo
-    # active: pro
+#    active: zhaoo
+     active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
@@ -48,3 +50,5 @@ custom:
     logout-interception:
       - /api/user/logout
       - /api/admin/logout
+
+

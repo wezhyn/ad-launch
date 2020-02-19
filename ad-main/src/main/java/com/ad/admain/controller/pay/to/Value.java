@@ -7,12 +7,11 @@ import lombok.Data;
 import javax.persistence.*;
 
 /**
- * @author : lb
+ * @author : zlb
  * @date : 2019/12/31
  */
 @Data
-@Entity
-@Table(name="ad_value")
+@Entity(name="ad_value")
 public class Value implements IBaseTo<Integer> {
 
     @Id
