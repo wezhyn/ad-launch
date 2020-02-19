@@ -30,4 +30,10 @@ public class GenericUserServiceImplTest {
 
     }
 
+
+    @Test
+    public void deleteCascadeEquipment() {
+        genericUserService.delete(5);
+    }
+
 }
