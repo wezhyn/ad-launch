@@ -8,8 +8,8 @@ management:
     enabled: false
 spring:
   profiles:
-#    active: zhaoo
-     active: dev
+    active: zhaoo
+#     active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
