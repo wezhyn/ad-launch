@@ -117,7 +117,7 @@ public class QuartzController {
         synchronized (log) {
             //只允许一个线程进入操作
           JobKey jobKey = JobKey.jobKey("initializeJob","initializeJob");
-          TriggerKey triggerKey = TriggerKey.triggerKey("initializeJob","initializeJob");
+//          TriggerKey triggerKey = TriggerKey.triggerKey("initializeJob","initializeJob");
           org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
           try {
              JobDetail jobDetail =  scheduler.getJobDetail(jobKey);

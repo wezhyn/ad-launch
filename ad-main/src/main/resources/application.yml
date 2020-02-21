@@ -50,5 +50,10 @@ custom:
     logout-interception:
       - /api/user/logout
       - /api/admin/logout
+netty:
+  server:
+    address: localhost
+    port: 8888
+
 
 

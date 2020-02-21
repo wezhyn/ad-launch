@@ -115,7 +115,12 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-
+<!--        netty所有的依赖-->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.42.Final</version>
+        </dependency>
 
     </dependencies>
 
