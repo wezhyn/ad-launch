@@ -136,7 +136,7 @@ public class DynamicServiceImpl implements DynamicJobService{
             repository.save(jobEntity);
         }
         }
-
+        //获取job的初始化触发器
     @Override
     public Trigger getInitialTrigger() {
         try {
@@ -154,6 +154,7 @@ public class DynamicServiceImpl implements DynamicJobService{
         }
         return null;    }
 
+        //获取初始化job的JobDetail
     @Override
     public JobDetail getInitialJobDetail() {
         String des = "to load job every 5 mins";
