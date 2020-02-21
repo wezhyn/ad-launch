@@ -3,7 +3,7 @@ package com.ad.admain.controller.dashboard;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity(name="ad_bill_aggregation")
+@DynamicInsert
 public class BillAggregation implements IBaseTo<Integer> {
 
 
@@ -37,7 +38,7 @@ public class BillAggregation implements IBaseTo<Integer> {
     /**
      * 某段时间内的成交量，与上一次统计之间的差值
      */
-    @Column(name="bill_sum")
+    @Column(name="bill_sum", columnDefinition="  double(15,3)  null default 0 ")
     private Double billSum;
 
     /**
@@ -54,11 +55,79 @@ public class BillAggregation implements IBaseTo<Integer> {
     private Boolean accurate;
 
 
-    @Column(name="record_time")
-    @ColumnDefault("current_timestamp")
+    @Column(name="record_time", columnDefinition="timestamp  null  default current_timestamp")
     private LocalDateTime recordTime;
 
 
     @Column(name="modify_time", columnDefinition="timestamp  null  default current_timestamp on update current_timestamp")
     private LocalDateTime modifyTime;
+
+    public static BillAggregationBuilder builder() {
+        return new BillAggregationBuilder();
+    }
+
+
+    public static final class BillAggregationBuilder {
+        private Integer id;
+        private DateType billScope;
+        private Double billSum;
+        private Integer recordBillId;
+        private Boolean accurate;
+        private LocalDateTime recordTime;
+        private LocalDateTime modifyTime;
+
+        private BillAggregationBuilder() {
+        }
+
+        public static BillAggregationBuilder aBillAggregation() {
+            return new BillAggregationBuilder();
+        }
+
+        public BillAggregationBuilder id(Integer id) {
+            this.id=id;
+            return this;
+        }
+
+        public BillAggregationBuilder billScope(DateType billScope) {
+            this.billScope=billScope;
+            return this;
+        }
+
+        public BillAggregationBuilder billSum(Double billSum) {
+            this.billSum=billSum;
+            return this;
+        }
+
+        public BillAggregationBuilder recordBillId(Integer recordBillId) {
+            this.recordBillId=recordBillId;
+            return this;
+        }
+
+        public BillAggregationBuilder accurate(Boolean accurate) {
+            this.accurate=accurate;
+            return this;
+        }
+
+        public BillAggregationBuilder recordTime(LocalDateTime recordTime) {
+            this.recordTime=recordTime;
+            return this;
+        }
+
+        public BillAggregationBuilder modifyTime(LocalDateTime modifyTime) {
+            this.modifyTime=modifyTime;
+            return this;
+        }
+
+        public BillAggregation build() {
+            BillAggregation billAggregation=new BillAggregation();
+            billAggregation.setId(id);
+            billAggregation.setBillScope(billScope);
+            billAggregation.setBillSum(billSum);
+            billAggregation.setRecordBillId(recordBillId);
+            billAggregation.setAccurate(accurate);
+            billAggregation.setRecordTime(recordTime);
+            billAggregation.setModifyTime(modifyTime);
+            return billAggregation;
+        }
+    }
 }

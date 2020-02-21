@@ -1,5 +1,7 @@
-package com.ad.admain.controller.dashboard;
+package com.ad.admain.controller.dashboard.repository;
 
+import com.ad.admain.controller.dashboard.BillAggregation;
+import com.ad.admain.controller.dashboard.DateType;
 import org.hibernate.query.NativeQuery;
 
 import javax.persistence.EntityManager;

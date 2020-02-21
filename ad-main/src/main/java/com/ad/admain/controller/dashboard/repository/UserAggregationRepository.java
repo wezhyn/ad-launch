@@ -1,4 +1,4 @@
-package com.ad.admain.controller.dashboard;
+package com.ad.admain.controller.dashboard.repository;
 
 import java.util.Map;
 

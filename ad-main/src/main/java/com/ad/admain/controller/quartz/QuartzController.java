@@ -5,15 +5,14 @@ import com.ad.admain.controller.quartz.dto.ModifyCronDTO;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.service.DynamicJobService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
 import org.quartz.Scheduler;
+import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Set;
@@ -39,7 +38,7 @@ public class QuartzController {
     private JobEntityRepository repository;
 
     //初始化启动所有的Job，容器内依赖注入完成后便启动
-    @PostConstruct
+    @PostMapping
     public void initialize() {
         try {
             startJobPerFiveMins();
@@ -53,21 +52,21 @@ public class QuartzController {
     @RequestMapping("/refresh/{id}")
     public String refresh(@PathVariable @NotNull Integer id) throws SchedulerException {
         String result;
-        JobEntity entity = jobService.getJobEntityById(id);
+        JobEntity entity=jobService.getJobEntityById(id);
         if (Objects.isNull(entity)) return "error: id is not exist ";
         synchronized (log) {
-            JobKey jobKey = jobService.getJobKey(entity);
-            org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            JobKey jobKey=jobService.getJobKey(entity);
+            org.quartz.Scheduler scheduler=schedulerFactoryBean.getScheduler();
             scheduler.pauseJob(jobKey);
             scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
             scheduler.deleteJob(jobKey);
-            JobDataMap map = jobService.getJobDataMap(entity);
-            JobDetail jobDetail = jobService.getJobDetail(jobKey, entity.getDescription(), map);
+            JobDataMap map=jobService.getJobDataMap(entity);
+            JobDetail jobDetail=jobService.getJobDetail(jobKey, entity.getDescription(), map);
             if (entity.getStatus().equals("OPEN")) {
                 scheduler.scheduleJob(jobDetail, jobService.getTrigger(entity));
-                result = "Refresh Job : " + entity.getName() + "\t " + " success !";
+                result="Refresh Job : " + entity.getName() + "\t " + " success !";
             } else {
-                result = "Refresh Job : " + entity.getName() + "\t : " + " failed ! , " +
+                result="Refresh Job : " + entity.getName() + "\t : " + " failed ! , " +
                         "Because the Job status is " + entity.getStatus();
             }
         }
@@ -81,9 +80,9 @@ public class QuartzController {
         String result;
         try {
             reStartAllJobs();
-            result = "success";
+            result="success";
         } catch (SchedulerException e) {
-            result = "exception : " + e.getMessage();
+            result="exception : " + e.getMessage();
         }
         return "refresh all jobs : " + result;
     }
@@ -93,8 +92,8 @@ public class QuartzController {
      */
     private void reStartAllJobs() throws SchedulerException {
         synchronized (log) {                                                         //只允许一个线程进入操作
-            org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
-            Set<JobKey> set = scheduler.getJobKeys(GroupMatcher.anyGroup());
+            org.quartz.Scheduler scheduler=schedulerFactoryBean.getScheduler();
+            Set<JobKey> set=scheduler.getJobKeys(GroupMatcher.anyGroup());
             scheduler.pauseJobs(GroupMatcher.anyGroup());                               //暂停所有JOB
             for (JobKey jobKey : set) {                                                 //删除从数据库中注册的所有JOB
                 scheduler.unscheduleJob(TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup()));
@@ -102,35 +101,36 @@ public class QuartzController {
             }
             for (JobEntity job : jobService.loadJobs()) {                               //从数据库中注册的所有JOB
                 log.info("Job register name : {} , group : {} , cron : {}", job.getName(), job.getJobGroup(), job.getCron());
-                JobDataMap map = jobService.getJobDataMap(job);
-                JobKey jobKey = jobService.getJobKey(job);
-                JobDetail jobDetail = jobService.getJobDetail(jobKey, job.getDescription(), map);
+                JobDataMap map=jobService.getJobDataMap(job);
+                JobKey jobKey=jobService.getJobKey(job);
+                JobDetail jobDetail=jobService.getJobDetail(jobKey, job.getDescription(), map);
                 if (job.getStatus().equals("OPEN")) scheduler.scheduleJob(jobDetail, jobService.getTrigger(job));
                 else
                     log.info("Job jump name : {} , Because {} status is {}", job.getName(), job.getName(), job.getStatus());
             }
         }
     }
+
     //每经5min将数据库中为执行的任务取出执行
     private void startJobPerFiveMins() throws SchedulerException {
         synchronized (log) {
             //只允许一个线程进入操作
-          JobKey jobKey = JobKey.jobKey("initializeJob","initializeJob");
-          TriggerKey triggerKey = TriggerKey.triggerKey("initializeJob","initializeJob");
-          org.quartz.Scheduler scheduler = schedulerFactoryBean.getScheduler();
-          try {
-             JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
-             if (jobDetail!=null){
-                 scheduler.pauseJob(jobKey);
-                 scheduler.deleteJob(jobKey);
-             }
-          } catch (SchedulerException e) {
-              e.printStackTrace();
-          }
+            JobKey jobKey=JobKey.jobKey("initializeJob", "initializeJob");
+            TriggerKey triggerKey=TriggerKey.triggerKey("initializeJob", "initializeJob");
+            org.quartz.Scheduler scheduler=schedulerFactoryBean.getScheduler();
+            try {
+                JobDetail jobDetail=scheduler.getJobDetail(jobKey);
+                if (jobDetail!=null) {
+                    scheduler.pauseJob(jobKey);
+                    scheduler.deleteJob(jobKey);
+                }
+            } catch (SchedulerException e) {
+                e.printStackTrace();
+            }
 
-            JobDetail jobDetail = jobService.getInitialJobDetail();
-            Trigger trigger = jobService.getInitialTrigger();
-            scheduler.scheduleJob(jobDetail,trigger);
+            JobDetail jobDetail=jobService.getInitialJobDetail();
+            Trigger trigger=jobService.getInitialTrigger();
+            scheduler.scheduleJob(jobDetail, trigger);
         }
     }
 
@@ -139,18 +139,18 @@ public class QuartzController {
     public String modifyJob(@RequestBody @Validated ModifyCronDTO dto) {
         if (!CronExpression.isValidExpression(dto.getCron())) return "cron is invalid !";
         synchronized (log) {
-            JobEntity job = jobService.getJobEntityById(dto.getId());
+            JobEntity job=jobService.getJobEntityById(dto.getId());
             if (job.getStatus().equals("OPEN")) {
                 try {
-                    JobKey jobKey = jobService.getJobKey(job);
-                    TriggerKey triggerKey = new TriggerKey(jobKey.getName(), jobKey.getGroup());
-                    Scheduler scheduler = schedulerFactoryBean.getScheduler();
-                    CronTrigger cronTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
-                    String oldCron = cronTrigger.getCronExpression();
+                    JobKey jobKey=jobService.getJobKey(job);
+                    TriggerKey triggerKey=new TriggerKey(jobKey.getName(), jobKey.getGroup());
+                    Scheduler scheduler=schedulerFactoryBean.getScheduler();
+                    CronTrigger cronTrigger=(CronTrigger) scheduler.getTrigger(triggerKey);
+                    String oldCron=cronTrigger.getCronExpression();
                     if (!oldCron.equalsIgnoreCase(dto.getCron())) {
                         job.setCron(dto.getCron());
-                        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(dto.getCron());
-                        CronTrigger trigger = TriggerBuilder.newTrigger()
+                        CronScheduleBuilder cronScheduleBuilder=CronScheduleBuilder.cronSchedule(dto.getCron());
+                        CronTrigger trigger=TriggerBuilder.newTrigger()
                                 .withIdentity(jobKey.getName(), jobKey.getGroup())
                                 .withSchedule(cronScheduleBuilder)
                                 .usingJobData(jobService.getJobDataMap(job))

@@ -1,5 +1,6 @@
 package com.ad.admain.controller.dashboard;
 
+import com.ad.admain.controller.dashboard.repository.BillAggregationRepository;
 import com.ad.admain.controller.pay.TradeStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,12 +47,5 @@ public class BillAggregationRepositoryTest {
         System.out.println(billAccount);
     }
 
-    @Test
-    public void getLast() {
-        LocalDateTime currentHour=LocalDateTime.of(LocalDate.now(), LocalTime.of(18, 0));
 
-        final BillAggregation lastByBillScope=billAggregationRepository.findLast(DateType.HOUR, currentHour).get();
-
-        System.out.println(lastByBillScope);
-    }
 }

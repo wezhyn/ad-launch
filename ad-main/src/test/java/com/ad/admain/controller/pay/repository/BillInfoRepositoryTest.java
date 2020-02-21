@@ -32,24 +32,26 @@ public class BillInfoRepositoryTest {
     }
 
 
+    /**
+     * 创建评估样品
+     */
     @Test
     public void createSample() {
         final Random random=new Random();
         final Random datetime=new Random();
-        final Random date=new Random();
         for (int j=0; j < 10; j++) {
             for (int i=0; i < 24; i++) {
                 int r=random.nextInt(10);
                 for (int k=0; k < r; k++) {
                     BillInfo billInfo=BillInfo.builder()
-                            .orderId(62)
+                            .orderId(61)
                             .totalAmount(random.nextDouble()*200)
                             .tradeStatus(TradeStatus.TRADE_SUCCESS)
                             .alipayTradeNo(String.valueOf(random.nextInt(1000)))
                             .buyerId("111")
                             .gmtCreate(LocalDateTime.now())
                             .gmtPayment(LocalDateTime.of(LocalDate.now().minusDays(10 - j), LocalTime.MIN.plusHours(i)
-                                    .plusMinutes(datetime.nextInt(60))))
+                                    .plusMinutes(datetime.nextInt(10) + 10*k/2)))
                             .sellerId("123")
                             .payType(PayType.ALIPAY)
                             .build();

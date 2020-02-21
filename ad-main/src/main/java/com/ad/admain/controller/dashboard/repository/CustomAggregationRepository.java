@@ -1,5 +1,7 @@
-package com.ad.admain.controller.dashboard;
+package com.ad.admain.controller.dashboard.repository;
 
+import com.ad.admain.controller.dashboard.BillAggregation;
+import com.ad.admain.controller.dashboard.DateType;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
