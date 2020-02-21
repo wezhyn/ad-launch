@@ -2,6 +2,7 @@ package com.ad.admain.controller.account.entity;
 
 import com.ad.admain.controller.account.AuthenticationEnum;
 import com.ad.admain.controller.account.SexEnum;
+import com.ad.admain.controller.equipment.entity.Equipment;
 import com.wezhyn.project.BaseEnum;
 import com.wezhyn.project.annotation.UpdateIgnore;
 import lombok.*;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.GenerationTime;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author : wezhyn
@@ -98,6 +100,10 @@ public class GenericUser implements IUser {
     )
     @ColumnDefault("current_timestamp")
     private LocalDateTime lastModified;
+
+
+    @OneToMany(mappedBy="orderUser", cascade=CascadeType.REMOVE)
+    private List<Equipment> equipmentList;
 
 
     @Override

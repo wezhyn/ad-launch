@@ -50,6 +50,7 @@ public class ZfbController {
 
     /**
      * 支付宝 app 支付同步通知,（忽略执行校验)
+     * 无用
      *
      * @param request      request
      * @param httpResponse response

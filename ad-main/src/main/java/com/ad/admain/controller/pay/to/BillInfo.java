@@ -23,6 +23,9 @@ import java.time.LocalDateTime;
 @Entity(name="ad_bill_info")
 @Getter
 @Setter
+@Table(indexes={
+        @Index(name="bill_info_id_total_amount", columnList="gmtPayment,tradeStatus,totalAmount")
+})
 public class BillInfo implements IBaseTo<Integer> {
 
 

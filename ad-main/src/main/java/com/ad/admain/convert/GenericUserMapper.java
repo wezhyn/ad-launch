@@ -3,9 +3,7 @@ package com.ad.admain.convert;
 import com.ad.admain.config.QiNiuProperties;
 import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -17,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Mapper(
         config=CentralMapperConfig.class,
-        uses={})
+        uses={},
+        unmappedSourcePolicy=ReportingPolicy.IGNORE)
 public abstract class GenericUserMapper implements AbstractMapper<GenericUser, UserDto> {
 
     @Autowired
@@ -40,4 +39,10 @@ public abstract class GenericUserMapper implements AbstractMapper<GenericUser, U
                     expression="java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )")
     })
     public abstract UserDto toDto(GenericUser genericUser);
+
+
+    @Override
+    @Mapping(target="equipmentList", ignore=true)
+    @InheritInverseConfiguration(name="toDto")
+    public abstract GenericUser toTo(UserDto userDto);
 }
