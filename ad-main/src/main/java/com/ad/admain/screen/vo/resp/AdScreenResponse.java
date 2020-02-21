@@ -4,13 +4,14 @@ package com.ad.admain.screen.vo.resp;
 import com.ad.admain.screen.vo.FrameType;
 import com.ad.admain.screen.vo.IScreenFrame;
 import com.ad.admain.utils.AdStringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
  * @author wezhyn
  * @since 02.19.2020
  */
-@Component
+
 public class AdScreenResponse extends AbstractScreenResponse {
 
 

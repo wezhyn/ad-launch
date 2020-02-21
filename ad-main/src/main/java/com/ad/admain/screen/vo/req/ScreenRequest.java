@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Builder
 @Data
-@Component
 public class ScreenRequest implements IScreenFrame {
 
 
