@@ -52,10 +52,10 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("'暂无'")
     private String name;
 
-    @ColumnDefault("0.00")
+    @ColumnDefault("0")
     private Double latitude;
 
-    @ColumnDefault("0.00")
+    @ColumnDefault("0")
     private Double longitude;
 
     @Column(name="`key`")

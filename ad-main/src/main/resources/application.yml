@@ -54,6 +54,7 @@ netty:
   server:
     address: localhost
     port: 8888
+    allTimeout: 60
 
 
 

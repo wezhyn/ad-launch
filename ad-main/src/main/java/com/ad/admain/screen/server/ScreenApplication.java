@@ -1,6 +1,6 @@
-package com.ad.admain.screen;
+package com.ad.admain.screen.server;
 
-import com.ad.admain.screen.handler.HeartBeatHandler;
+import com.ad.admain.screen.handler.HeartBeatMsgHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -33,7 +33,7 @@ public class ScreenApplication {
                         public void initChannel(SocketChannel ch) {
                             final ByteBuf delimiter=Unpooled.copiedBuffer("SOF".getBytes());
                             ch.pipeline().addLast(new DelimiterBasedFrameDecoder(55, false, delimiter));
-                            ch.pipeline().addLast(new HeartBeatHandler());
+                            ch.pipeline().addLast(new HeartBeatMsgHandler());
                             ch.pipeline().addLast(new IdleStateHandler(0,0,60));
                         }
                     });

@@ -70,6 +70,11 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
         return equipmentRepository.findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(true,rate,info[0],info[1],info[2],info[3], EquipmentVerify.PASSING_VERIFY);
     }
 
+    @Override
+    public Equipment findEquipmentByIMEI(String IMEI) {
+        return equipmentRepository.findEquipmentByKeyEquals(IMEI);
+    }
+
 
     @Override
     public EquipmentRepository getRepository() {
