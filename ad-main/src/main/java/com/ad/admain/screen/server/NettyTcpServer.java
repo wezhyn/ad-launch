@@ -1,5 +1,7 @@
 package com.ad.admain.screen.server;
 
+import com.ad.admain.screen.handler.GpsMsgHandler;
+import com.ad.admain.screen.handler.HeartBeatMsgHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -8,6 +10,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -34,6 +37,7 @@ public class NettyTcpServer {
 
     @Autowired
     ScreenChannelInitializer screenChannelInitializer;
+
 
     EventLoopGroup bossGroup=new NioEventLoopGroup();
     EventLoopGroup workerGroup=new NioEventLoopGroup();
