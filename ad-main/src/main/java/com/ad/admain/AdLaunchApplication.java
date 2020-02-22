@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author : wezhyn
  * @date : 2019/09/20
  */
-@SpringBootApplication(scanBasePackages="com.ad",exclude = {SecurityAutoConfiguration.class})
+@SpringBootApplication(scanBasePackages="com.ad.*",exclude = {SecurityAutoConfiguration.class})
 @EnableTransactionManagement()
 @EnableConfigurationProperties(value={JwtProperties.class, QiNiuProperties.class})
 public class AdLaunchApplication {

@@ -1,37 +1,30 @@
-package com.ad.admain.screen.codec;
+package com.ad.admain.screen.handler;
 
 import com.ad.admain.screen.vo.FrameType;
-import com.ad.admain.screen.vo.req.ConfirmMsg;
-import com.ad.admain.screen.vo.req.GpsMsg;
-import com.ad.admain.screen.vo.req.HeartBeatMsg;
 import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * @ClassName Decoder
- * @Description TODO
- * @Param
- * @Author ZLB
- * @Date 2020/2/21 17:35
- * @Version 1.0
+ * @author wezhyn
+ * @since 02.19.2020
  */
 @Slf4j
-public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
+public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdapter {
+
+
     /**
      * 帧开头: SOF
      */
-    private final static ByteBuf BEGIN_FIELD= Unpooled.copiedBuffer("SOF".getBytes());
+    private final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
     /**
      * 帧末尾：EOF
      */
@@ -44,7 +37,6 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     /**
      * 客户端帧除净数据外的帧长度
      */
-
     private final int minLength;
     /**
      * 距离 SOF 的偏移量
@@ -60,26 +52,28 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
      */
     private final boolean stripDelimiter;
 
-    public ScreenProtocolInDecoder(int minLength, int lengthFieldOffset, int lengthFieldLength, boolean stripLineDelimiter) {
+    public ScreenProtocolCheckInboundHandler(int minLength, int lengthFieldOffset, int lengthFieldLength, boolean stripLineDelimiter) {
         this.minLength=minLength;
         this.lengthFieldOffset=lengthFieldOffset;
         this.lengthFieldLength=lengthFieldLength;
         stripDelimiter=stripLineDelimiter;
     }
 
-    public ScreenProtocolInDecoder(int minLength, int lengthFieldOffset, int lengthFieldLength) {
+    public ScreenProtocolCheckInboundHandler(int minLength, int lengthFieldOffset, int lengthFieldLength) {
         this(minLength, lengthFieldOffset, lengthFieldLength, true);
     }
+
+
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        ByteBuf inboundMsg= byteBuf ;
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf inboundMsg=(ByteBuf) msg;
         ScreenRequest request=null;
         for (; ; ) {
             inboundMsg.markReaderIndex();
             final int sof=findBeginOfLine(inboundMsg);
 //              判断该信息是否大于等于最小进长度
             if (inboundMsg.readableBytes() < sof + minLength) {
-                discardMsg(channelHandlerContext, inboundMsg);
+                discardMsg(ctx, inboundMsg);
             }
             int actualLengthField=sof + lengthFieldOffset;
             int frameLength=getFrameLength(inboundMsg, actualLengthField, lengthFieldLength);
@@ -95,17 +89,16 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
 //            解析数据
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
-                list.add(request);
-                channelHandlerContext.fireChannelRead(request);
                 break;
-            } catch (ScreenProtocolInDecoder.ParserException e) {
+            } catch (ParserException e) {
                 log.error("解析错误", e);
                 inboundMsg.resetReaderIndex();
                 inboundMsg.skipBytes(sof + BEGIN_FIELD.readableBytes());
             }
         }
+        ctx.channel().read();
+        ctx.fireChannelRead(request);
     }
-
 
     private ScreenRequest readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
         final ScreenRequest request=new ScreenRequest();
@@ -113,28 +106,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         readRequestEquipmentName(msg, request);
         readType(msg, request);
         readNetData(msg, request);
-        int type = request.type();
-        switch (type){
-            case 1: {
-                HeartBeatMsg heartBeatMsg = new HeartBeatMsg();
-                BeanUtils.copyProperties(request,heartBeatMsg);
-                return heartBeatMsg;
-            }
-            case 2:{
-                ConfirmMsg confirmMsg = new ConfirmMsg();
-                BeanUtils.copyProperties(request,confirmMsg);
-                return confirmMsg;
-            }
-            case 3:{
-                GpsMsg gpsMsg = new GpsMsg();
-                BeanUtils.copyProperties(request,gpsMsg);
-                return gpsMsg;
-            }
-            default: {
-                throw new ScreenProtocolInDecoder.ParserException();
-            }
-
-        }
+        return request;
     }
 
     private void readRequestEquipmentName(ByteBuf msg, ScreenRequest request) throws ParserException {
@@ -160,7 +132,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
                 break;
             }
             default: {
-                throw new ScreenProtocolInDecoder.ParserException();
+                throw new ParserException();
             }
         }
     }
@@ -172,7 +144,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
             String gpsString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
             final String[] gpsSplit=gpsString.split(",");
             if (gpsSplit.length!=4) {
-                throw new ScreenProtocolInDecoder.ParserException();
+                throw new ParserException();
             }
             final double[] gpsDouble=new double[gpsSplit.length];
             for (int i=0; i < gpsSplit.length; i++) {
@@ -199,10 +171,10 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         checkDelimiter(msg);
     }
 
-    private void checkDelimiter(ByteBuf msg) throws  ParserException {
+    private void checkDelimiter(ByteBuf msg) throws ParserException {
         final byte delimiter=msg.readByte();
         if (!Objects.equals(delimiter, DELIMITER)) {
-            throw new ScreenProtocolInDecoder.ParserException();
+            throw new ParserException();
         }
     }
 
@@ -240,4 +212,8 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         public ParserException() {
         }
     }
+
+
+
+
 }
