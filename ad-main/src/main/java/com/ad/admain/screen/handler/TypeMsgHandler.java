@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @Version 1.0
  */
 @Component
-public class TypeHandler extends BaseHandler<ScreenRequest> {
+public class TypeMsgHandler extends BaseMsgHandler<ScreenRequest> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ScreenRequest msg) throws Exception {
         FrameType type = msg.getFrameType();
