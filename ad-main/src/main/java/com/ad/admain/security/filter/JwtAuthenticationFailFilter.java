@@ -17,6 +17,8 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 /**
+ * 用户认证失败，返回信息处理
+ *
  * @author wezhyn
  * @since 12.26.2019
  */

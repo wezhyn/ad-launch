@@ -30,6 +30,13 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         clean();
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        if (AdPhoneAuthentication.class==authentication.getClass() && !authentication.isAuthenticated()) {
+//            表示为发送手机验证码
+            ResponseResult result=ResponseResult.forSuccessBuilder()
+                    .withMessage("发送登录短信成功").build();
+            write(result, request, response);
+            return;
+        }
         String token=securityJwtProvider.createToken(authentication, false, authentication.getName());
         ResponseResult result=ResponseResult.forSuccessBuilder()
                 .withMessage("登录成功")
@@ -44,8 +51,5 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         }
     }
 
-    @Override
-    public void clean() {
-        MarkAntPathRequestMatcherExtractor.removeThreadLocal();
-    }
+
 }

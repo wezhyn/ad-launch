@@ -20,6 +20,8 @@ public interface AdminRepository extends JpaRepository<Admin, Integer> {
 
     Optional<Admin> findByUsername(String username);
 
+    Optional<Admin> findByMobilePhone(String phone);
+
     /**
      * 修改用户头像
      *

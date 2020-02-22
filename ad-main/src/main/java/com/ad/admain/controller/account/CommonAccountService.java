@@ -36,4 +36,11 @@ public interface CommonAccountService<T, ID> {
      */
     JpaRepository<T, ID> getRepository();
 
+    /**
+     * 根据s 的开头判断是用户查询还是手机查询
+     *
+     * @param s 查询字段
+     * @return s
+     */
+    Optional<T> getOneByUsernameOrPhone(String s);
 }

@@ -40,7 +40,7 @@ public class AdUserDetailServiceImpl extends AdUserDetailsService {
     @Override
     protected AdUserDetails getUserDetails(String username) {
 //        IUser user=genericUserService.getById(username)
-        IUser user=genericUserService.getUserByUsername(username)
+        IUser user=genericUserService.getOneByUsernameOrPhone(username)
                 .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
         if (log.isDebugEnabled()) {
             log.debug("找到用户 : " + user);

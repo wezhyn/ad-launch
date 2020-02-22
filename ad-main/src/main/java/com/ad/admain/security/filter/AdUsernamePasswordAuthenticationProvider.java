@@ -3,7 +3,6 @@ package com.ad.admain.security.filter;
 import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.security.AdUserDetails;
 import com.ad.admain.security.AdUserDetailsService;
-import com.ad.admain.security.MarkAntPathRequestMatcherExtractor;
 import com.ad.admain.security.exception.AdUsernamePasswordException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +22,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 /**
- * @author wezhyn
+ * 只支持 {@link AdAuthentication}
  * 登录时获取的userDetails 类型为{@link AdUserDetails}
  * 验证条件：验证id，验证密码
+ *
+ * @author wezhyn
  */
 public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
     private final Logger logger=LoggerFactory.getLogger(this.getClass());
@@ -60,12 +61,12 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
     }
 
     /**
-     * 返回的认证认证信息
+     * 返回成功的认证信息
      *
-     * @param principal
-     * @param authentication
-     * @param user
-     * @return
+     * @param principal      username
+     * @param authentication adAuth
+     * @param user           user
+     * @return authentication
      */
     @Override
     protected Authentication createSuccessAuthentication(Object principal, Authentication authentication, UserDetails user) {
@@ -74,7 +75,7 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
         // Also ensure we return the original getDetails(), so that future
         // authentication events after cache expiry contain the details
         AdAuthentication result=new AdAuthentication(
-                principal, authentication.getCredentials(),
+                principal, "",
                 authoritiesMapper.mapAuthorities(user.getAuthorities()));
         result.setDetails(authentication.getDetails());
 
@@ -86,14 +87,13 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
         AdAuthentication auth=(AdAuthentication) authentication;
 
         AdUserDetails user=null;
-        String mark=MarkAntPathRequestMatcherExtractor.getMarkCache().get();
+        String mark=auth.getMark();
         for (AdUserDetailsService userDetailsService : userDetailsServices) {
             if (userDetailsService.support(mark==null ? "" : mark)) {
                 user=userDetailsService.loadUserByUsername(username);
                 this.preAuthenticationChecks.check(user);
             }
         }
-        MarkAntPathRequestMatcherExtractor.getMarkCache().remove();
         return user;
     }
 
@@ -109,7 +109,7 @@ public class AdUsernamePasswordAuthenticationProvider extends AbstractUserDetail
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return AdAuthentication.class.isAssignableFrom(authentication);
+        return AdAuthentication.class==authentication;
     }
 
     private class DefaultPreAuthenticationChecks implements UserDetailsChecker {

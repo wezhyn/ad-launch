@@ -1,6 +1,7 @@
 package com.ad.admain.config.web;
 
 import com.ad.admain.config.JwtConfig;
+import com.ad.admain.controller.ISmsService;
 import com.ad.admain.security.*;
 import com.ad.admain.security.filter.*;
 import com.ad.admain.security.jwt.JwtDetailService;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -58,10 +60,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ISmsService smsService;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         AdUsernamePasswordAuthenticationProvider adUsernamePasswordAuthenticationProvider=new AdUsernamePasswordAuthenticationProvider(passwordEncoder, adUserDetailsServices);
+        AdPhoneAuthenticationProvider adPhoneAuthenticationProvider=new AdPhoneAuthenticationProvider(smsService, adUserDetailsServices);
         auth
+                .authenticationProvider(adPhoneAuthenticationProvider)
                 .authenticationProvider(adUsernamePasswordAuthenticationProvider);
     }
 
@@ -91,6 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilterBefore(usernamePasswordAuthenticationFilter, LogoutFilter.class)
                 .addFilterBefore(jwtCheckAuthenticationFilter, usernamePasswordAuthenticationFilter.getClass())
+                .addFilterBefore(new HttpStatusFilter(), HeaderWriterFilter.class)
                 .addFilterAt(adJwtLogoutAuthenticationFilter(jwtProperties.getLogoutInterception(), jwtDetailService), LogoutFilter.class)
                 .addFilterBefore(authenticationFilter, AdJwtCheckAuthenticationFilter.class)
                 .authorizeRequests().antMatchers(HttpMethod.OPTIONS).permitAll()
