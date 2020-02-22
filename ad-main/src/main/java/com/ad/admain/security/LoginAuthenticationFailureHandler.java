@@ -33,8 +33,5 @@ public class LoginAuthenticationFailureHandler implements AuthenticationFailureH
         response.getWriter().write(this.objectMapper.writeValueAsString(responseResult));
     }
 
-    @Override
-    public void clean() {
-        MarkAntPathRequestMatcherExtractor.removeThreadLocal();
-    }
+
 }

@@ -84,8 +84,9 @@ public class AggregationServiceImpl implements AggregationService {
 //                当汇总记录非精确时，若距离上次修改时间大于 DateType.plusMin 则重新获取
                 if (!aggregation.getAccurate()) {
                     LocalDateTime last=aggregation.getModifyTime()==null ? LocalDateTime.now() : aggregation.getModifyTime();
+                    Assert.notNull(aggregation.getId(), "无效的账单数据");
                     if (type.plusMin(last).isBefore(LocalDateTime.now())) {
-                        propagateAggregation(type, handleTime);
+                        propagateAggregation(aggregation.getId(), type, handleTime);
                     }
                 }
             }
@@ -98,16 +99,24 @@ public class AggregationServiceImpl implements AggregationService {
 
 
     public AggregationEvent propagateAggregation(DateType type, LocalDateTime oneTime) {
+        return this.propagateAggregation(null, type, oneTime);
+    }
+
+    public AggregationEvent propagateAggregation(Integer id, DateType type, LocalDateTime oneTime) {
 //
 //        发布 小时账单事件时，统计到前一个小时之间的账单数据
 //        发布 日账单的时候，统一前一天的账单数据
         AccurateStrategy accurateStrategy=new AccurateStrategy.CalculateAccurate();
         boolean isAccurate=accurateStrategy.isAccurate(oneTime);
-        final AggregationEvent event=new AggregationEvent(this, type, isAccurate, oneTime);
+        AggregationEvent event;
+        if (id!=null) {
+            event=new AggregationEvent(this, id, type, isAccurate, oneTime);
+        } else {
+            event=new AggregationEvent(this, type, isAccurate, oneTime);
+        }
         applicationEventPublisher.publishEvent(event);
         return event;
     }
-
 
     private AggregationDto initNum() {
         final BigInteger userNum=(BigInteger) billAggregationRepository.getUserNumApproximate().getOrDefault("rows", 0);

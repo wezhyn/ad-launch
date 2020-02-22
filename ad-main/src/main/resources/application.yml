@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 28080
   address: 0.0.0.0
   tomcat:
     max-threads: 8
@@ -32,6 +32,12 @@ spring:
       file-size-threshold: 0
       resolve-lazily: false
 custom:
+  sms:
+    app-id: 1400320689
+    app-key: 15474d8d69133abce7c13fbd3736d9f4
+    register-template: 540017
+    login-template: 540023
+    sms-sign: 何事秋风悲画扇
   qn:
     access-key: w8q1azRK1pjyjs0Fp-pDEBmhODVOOzL-PbDJTODU
     secret-key: 4lHcLBv6Ywirb0ATkQ62ZnxtC_ONhRyF68Xb-xhG

@@ -9,6 +9,18 @@ Content-Type: application/json
 
 
 ###
+
+POST http://{{url}}/api/user/login
+Content-Type: application/json
+
+{
+  "mobilePhone": "13588761541",
+  "code": "316662"
+}
+
+
+
+###
 GET http://{{url}}//api/user/logout
 Accept: application/json
 #X-Token: test-token

@@ -14,4 +14,5 @@ import java.util.Optional;
 public interface AdminService extends BaseService<Admin, Integer>, CommonAccountService<Admin, Integer> {
 
     Optional<Admin> getByUsername(String s);
+
 }

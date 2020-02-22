@@ -1,9 +1,11 @@
 package com.ad.admain.security.filter;
 
 import com.ad.admain.security.AdAuthentication;
+import com.ad.admain.security.AdPhoneAuthentication;
 import com.ad.admain.security.IUsernamePasswordConvert;
 import com.ad.admain.security.MarkAntPathRequestMatcherExtractor;
 import com.ad.admain.security.exception.AdUsernamePasswordException;
+import com.wezhyn.project.utils.Strings;
 import lombok.Data;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,7 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
         super("/login");
         this.usernamePasswordConverts=usernamePasswordConverts;
         this.authenticationManager=authenticationManager;
+//        设置 mark
         setRequiresAuthenticationRequestMatcher(new MarkAntPathRequestMatcherExtractor(matchs));
     }
 
@@ -53,7 +56,7 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
         if (definition==null) {
             throw new AdUsernamePasswordException("从请求中读取账户信息出错");
         }
-        AdAuthentication authRequest=new AdAuthentication(definition.getUsername(), definition.getPassword());
+        AdAuthentication authRequest=definition.generate(request);
         try {
             return this.authenticationManager.authenticate(authRequest);
         } catch (Exception e) {
@@ -66,6 +69,18 @@ public class AdUsernamePasswordAuthenticationFilter extends AbstractAuthenticati
     public static class UsernamePasswordDefinition {
         private String username;
         private String password;
+        private String mobilePhone;
+        private String code;
+
+        public AdAuthentication generate(HttpServletRequest request) {
+            String mark=request.getAttribute("mark")==null ? "" : (String) request.getAttribute("mark");
+            if (!Strings.isEmpty(mobilePhone)) {
+                return new AdPhoneAuthentication(mobilePhone, code, mark);
+            } else if (!Strings.isEmpty(username) && !Strings.isEmpty(password)) {
+                return new AdAuthentication(username, password, mark);
+            }
+            throw new AdUsernamePasswordException("登录信息错误");
+        }
     }
 
 }

@@ -40,18 +40,18 @@ public class DateTimeMapper {
 
     }
 
-    private void check() {
+    private static void check() {
         if (SYSTEM_DATE_TIME_FORMAT==null) {
             throw new RuntimeException("无配置文件：config.properties");
         }
     }
 
-    public LocalDateTime parseLocalDateTime(String time) {
+    public static LocalDateTime parseLocalDateTime(String time) {
         check();
         return StringUtils.isEmpty(time) ? null : LocalDateTime.parse(time, SYSTEM_DATE_TIME_FORMAT);
     }
 
-    public String convertLocalDateTime(LocalDateTime time) {
+    public static String convertLocalDateTime(LocalDateTime time) {
         check();
         return time==null ? "" : SYSTEM_DATE_TIME_FORMAT.format(time);
     }

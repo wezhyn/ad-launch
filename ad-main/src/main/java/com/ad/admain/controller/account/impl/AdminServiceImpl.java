@@ -35,6 +35,14 @@ public class AdminServiceImpl extends AbstractBaseService<Admin, Integer> implem
     }
 
     @Override
+    public Optional<Admin> getOneByUsernameOrPhone(String s) {
+        if (Character.isDigit(s.charAt(0))) {
+            return getRepository().findByMobilePhone(s);
+        }
+        return getRepository().findByUsername(s);
+    }
+
+    @Override
     public Optional<String> getUserAvatar(String username) {
 //    todo:modify
         if (StringUtils.isEmpty(username)) {

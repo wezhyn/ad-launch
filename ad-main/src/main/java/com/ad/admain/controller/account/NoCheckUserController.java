@@ -1,6 +1,7 @@
 package com.ad.admain.controller.account;
 
 import com.ad.admain.controller.AbstractBaseController;
+import com.ad.admain.controller.account.dto.RegisterDto;
 import com.ad.admain.controller.account.dto.UserDto;
 import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.convert.AbstractMapper;
@@ -8,10 +9,12 @@ import com.ad.admain.convert.GenericUserMapper;
 import com.wezhyn.project.BaseService;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.stream.Collectors;
 
 /**
  * @author wezhyn
@@ -34,8 +37,22 @@ public class NoCheckUserController extends AbstractBaseController<UserDto, Integ
     }
 
     @PostMapping(value={"/register", "/create"})
-    public ResponseResult register(@RequestBody UserDto userDto) {
+    public ResponseResult register(@Valid @RequestBody RegisterDto userDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String field=bindingResult.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .collect(Collectors.joining("|"));
+            return ResponseResult.forFailureBuilder()
+                    .withMessage(field).build();
+        }
         return createTo(userDto);
+    }
+
+    @ExceptionHandler(value=Exception.class)
+    public ResponseResult error(Exception e) {
+        return ResponseResult.forFailureBuilder()
+                .withMessage(e.getMessage())
+                .build();
     }
 
     @Override

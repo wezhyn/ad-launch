@@ -6,10 +6,8 @@ import com.ad.admain.controller.dashboard.TimeUtils;
 import com.ad.admain.controller.dashboard.repository.BillAggregationRepository;
 import com.ad.admain.controller.dashboard.service.AccurateStrategy;
 import com.google.common.util.concurrent.AtomicDouble;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,14 +49,11 @@ public class AggregationListener implements ApplicationListener<AggregationEvent
     private final BillAggregationRepository billAggregationRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final TaskExecutor taskExecutor;
 
-
-    public AggregationListener(BillAggregationRepository billAggregationRepository, ApplicationEventPublisher applicationEventPublisher,
-                               @Qualifier(value="publish_task_executor") TaskExecutor taskExecutor) {
+    public AggregationListener(BillAggregationRepository billAggregationRepository, ApplicationEventPublisher applicationEventPublisher
+    ) {
         this.billAggregationRepository=billAggregationRepository;
         this.applicationEventPublisher=applicationEventPublisher;
-        this.taskExecutor=taskExecutor;
     }
 
     @Override
@@ -73,7 +68,9 @@ public class AggregationListener implements ApplicationListener<AggregationEvent
                 Double account=billAggregationRepository.accountBillAccount(timeBound.getStartTime(), timeBound.getEndTime());
                 account=account==null ? 0 : account;
                 final BillAggregation aggregation=BillAggregation.builder()
+                        .id(event.isUpdate() ? event.getId() : null)
                         .accurate(event.isAccurate()).billScope(event.getDateType()).billSum(account)
+                        .modifyTime(LocalDateTime.now())
                         .recordTime(TimeUtils.standardTime(DateType.HOUR, event.getHandleTime())).recordBillId(1).build();
                 reflectResult(event, aggregation);
                 break;
@@ -118,8 +115,9 @@ public class AggregationListener implements ApplicationListener<AggregationEvent
             trace++;
 //                   判断当前查询是否是非精确
             final boolean isAccurate=AccurateStrategy.ACCURATE_INSTANCE.isAccurate(b.getRecordTime());
-            if (isAccurate!=b.getAccurate()) {
-                applicationEventPublisher.publishEvent(new AggregationEvent(originEvent.getSource(), prepareType, isAccurate, b.getRecordTime()));
+            if (!b.getAccurate()) {
+//                刷新旧数据
+                applicationEventPublisher.publishEvent(new AggregationEvent(originEvent.getSource(), b.getId(), prepareType, isAccurate, b.getRecordTime()));
             }
             sum.addAndGet(b.getBillSum());
         }
@@ -132,7 +130,9 @@ public class AggregationListener implements ApplicationListener<AggregationEvent
         }
         boolean isAccurate=!isError.get() && AccurateStrategy.ACCURATE_INSTANCE.isAccurate(standardTime);
         BillAggregation billAggregation=BillAggregation.builder()
+                .id(originEvent.isUpdate() ? originEvent.getId() : null)
                 .billScope(originEvent.getDateType()).billSum(sum.get()).recordTime(standardTime)
+                .modifyTime(LocalDateTime.now())
                 .accurate(isAccurate).recordBillId(1).build();
         reflectResult(originEvent, billAggregation);
     }

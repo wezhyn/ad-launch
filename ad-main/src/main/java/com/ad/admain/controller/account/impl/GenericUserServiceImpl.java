@@ -64,7 +64,16 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
 
     @Override
     public Optional<GenericUser> getUserByUsername(String username) {
-        return getRepository().findGenericUserByUsername(username);
+        return getRepository().findByUsername(username);
+    }
+
+    @Override
+    public Optional<String> getUserAvatar(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return Optional.empty();
+        }
+        Optional<GenericUser> user=getRepository().findByUsername(username);
+        return user.map(GenericUser::getAvatar);
     }
 
     @Override
@@ -87,12 +96,11 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     }
 
     @Override
-    public Optional<String> getUserAvatar(String username) {
-        if (StringUtils.isEmpty(username)) {
-            return Optional.empty();
+    public Optional<GenericUser> getOneByUsernameOrPhone(String s) {
+        if (Character.isDigit(s.charAt(0))) {
+            return getRepository().findByMobilePhone(s);
         }
-        Optional<GenericUser> user=getRepository().findGenericUserByUsername(username);
-        return user.map(GenericUser::getAvatar);
+        return getRepository().findByUsername(s);
     }
 
     @Override

@@ -18,6 +18,14 @@ import java.util.concurrent.CountDownLatch;
 @Getter
 public class AggregationEvent extends ApplicationEvent {
 
+
+    /**
+     * 用来标识是用来修改某个汇总表，而非创建汇总表
+     */
+    private Integer id;
+
+    private boolean update;
+
     /**
      * 聚合数据的类型
      */
@@ -43,6 +51,17 @@ public class AggregationEvent extends ApplicationEvent {
         this.handleTime=handleTime;
         output=null;
         watch=new CountDownLatch(1);
+        update=false;
+    }
+
+    public AggregationEvent(Object source, Integer id, DateType dateType, boolean accurate, LocalDateTime handleTime) {
+        super(source);
+        this.id=id;
+        this.dateType=dateType;
+        this.accurate=accurate;
+        this.handleTime=handleTime;
+        watch=new CountDownLatch(1);
+        this.update=true;
     }
 
     private void set(Object o) {

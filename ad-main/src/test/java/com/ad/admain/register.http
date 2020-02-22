@@ -1,0 +1,22 @@
+POST http://{{url}}/api/code/register
+Content-Type: application/json
+
+{
+  "mobilePhone": "13588761541"
+}
+
+###
+POST http://{{url}}/api/user/register
+Content-Type: application/json
+
+{
+  "username": "zhaoo",
+  "password": "zhaoo",
+  "mobilePhone": "13588761541",
+  "email": "wezhyn@qq.com",
+  "code": "5222157"
+}
+
+###
+
+

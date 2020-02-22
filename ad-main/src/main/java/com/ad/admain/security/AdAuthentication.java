@@ -23,8 +23,14 @@ public class AdAuthentication extends UsernamePasswordAuthenticationToken {
     /**********************************************************
 */
 
-    public AdAuthentication(String userName, String password) {
+    /**
+     * 标识是用户登录还是管理员登录
+     */
+    private String mark;
+
+    public AdAuthentication(String userName, String password, String mark) {
         super(userName, password);
+        this.mark=mark;
     }
 
     public AdAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {

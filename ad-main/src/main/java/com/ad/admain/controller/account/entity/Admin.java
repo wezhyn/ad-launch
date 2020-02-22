@@ -44,6 +44,8 @@ public class Admin implements IAdmin {
 
     private String idCard;
 
+    private String mobilePhone;
+
     @UpdateIgnore
     private String avatar;
 

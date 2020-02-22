@@ -4,6 +4,7 @@ import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -18,6 +19,10 @@ import java.time.LocalDateTime;
 @Data
 @Entity(name="ad_bill_aggregation")
 @DynamicInsert
+@DynamicUpdate
+@Table(
+        indexes=@Index(name="bill_scope_record_time", unique=true, columnList="bill_scope,record_time")
+)
 public class BillAggregation implements IBaseTo<Integer> {
 
 

@@ -27,7 +27,15 @@ public interface GenericUserRepository extends JpaRepository<GenericUser, Intege
      * @param userName userName
      * @return {@link GenericUser}
      */
-    Optional<GenericUser> findGenericUserByUsername(String userName);
+    Optional<GenericUser> findByUsername(String userName);
+
+    /**
+     * 通过手机获取用户信息
+     *
+     * @param phone 手机号
+     * @return {@link GenericUser}
+     */
+    Optional<GenericUser> findByMobilePhone(String phone);
 
 
     /**

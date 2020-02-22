@@ -20,10 +20,7 @@ import java.util.Map;
 @Slf4j
 public class MarkAntPathRequestMatcherExtractor implements RequestMatcher {
 
-    /**
-     * 储存当前登录用户是使用何种标识： requestMatchers.key
-     */
-    private static final ThreadLocal<String> MARK_CACHE=new ThreadLocal<>();
+
     private Map<String, RequestMatcher> requestMarkMatchers;
 
     /**
@@ -43,25 +40,13 @@ public class MarkAntPathRequestMatcherExtractor implements RequestMatcher {
         }
     }
 
-    /**
-     * todo: 一个更好的解决方案
-     * 在{@link com.ad.admain.security.LoginAuthenticationFailureHandler} 和
-     * {@link com.ad.admain.security.LoginAuthenticationSuccessHandler} 中清除
-     */
-    public static void removeThreadLocal() {
-        MARK_CACHE.remove();
-    }
-
-    public static ThreadLocal<String> getMarkCache() {
-        return MARK_CACHE;
-    }
 
     @Override
     public boolean matches(HttpServletRequest request) {
         for (String mark : requestMarkMatchers.keySet()) {
             RequestMatcher matcher=requestMarkMatchers.get(mark);
             if (matcher.matches(request)) {
-                MARK_CACHE.set(mark);
+                request.setAttribute("mark", mark);
                 return true;
             }
         }

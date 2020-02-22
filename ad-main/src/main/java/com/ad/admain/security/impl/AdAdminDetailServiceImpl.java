@@ -43,7 +43,7 @@ public class AdAdminDetailServiceImpl extends AdUserDetailsService {
 
     @Override
     public AdUserDetails getUserDetails(String username) {
-        Optional<Admin> user=adminService.getByUsername(username);
+        Optional<Admin> user=adminService.getOneByUsernameOrPhone(username);
         return user.map(this::createUser)
                 .orElseThrow(()->new UsernameNotFoundException("无法找到该用户 : " + username));
     }
