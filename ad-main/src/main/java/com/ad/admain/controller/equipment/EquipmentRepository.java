@@ -32,5 +32,5 @@ public interface EquipmentRepository extends JpaRepository<Equipment, Integer> {
     //找出到区域内在线且审核通过的并且剩余的广告位多于需求频率的车辆
     List<Equipment> findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(Boolean status, Integer need, Double minlgt, Double maxlgt, Double minlat, Double maxlat, EquipmentVerify verity);
 
-
+    Equipment findEquipmentByKeyEquals(String key);
 }

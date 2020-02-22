@@ -46,4 +46,7 @@ public interface EquipmentService extends BaseService<Equipment, Integer> {
 
     //统计目标区域内符合订单需求的车辆
     List<Equipment> findAllAvailableEquips(Boolean status,Integer rate,Double longitude,Double latitude,Double square);
+
+    //根据imei号查询设备
+    Equipment findEquipmentByIMEI(String IMEI);
 }
