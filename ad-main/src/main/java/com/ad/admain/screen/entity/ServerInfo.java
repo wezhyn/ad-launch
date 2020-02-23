@@ -19,7 +19,7 @@ import javax.persistence.*;
  * @Version 1.0
  */
 @Entity
-@Table(name = "screen_server_info")
+@Table(name="screen_server_info")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,15 +28,15 @@ import javax.persistence.*;
 @Builder
 public class ServerInfo implements IBaseTo<Integer> {
 
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Id
-    int id;
+    Integer id;
 
-    @Column(name = "ip")
+    @Column(name="ip")
     String ip;
 
-    @Column(name = "port")
-    int port;
+    @Column(name="port")
+    Integer port;
 
 }
