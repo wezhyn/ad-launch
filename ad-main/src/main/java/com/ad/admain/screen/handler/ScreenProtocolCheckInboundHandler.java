@@ -1,5 +1,10 @@
 package com.ad.admain.screen.handler;
 
+import com.ad.admain.controller.equipment.EquipmentService;
+import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.screen.dao.RemoteInfoRepository;
+import com.ad.admain.screen.entity.RemoteInfo;
+import com.ad.admain.screen.service.RemoteInfoService;
 import com.ad.admain.screen.vo.FrameType;
 import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
@@ -9,7 +14,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -18,8 +29,14 @@ import java.util.Objects;
  * @since 02.19.2020
  */
 @Slf4j
+@Component
 public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdapter {
 
+    @Autowired
+    EquipmentService equipmentService;
+
+    @Autowired
+    RemoteInfoService remoteInfoService;
 
     /**
      * 帧开头: SOF
@@ -63,6 +80,10 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         this(minLength, lengthFieldOffset, lengthFieldLength, true);
     }
 
+    public ScreenProtocolCheckInboundHandler() {
+        this(27,3,4,true);
+    }
+
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -89,6 +110,27 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 //            解析数据
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
+                String imei = request.getEquipmentName();
+                InetSocketAddress socketAddress = (InetSocketAddress)ctx.channel().remoteAddress();
+                InetAddress inetAddress = socketAddress.getAddress();
+                String clientIp=  inetAddress.getHostAddress();
+                int clientPort = socketAddress.getPort();
+                Equipment equipment = equipmentService.findEquipmentByIMEI(imei);
+                if (equipment!=null){
+                RemoteInfo remoteInfo = remoteInfoService.findByEquipId(equipment.getId());
+                if (remoteInfo==null){
+                    remoteInfoService.save(new RemoteInfo().builder()
+                    .ip(clientIp)
+                    .port(clientPort)
+                    .equipment(equipment)
+                    .build());
+                }else {
+                    remoteInfo.setIp(clientIp);
+                    remoteInfo.setPort(clientPort);
+                    remoteInfoService.save(remoteInfo);
+                }
+                }
+
                 break;
             } catch (ParserException e) {
                 log.error("解析错误", e);
@@ -96,7 +138,6 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                 inboundMsg.skipBytes(sof + BEGIN_FIELD.readableBytes());
             }
         }
-        ctx.channel().read();
         ctx.fireChannelRead(request);
     }
 
@@ -213,7 +254,11 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         }
     }
 
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 
+
+    }
 
 
 }

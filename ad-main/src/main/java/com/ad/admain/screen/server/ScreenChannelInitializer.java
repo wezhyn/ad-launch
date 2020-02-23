@@ -1,22 +1,14 @@
 package com.ad.admain.screen.server;
 
-import com.ad.admain.screen.codec.ScreenProtocolInDecoder;
 import com.ad.admain.screen.codec.ScreenProtocolOutEncoder;
-import com.ad.admain.screen.handler.GpsMsgHandler;
-import com.ad.admain.screen.handler.HeartBeatMsgHandler;
-import com.ad.admain.screen.handler.TypeHandler;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelPipeline;
+import com.ad.admain.screen.handler.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName ChannelInitializer
@@ -33,21 +25,29 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     private int allTimeOut;
 
     @Autowired
-    HeartBeatMsgHandler heartBeatMsgHandler;
+    HeartBeatMsgMsgHandler heartBeatMsgHandler;
 
     @Autowired
-    GpsMsgHandler gpsMsgHandler;
+    GpsMsgMsgHandler gpsMsgHandler;
 
     @Autowired
-    TypeHandler typeHandler;
+    TypeMsgHandler typeHandler;
+
+    @Autowired
+    ConfirmMsgHandler confirmMsgHandler;
+
+    @Autowired
+    ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler;
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
+        ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
+        ch.pipeline().addLast(screenProtocolCheckInboundHandler);
         ch.pipeline().addLast(new IdleStateHandler(0,0,60));
         ch.pipeline().addLast(typeHandler);
         ch.pipeline().addLast(heartBeatMsgHandler);
         ch.pipeline().addLast(gpsMsgHandler);
+        ch.pipeline().addLast(confirmMsgHandler);
     }
 }

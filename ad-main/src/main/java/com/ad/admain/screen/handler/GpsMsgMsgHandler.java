@@ -7,7 +7,6 @@ import io.netty.channel.ChannelHandlerContext;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class GpsMsgHandler extends BaseHandler<GpsMsg>{
+public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
     @Autowired
     EquipmentService equipmentService;
     @Override

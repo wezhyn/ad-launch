@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Version 1.0
  */
 @Slf4j
-public abstract class BaseHandler<T> extends SimpleChannelInboundHandler<T> {
+public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     //消息流水号
     private static final AttributeKey<Short> SERIAL_NUMBER = AttributeKey.newInstance("serialNumber");
 
