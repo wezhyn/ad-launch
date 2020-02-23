@@ -9,6 +9,7 @@ import java.util.Map;
  * @author : wezhyn
  * @date : 2019/09/19
  */
+@SuppressWarnings("unused")
 @Data
 public class ResponseResult {
     /*
@@ -17,14 +18,16 @@ public class ResponseResult {
         /**********************************************************
     */
 
-    public static final int SUCCESS_CODE=20000;
-    public static final int FAILURE_CODE=50000;
     /**
      * 成功：20000
      */
     private int code;
     private Map<String, Object> data;
     private String message;
+    /**
+     * 访问路径
+     */
+    private String path;
 
     public ResponseResult() {
     }
@@ -39,21 +42,47 @@ public class ResponseResult {
         this.message=builder.message;
 //        返回的 data 不允许被修改
         this.data=builder.data;
+        this.path=builder.path;
     }
 
     public static Builder forSuccessBuilder() {
-        return new Builder(SUCCESS_CODE);
+        return new Builder(ResponseType.SUCCESS);
     }
 
     public static Builder forFailureBuilder() {
-        return new Builder(FAILURE_CODE);
+        return new Builder(ResponseType.GENERIC_FAIL);
     }
 
-    public static Builder forFailureBuilder(int failureCode) {
-        if (failureCode==0) {
-            failureCode=FAILURE_CODE;
+    public static Builder forFailureBuilder(ResponseType type) {
+        return new Builder(type);
+    }
+
+    public static Builder forFailureBuilder(Integer failureCode) {
+        if (failureCode==null || failureCode==0) {
+            return forFailureBuilder();
         }
         return new Builder(failureCode);
+    }
+
+    public static Builder forHttpStatusCode(Integer statusCode) {
+        if (statusCode==null) {
+            return forFailureBuilder();
+        }
+        switch (statusCode) {
+            case 200:
+                return new Builder(ResponseType.SUCCESS);
+            case 401:
+            case 403:
+                return new Builder(ResponseType.NO_LOGIN_AUTHENTICATION);
+            case 404:
+                return new Builder(ResponseType.NOT_FOUND);
+            case 500:
+                return new Builder(ResponseType.SERVER_EXCEPTION);
+
+            default:
+                return new Builder(ResponseType.GENERIC_FAIL);
+        }
+
     }
 
 
@@ -62,8 +91,11 @@ public class ResponseResult {
         private int code;
         private Map<String, Object> data;
         private String message;
+        private String path;
 
-        private Builder() {
+        private Builder(ResponseType type) {
+            this.code=type.getNumber();
+            this.message=type.getValue();
         }
 
         private Builder(int code) {
@@ -81,7 +113,16 @@ public class ResponseResult {
         }
 
         public Builder withMessage(String message) {
-            this.message=message;
+            if (message!=null) {
+                this.message=message;
+            }
+            return this;
+        }
+
+        public Builder withPath(String path) {
+            if (path!=null) {
+                this.path=path;
+            }
             return this;
         }
 

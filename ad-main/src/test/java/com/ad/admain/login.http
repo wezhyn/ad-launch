@@ -14,7 +14,8 @@ POST http://{{url}}/api/user/login
 Content-Type: application/json
 
 {
-  "mobilePhone": "13456789999"
+  "mobilePhone": "13456789999",
+  "code": "508143"
 }
 
 

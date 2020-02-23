@@ -3,6 +3,7 @@ package com.ad.admain.security.filter;
 import com.ad.admain.security.exception.JwtAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wezhyn.project.controller.ResponseResult;
+import com.wezhyn.project.controller.ResponseType;
 import com.wezhyn.project.utils.HttpServletRequests;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -24,7 +25,6 @@ import java.nio.charset.Charset;
  */
 public class JwtAuthenticationFailFilter extends GenericFilterBean {
 
-    public static final int DEFAULT_CODE=50008;
     private static final ObjectMapper OBJECT_MAPPER=new ObjectMapper();
 
 
@@ -38,10 +38,10 @@ public class JwtAuthenticationFailFilter extends GenericFilterBean {
             response.setContentType("application/json;charset=" + requestCharset.name());
             chain.doFilter(request, response);
         } catch (JwtAuthenticationException authentication) {
-            ResponseResult responseResult=ResponseResult.forFailureBuilder(DEFAULT_CODE)
+            ResponseResult responseResult=ResponseResult
+                    .forFailureBuilder(ResponseType.LOGIN_EXCEPTION)
                     .withMessage(authentication.getMessage())
                     .build();
-            response.setStatus(200);
             PrintWriter writer=response.getWriter();
             writer.print(OBJECT_MAPPER.writeValueAsString(responseResult));
             writer.flush();

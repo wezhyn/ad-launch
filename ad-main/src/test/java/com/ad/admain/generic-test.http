@@ -1,0 +1,4 @@
+GET http://{{url}}/api/test/auth
+Accept: application/json
+
+###

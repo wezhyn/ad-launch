@@ -3,6 +3,7 @@ package com.ad.admain.controller;
 import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.controller.account.entity.GenericUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +34,12 @@ public class MainTestController {
     @GetMapping(value={"/", "/api"})
     public String hello() {
         return "Hello";
+    }
+
+    @GetMapping("/api/test/auth")
+    @PreAuthorize("isAuthenticated()")
+    public String testAuth() {
+        return "Hello auth";
     }
 
 
