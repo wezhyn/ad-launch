@@ -38,4 +38,9 @@ public class RemoteInfoServiceImpl extends AbstractBaseService<RemoteInfo,Intege
     public RemoteInfo findByEquipId(int equipId) {
         return remoteInfoRepository.findByEquipment_Id(equipId);
     }
+
+    @Override
+    public RemoteInfo findByIpAndPort(String ip, int port) {
+        return remoteInfoRepository.findByIpEqualsAndPortEquals(ip,port);
+    }
 }
