@@ -68,7 +68,7 @@ public class AliPayHolderTest {
         model.setOrderTitle("test");
         model.setBizScene("DIRECT_TRANSFER");
         Participant payee=new Participant();
-        payee.setIdentity("nctpdw6922@sandbox.com");
+        payee.setIdentity("nctss2pdw6922@sandbox.com");
         payee.setIdentityType("ALIPAY_LOGON_ID");
         payee.setName("沙箱环境");
         model.setPayeeInfo(payee);

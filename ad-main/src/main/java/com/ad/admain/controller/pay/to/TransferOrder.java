@@ -1,6 +1,5 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.account.entity.IUser;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,7 +52,6 @@ public class TransferOrder extends Order {
         private String identifyName;
         private String remark;
         private Integer id;
-        private GenericUser orderUser;
         private Double totalAmount;
         private OrderVerify verify;
 
@@ -63,10 +61,7 @@ public class TransferOrder extends Order {
         }
 
 
-        public TransferOrderBuilder orderName(String orderName) {
-            this.orderName=orderName;
-            return this;
-        }
+
 
         public TransferOrderBuilder identify(String identify) {
             this.identify=identify;
@@ -78,11 +73,10 @@ public class TransferOrder extends Order {
             return this;
         }
 
-        public TransferOrderBuilder orderName(IUser user) {
+        private void orderName(IUser user) {
             Assert.notNull(totalAmount, "账单金额不能为null");
             Assert.notNull(user, "用户不能为空");
             this.orderName=String.format("%s 提现 %f 钱 %s ", user.getUsername(), totalAmount, LocalDateTime.now());
-            return this;
         }
 
         public TransferOrderBuilder identifyName(String identifyName) {
@@ -95,17 +89,8 @@ public class TransferOrder extends Order {
             return this;
         }
 
-        public TransferOrderBuilder id(Integer id) {
-            this.id=id;
-            return this;
-        }
 
-        public TransferOrderBuilder orderUser(GenericUser orderUser) {
-            this.orderUser=orderUser;
-            return this;
-        }
-
-        public TransferOrderBuilder totalAmount(Double totalAmount) {
+        private TransferOrderBuilder totalAmount(Double totalAmount) {
             this.totalAmount=totalAmount;
             return this;
         }
@@ -119,7 +104,6 @@ public class TransferOrder extends Order {
             TransferOrder transferOrder=new TransferOrder();
             transferOrder.setOrderName(orderName);
             transferOrder.setId(id);
-            transferOrder.setOrderUser(orderUser);
             transferOrder.setTotalAmount(totalAmount);
             transferOrder.setVerify(verify);
             transferOrder.identifyName=this.identifyName;

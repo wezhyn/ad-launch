@@ -1,12 +1,16 @@
 package com.ad.admain.pay;
 
+import com.ad.admain.pay.exception.WithdrawException;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
+import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 
 import java.util.HashMap;
@@ -126,5 +130,17 @@ public final class AliPayHolder {
         }
     }
 
+    public static <T, R extends AlipayFundTransUniTransferModel> WithDrawNotification handleWithDraw(T order, Function<T, R> orderMapper) throws WithdrawException {
+        final R model=orderMapper.apply(order);
+        AlipayFundTransUniTransferRequest request=new AlipayFundTransUniTransferRequest();
+        request.setBizModel(model);
+        try {
+            AlipayFundTransUniTransferResponse response=ALI_PAY_CLIENT.certificateExecute(request);
+            return new WithDrawResponse(response);
+        } catch (AlipayApiException e) {
+            throw new WithdrawException(e);
+        }
+
+    }
 
 }

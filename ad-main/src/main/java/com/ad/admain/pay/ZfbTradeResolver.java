@@ -60,4 +60,6 @@ public class ZfbTradeResolver {
         }
         return zfbTrade.successNotificationAware(alipayAsyncNotification);
     }
+
+
 }
