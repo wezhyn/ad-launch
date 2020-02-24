@@ -29,6 +29,11 @@ public class AdOrder extends Order {
     private List<Value> valueList;
 
     /**
+     * 订单状态，订单被更新时，需要更新该属性
+     */
+    private OrderStatus orderStatus;
+
+    /**
      * 要求广告投放到车上的数量
      */
     private Integer deliverNum;
@@ -46,6 +51,7 @@ public class AdOrder extends Order {
     private Double latitude;
 
     private Double longitude;
+
 
     /**
      * 广告投放范围

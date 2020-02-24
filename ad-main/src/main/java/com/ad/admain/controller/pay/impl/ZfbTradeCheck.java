@@ -1,5 +1,6 @@
 package com.ad.admain.controller.pay.impl;
 
+import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoService;
 import com.ad.admain.controller.pay.TradeStatus;
 import com.ad.admain.controller.pay.repository.BillInfoRepository;
@@ -25,6 +26,9 @@ public class ZfbTradeCheck implements ZfbTradeI {
 
     @Autowired
     private BillInfoRepository orderInfoRepository;
+
+    @Autowired
+    private AdOrderService adOrderService;
 
     @Override
     @Transactional(rollbackFor=Exception.class)

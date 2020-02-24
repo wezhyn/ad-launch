@@ -1,6 +1,7 @@
 package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.controller.pay.to.OrderStatus;
 import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,5 +21,7 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
      */
     Page<AdOrder> search(OrderSearchType type, String context, Pageable pageable);
 
+
+    void modifyOrderStatus(Integer orderId, OrderStatus orderStatus);
 
 }

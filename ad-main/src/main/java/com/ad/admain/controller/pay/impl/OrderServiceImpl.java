@@ -2,9 +2,11 @@ package com.ad.admain.controller.pay.impl;
 
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
+import com.ad.admain.controller.pay.exception.OrderStatusException;
 import com.ad.admain.controller.pay.repository.AdOrderRepository;
 import com.ad.admain.controller.pay.repository.ValueReposity;
 import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.controller.pay.to.OrderStatus;
 import com.ad.admain.controller.pay.to.Value;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,35 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         return order;
     }
 
+    @Override
+    public void modifyOrderStatus(Integer orderId, OrderStatus orderStatus) {
+        final AdOrder one=getRepository().getOne(orderId);
+        Assert.notNull(one, "无目标订单");
+        OrderStatus currentStatus=one.getOrderStatus();
+        OrderStatus nextStatus=null;
+        if (orderStatus.getNumber()==currentStatus.getNumber() + 1) {
+//            正常升级
+            nextStatus=orderStatus;
+        } else if (orderStatus.getNumber() <= 0) {
+            switch (orderStatus) {
+                case REFUNDED:
+                    throw new OrderStatusException("订单已经是退款完毕状态");
+                case WAITING_PAYMENT:
+                    throw new OrderStatusException("无法设置等待支付状态");
+                case REFUNDING: {
+
+                    break;
+                }
+                default: {
+                    throw new OrderStatusException("无该状态判断");
+                }
+            }
+
+        } else {
+            throw new OrderStatusException("无法越级更新");
+        }
+
+    }
 
     @Override
     public AdOrderRepository getRepository() {
