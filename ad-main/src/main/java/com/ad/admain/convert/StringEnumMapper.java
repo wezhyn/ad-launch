@@ -24,14 +24,14 @@ class StringEnumMapper {
      * @param <T>    tClass
      * @return Enum<?>
      */
-    <T extends Enum<T> & StringEnum> T stringEnum(String value, @TargetType Class<T> tClass) {
+    public <T extends Enum<T> & StringEnum> T stringEnum(String value, @TargetType Class<T> tClass) {
         if (value==null) {
             return null;
         }
         return EnumUtils.valueOfStringEnumIgnoreCase(tClass, value);
     }
 
-    <T extends Enum<?> & StringEnum> String getStringEnumValue(T stringEnum) {
+    public <T extends Enum<?> & StringEnum> String getStringEnumValue(T stringEnum) {
         if (stringEnum==null) {
             return "";
         }

@@ -3,19 +3,21 @@ package com.ad.admain.controller.pay;
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
-import com.ad.admain.controller.pay.to.*;
+import com.ad.admain.controller.pay.to.AdBillInfo;
+import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.controller.pay.to.PayType;
+import com.ad.admain.controller.pay.to.Value;
 import com.ad.admain.convert.AdOrderMapper;
 import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.security.AdAuthentication;
-import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.domain.Participant;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -44,21 +46,6 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         model.setProductCode("QUICK_MSECURITY_PAY");
         return model;
     };
-    private static final Function<TransferOrder, AlipayFundTransUniTransferModel> TRANSFER_MODEL_MAPPER=o->{
-        AlipayFundTransUniTransferModel model=new AlipayFundTransUniTransferModel();
-        model.setOutBizNo(o.getId().toString());
-        model.setTransAmount(o.getTotalAmount().toString());
-        model.setProductCode("TRANS_ACCOUNT_NO_PWD");
-        model.setOrderTitle(o.getOrderName());
-        model.setBizScene("DIRECT_TRANSFER");
-        Participant payee=new Participant();
-        payee.setIdentity(o.getIdentify());
-        payee.setIdentityType(o.getIdentityType());
-        payee.setName(o.getIdentifyName());
-        model.setPayeeInfo(payee);
-        model.setRemark(o.getRemark());
-        return model;
-    };
     private final AdOrderMapper orderMapper;
     private final AdOrderService orderService;
     private final BillInfoService orderInfoService;
@@ -82,7 +69,8 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         orderDto.setUid(authentication.getId());
         final AdOrder order=getConvertMapper().toTo(orderDto);
         AdBillInfo savedOrder=orderInfoService.createOrder(order, PayType.ALI_PAY);
-        AdOrder sOrder=orderService.getById(savedOrder.getId()).get();
+        Assert.notNull(savedOrder.getOrder(), "系统异常");
+        AdOrder sOrder=savedOrder.getOrder();
         String orderInfoSign=AliPayHolder.signZfb(sOrder, ORDER_ALIPAY_MAPPER);
         return ResponseResult.forSuccessBuilder()
                 .withCode(20000)

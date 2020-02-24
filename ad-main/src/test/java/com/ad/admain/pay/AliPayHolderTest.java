@@ -44,11 +44,11 @@ public class AliPayHolderTest {
     public void refund() throws AlipayApiException {
         AlipayTradeRefundRequest request=new AlipayTradeRefundRequest();
         AlipayTradeRefundModel model=new AlipayTradeRefundModel();
-        model.setOutTradeNo("63");
-        model.setTradeNo("2020022122001406181000036541");
+        model.setOutTradeNo("74");
+        model.setTradeNo("2020022422001406181000040391");
         model.setRefundAmount("10");
         model.setRefundReason("测试用例");
-        model.setOutRequestNo("H1H1H1");
+        model.setOutRequestNo("H1H1H2");
         request.setBizModel(model);
         AlipayTradeRefundResponse response=AliPayHolder.ALI_PAY_CLIENT.certificateExecute(request);
         if (response.isSuccess()) {

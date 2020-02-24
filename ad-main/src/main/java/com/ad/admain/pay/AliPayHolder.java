@@ -88,7 +88,8 @@ public final class AliPayHolder {
         System.out.println(parseMap);
         boolean isVerify;
         try {
-            isVerify=AlipaySignature.rsaCheckV1(parseMap, AliPayProperties.ALIPAY_PUBLIC_KEY,
+
+            isVerify=AlipaySignature.rsaCertCheckV1(parseMap, AliPayProperties.PUBLIC_CERT_PATH,
                     AliPayProperties.CHARSET, AliPayProperties.SIGN_TYPE);
         } catch (AlipayApiException e) {
             isVerify=false;

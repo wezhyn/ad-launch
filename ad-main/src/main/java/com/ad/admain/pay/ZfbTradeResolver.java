@@ -5,6 +5,8 @@ import com.ad.admain.controller.pay.TradeStatus;
 import java.util.Objects;
 
 /**
+ * 用于支付宝的下单，退款，提现
+ *
  * @author wezhyn
  * @since 12.01.2019
  */
@@ -46,8 +48,8 @@ public class ZfbTradeResolver {
      * 1. 四部验签
      * 2. 处理数据库
      *
-     * @param alipayAsyncNotification
-     * @return
+     * @param alipayAsyncNotification 异步通知参数
+     * @return 是否成功处理
      */
     public boolean handle(AlipayAsyncNotificationGetterI alipayAsyncNotification) {
         TradeStatus tradeStatus=handleOrderStatus(alipayAsyncNotification);

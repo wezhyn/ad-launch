@@ -1,11 +1,23 @@
-POST http://{{url}}/api/admin/order/queryDelete
+POST http://{{url}}/api/order/create
 Content-Type:  application/json
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODI1NzQwOTgsImlhdCI6MTU4MjUzODA5OCwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.BZnG7FIXymG_MKuOV6A2yWoFTf5eegga0BYZllyf_P0
 
 {
-  "idList": [
-    39,
-    40
+  "endDate": "2020-02-24T09:49:50.184Z",
+  "endTime": "2020-02-24T15:59:59.999Z",
+  "latitude": null,
+  "longitude": null,
+  "num": 100,
+  "price": 1,
+  "rate": 5,
+  "scope": 5,
+  "startDate": "2020-02-24T09:49:50.184Z",
+  "startTime": "2020-02-23T16:00:00.000Z",
+  "valueList": [
+    "傻逼儿子"
   ]
 }
 
 ###
+
+

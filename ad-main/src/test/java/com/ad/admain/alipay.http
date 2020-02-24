@@ -1,0 +1,6 @@
+GET http://{{url}}/zfb/notify_url
+Content-Type: application/x-www-form-urlencoded
+
+{gmt_create=2020-02-24 18:02:03, charset=utf-8, seller_email=puibgx4870@sandbox.com, subject=ad-order-710.0:0.0, sign=bxxvc5EnnA6cMkd/5pDQl+xfxSVpF+698uhHXLoepyLUYs+9BfYJTCxvebwXz1lf3wPHR5mQPK+UvNWxxLHq8LVqJiiIDlVPDtYsMBlZXdRwqk8OZOyZ4g4R/fF8cL5z/87du9DpFsifkwl33hRCvWquI4pyaA80T22ktrDFmYWFUZhRvFqfC9W3zT3VFwqHkWo62eJ8S1fzEd0CfvrZiyQB9sRvXv1oU4QavyjWGRTrx76TfFtP9bOtmm1rKsrFaI3wL74A+BNSMXseyHMZGwr5Lz1TzIiHA2gs2NpIMRvIt1TRe8BLrACXqebjWkMiwgQqAadi4gIqLD1l+0anSg==, body=shabiwenerzi, buyer_id=2088102179506184, invoice_amount=100.00, notify_id=2020022400222180206006181000609503, fund_bill_list=[{"amount":"100.00","fundChannel":"ALIPAYACCOUNT"}], notify_type=trade_status_sync, trade_status=TRADE_SUCCESS, receipt_amount=100.00, app_id=2016101800712719, buyer_pay_amount=100.00, sign_type=RSA2, seller_id=2088102180079633, gmt_payment=2020-02-24 18:02:06, notify_time=2020-02-24 18:02:07, version=1.0, out_trade_no=71, total_amount=100.00, trade_no=2020022422001406181000037557, auth_app_id=2016101800712719, buyer_logon_id=avs***@sandbox.com, point_amount=0.00}
+
+###

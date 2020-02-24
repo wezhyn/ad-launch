@@ -8,7 +8,6 @@ import com.ad.admain.controller.pay.exception.SearchException;
 import com.ad.admain.controller.pay.repository.BillInfoRepository;
 import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.controller.pay.to.AdOrder;
-import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.pay.to.PayType;
 import com.wezhyn.project.AbstractBaseService;
 import com.wezhyn.project.utils.EnumUtils;
@@ -46,13 +45,15 @@ public class BillInfoServiceImpl extends AbstractBaseService<AdBillInfo, Integer
 
     @Override
     public AdBillInfo createOrder(AdOrder order, PayType payType) {
-        Order createdOrder=orderService.save(order);
+        AdOrder createdOrder=orderService.save(order);
         AdBillInfo orderInfo=AdBillInfo.builder()
                 .orderId(createdOrder.getId())
                 .totalAmount(order.getTotalAmount())
                 .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
                 .build();
-        return orderInfoRepository.save(orderInfo);
+        final AdBillInfo savedInfo=orderInfoRepository.save(orderInfo);
+        savedInfo.setOrder(createdOrder);
+        return savedInfo;
     }
 
     @Override
