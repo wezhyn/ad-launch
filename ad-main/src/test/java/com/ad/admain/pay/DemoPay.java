@@ -16,12 +16,12 @@ public class DemoPay {
 
     public static void main(String[] args) throws AlipayApiException {
         AlipayClient alipayClient=new DefaultAlipayClient(
-                ZfbPayProperties.SERVER_URL,
-                ZfbPayProperties.APP_ID,
-                ZfbPayProperties.APP_PRIVATE_KEY,
+                AliPayProperties.SERVER_URL,
+                AliPayProperties.APP_ID,
+                AliPayProperties.APP_PRIVATE_KEY,
                 "json",
-                ZfbPayProperties.CHARSET,
-                ZfbPayProperties.ALIPAY_PUBLIC_KEY,
+                AliPayProperties.CHARSET,
+                AliPayProperties.ALIPAY_PUBLIC_KEY,
                 "RSA2");
 
         AlipayTradeAppPayRequest createRequest=new AlipayTradeAppPayRequest();

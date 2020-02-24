@@ -1,31 +1,24 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.TradeStatus;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * 由 {@link OrderService#save(Object)} 创建
- * 订单的支付情况，并保存 Alipay 的信息
- *
  * @author wezhyn
- * @since 12.01.2019
+ * @since 02.24.2020
  */
-@Builder
+@MappedSuperclass
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name="ad_bill_info")
-@Getter
-@Setter
-@Table(indexes={
-        @Index(name="bill_info_id_total_amount", columnList="gmtPayment,tradeStatus,totalAmount")
-})
 public class BillInfo implements IBaseTo<Integer> {
 
 
@@ -33,14 +26,12 @@ public class BillInfo implements IBaseTo<Integer> {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-
+    /**
+     * 对应不同 BillInfo ，其对应的Order类型不同
+     */
     @Column(name="order_id")
     private Integer orderId;
 
-
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="order_id", referencedColumnName="id", insertable=false, updatable=false)
-    private Order order;
 
     @Enumerated(value=EnumType.STRING)
     private TradeStatus tradeStatus;
@@ -49,11 +40,12 @@ public class BillInfo implements IBaseTo<Integer> {
 
     @Type(type="strategyEnum")
     @StrategyEnum(value=com.wezhyn.project.database.EnumType.NUMBER)
+    @Column(nullable=false, name="pay_type", columnDefinition="smallint comment '0：Alipay,1:Wechat' ")
     private PayType payType;
 
 
     /**
-     * 支付宝回调字段
+     * 常用回调字段
      */
     private LocalDateTime gmtCreate;
     private LocalDateTime gmtPayment;
@@ -61,12 +53,5 @@ public class BillInfo implements IBaseTo<Integer> {
     private String outBizNo;
     private String buyerId;
     private String sellerId;
-
-
-    @Override
-    public Integer getId() {
-        return orderId;
-    }
-
 
 }

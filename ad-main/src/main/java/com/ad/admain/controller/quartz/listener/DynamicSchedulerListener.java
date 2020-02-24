@@ -2,19 +2,15 @@ package com.ad.admain.controller.quartz.listener;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.controller.pay.OrderService;
-import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.controller.quartz.dao.JobEntityRepository;
+import com.ad.admain.controller.pay.AdOrderService;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.service.DynamicJobService;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @ClassName DynamicSchedulerListener
@@ -28,7 +24,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 public class DynamicSchedulerListener implements SchedulerListener {
     @Autowired
-    OrderService orderService;
+    AdOrderService orderService;
     DynamicJobService dynamicJobService;
 //    DynamicJobService dynamicJobService;
     @Autowired
@@ -55,8 +51,8 @@ public class DynamicSchedulerListener implements SchedulerListener {
 //        JobEntity jobEntity = dynamicJobService.getJobEntityById(jobId);
         JobEntity jobEntity = dynamicJobService.getJobEntityById(jobId);
         jobEntity.setIsFinished(true);
-        Order order = orderService.getById(orderId).orElse(null);
-        Equipment equipment = equipmentService.getById(equipId).orElse(null);
+        AdOrder order=orderService.getById(orderId).orElse(null);
+        Equipment equipment=equipmentService.getById(equipId).orElse(null);
         equipment.setRemain(equipment.getRemain()+order.getRate());
         dynamicJobService.updateJobEntity(jobEntity);
         equipmentService.save(equipment);

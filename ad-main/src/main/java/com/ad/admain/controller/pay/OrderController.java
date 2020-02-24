@@ -3,14 +3,13 @@ package com.ad.admain.controller.pay;
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
-import com.ad.admain.controller.pay.to.BillInfo;
-import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.controller.pay.to.PayType;
-import com.ad.admain.controller.pay.to.Value;
-import com.ad.admain.convert.OrderMapper;
-import com.ad.admain.pay.ZfbPayHolder;
+import com.ad.admain.controller.pay.to.*;
+import com.ad.admain.convert.AdOrderMapper;
+import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.security.AdAuthentication;
+import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.Participant;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,11 +29,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/order")
 @PreAuthorize("isAuthenticated()")
-public class OrderController extends AbstractBaseController<OrderDto, Integer, Order> {
+public class OrderController extends AbstractBaseController<OrderDto, Integer, AdOrder> {
 
-    private final OrderMapper orderMapper;
-
-    private static final Function<Order, AlipayTradeAppPayModel> ORDER_ALIPAY_MAPPER=o->{
+    private static final Function<AdOrder, AlipayTradeAppPayModel> ORDER_ALIPAY_MAPPER=o->{
         AlipayTradeAppPayModel model=new AlipayTradeAppPayModel();
         String body=o.getValueList().stream()
                 .filter(Objects::nonNull)
@@ -47,10 +44,26 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
         model.setProductCode("QUICK_MSECURITY_PAY");
         return model;
     };
-    private final OrderService orderService;
+    private static final Function<TransferOrder, AlipayFundTransUniTransferModel> TRANSFER_MODEL_MAPPER=o->{
+        AlipayFundTransUniTransferModel model=new AlipayFundTransUniTransferModel();
+        model.setOutBizNo(o.getId().toString());
+        model.setTransAmount(o.getTotalAmount().toString());
+        model.setProductCode("TRANS_ACCOUNT_NO_PWD");
+        model.setOrderTitle(o.getOrderName());
+        model.setBizScene("DIRECT_TRANSFER");
+        Participant payee=new Participant();
+        payee.setIdentity(o.getIdentify());
+        payee.setIdentityType(o.getIdentityType());
+        payee.setName(o.getIdentifyName());
+        model.setPayeeInfo(payee);
+        model.setRemark(o.getRemark());
+        return model;
+    };
+    private final AdOrderMapper orderMapper;
+    private final AdOrderService orderService;
     private final BillInfoService orderInfoService;
 
-    public OrderController(OrderService orderService, BillInfoService orderInfoService, OrderMapper orderMapper) {
+    public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper) {
         this.orderService=orderService;
         this.orderInfoService=orderInfoService;
         this.orderMapper=orderMapper;
@@ -67,14 +80,13 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
     public ResponseResult create(@RequestBody OrderDto orderDto, @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
 //        设置当前用户id
         orderDto.setUid(authentication.getId());
-        final Order order=getConvertMapper().toTo(orderDto);
-        BillInfo savedOrder=orderInfoService.createOrder(order, PayType.ALIPAY);
-        Order sOrder=orderService.getById(savedOrder.getId()).get();
-        savedOrder.setOrder(sOrder);
-        String orderInfoSign=ZfbPayHolder.signZfb(savedOrder.getOrder(), ORDER_ALIPAY_MAPPER);
+        final AdOrder order=getConvertMapper().toTo(orderDto);
+        AdBillInfo savedOrder=orderInfoService.createOrder(order, PayType.ALI_PAY);
+        AdOrder sOrder=orderService.getById(savedOrder.getId()).get();
+        String orderInfoSign=AliPayHolder.signZfb(sOrder, ORDER_ALIPAY_MAPPER);
         return ResponseResult.forSuccessBuilder()
                 .withCode(20000)
-                .withData("order", savedOrder.getOrder())
+                .withData("order", sOrder)
                 .withData("orderInfo", orderInfoSign)
                 .withMessage("创建订单成功")
                 .build();
@@ -91,7 +103,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
                                       @RequestParam(name="limit", defaultValue="10") int limit,
                                       @RequestParam(name="page", defaultValue="1") int page
     ) {
-        final Page<Order> search=getService().search(OrderSearchType.USER, adAuthentication.getId().toString(), PageRequest.of(page - 1, limit));
+        final Page<AdOrder> search=getService().search(OrderSearchType.USER, adAuthentication.getId().toString(), PageRequest.of(page - 1, limit));
         return doResponse(search);
     }
 
@@ -103,14 +115,14 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
             @PathVariable("type") OrderSearchType searchType,
             @RequestParam("context") String context) {
         Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<Order> searchResult=getService().search(searchType, context, pageable);
+        Page<AdOrder> searchResult=getService().search(searchType, context, pageable);
         return doResponse(searchResult);
     }
 
     @PostMapping("/verify")
     public ResponseResult verifyOrder(@RequestBody OrderDto orderDto) {
-        Order order=getConvertMapper().toTo(orderDto);
-        Order verifyEquipment=getService().update(order);
+        AdOrder order=getConvertMapper().toTo(orderDto);
+        AdOrder verifyEquipment=getService().update(order);
         return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
     }
 
@@ -122,12 +134,12 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, O
     }
 
     @Override
-    public OrderService getService() {
+    public AdOrderService getService() {
         return orderService;
     }
 
     @Override
-    public OrderMapper getConvertMapper() {
+    public AdOrderMapper getConvertMapper() {
         return orderMapper;
     }
 }

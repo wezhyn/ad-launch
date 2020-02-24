@@ -28,7 +28,7 @@ public abstract class AbstractSmsService implements ISmsService {
             .expireAfterAccess(120, TimeUnit.SECONDS)
             .build();
 
-    private static String randomDigitalCode() {
+    protected String randomDigitalCode() {
         final int code=ThreadLocalRandom.current().nextInt(123456, 1000000);
         return String.valueOf(code);
     }

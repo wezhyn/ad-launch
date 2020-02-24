@@ -1,7 +1,7 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.controller.pay.dto.BillInfoDto;
-import com.ad.admain.controller.pay.to.BillInfo;
+import com.ad.admain.controller.pay.to.AdBillInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,5 +11,5 @@ import org.mapstruct.ReportingPolicy;
  */
 @Mapper(config=CentralMapperConfig.class,
         unmappedTargetPolicy=ReportingPolicy.IGNORE)
-public abstract class BillInfoMapper implements AbstractMapper<BillInfo, BillInfoDto> {
+public abstract class BillInfoMapper implements AbstractMapper<AdBillInfo, BillInfoDto> {
 }

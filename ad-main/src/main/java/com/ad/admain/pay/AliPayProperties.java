@@ -11,7 +11,8 @@ import java.util.Properties;
  * @author wezhyn
  * @since 11.22.2019
  */
-public class ZfbPayProperties {
+public class AliPayProperties {
+
 
     public static final String SERVER_URL;
     public static final String APP_ID;
@@ -21,6 +22,10 @@ public class ZfbPayProperties {
     public static final String SIGN_TYPE;
     public static final String CALLBACK_NOTIFY_URL;
     public static final String AD_SYSTEM_SELLER_ID;
+    public static final CertificateType CERTIFICATE_TYPE;
+    public static final String CERT_PATH;
+    public static final String ROOT_CERT_PATH;
+    public static final String PUBLIC_CERT_PATH;
 
 
     static {
@@ -35,9 +40,20 @@ public class ZfbPayProperties {
             SIGN_TYPE=(String) properties.get("sign_type");
             CALLBACK_NOTIFY_URL=properties.getProperty("alipay_notify_url");
             AD_SYSTEM_SELLER_ID=properties.getProperty("alipay_ad_seller_system_id");
+            CERTIFICATE_TYPE=CertificateType.valueOf(properties.getProperty("certificate_type"));
+            CERT_PATH=properties.getProperty("cert_path");
+            ROOT_CERT_PATH=properties.getProperty("root_cert_path");
+            PUBLIC_CERT_PATH=properties.getProperty("public_cert_path");
         } catch (IOException e) {
             throw new RuntimeException("无支付宝应用设置");
         }
     }
 
+
+    enum CertificateType {
+        /**
+         * 支付宝证书类型
+         */
+        CERTIFICATE, PRIVATE_KEY;
+    }
 }

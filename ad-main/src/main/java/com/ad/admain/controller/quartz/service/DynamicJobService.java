@@ -1,8 +1,11 @@
 package com.ad.admain.controller.quartz.service;
 
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.quartz.entity.JobEntity;
-import org.quartz.*;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Trigger;
 
 import java.util.List;
 
@@ -26,7 +29,7 @@ public interface DynamicJobService {
     //获取JobKey,包含Name和Group
      JobKey getJobKey(JobEntity job);
 
-     void generateJobs(Order order);
+    void generateJobs(AdOrder order);
 
      Trigger getInitialTrigger();
 

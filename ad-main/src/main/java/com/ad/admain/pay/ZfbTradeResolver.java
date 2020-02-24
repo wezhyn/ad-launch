@@ -36,8 +36,8 @@ public class ZfbTradeResolver {
         if (orderStatus==TradeStatus.TRADE_SUCCESS || orderStatus==TradeStatus.TRADE_CANCEL_OTHER) {
             return orderStatus;
         }
-        return Objects.equals(zfbAsyncNotification.getAppId(), ZfbPayProperties.APP_ID)
-                && Objects.equals(zfbAsyncNotification.getSellerId(), ZfbPayProperties.AD_SYSTEM_SELLER_ID) ?
+        return Objects.equals(zfbAsyncNotification.getAppId(), AliPayProperties.APP_ID)
+                && Objects.equals(zfbAsyncNotification.getSellerId(), AliPayProperties.AD_SYSTEM_SELLER_ID) ?
                 orderStatus : TradeStatus.TRADE_CANCEL_OTHER;
     }
 

@@ -1,8 +1,9 @@
 package com.ad.admain.service.impl;
 
+import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
-import com.ad.admain.controller.pay.OrderService;
-import com.ad.admain.controller.pay.repository.OrderReposity;
+import com.ad.admain.controller.pay.repository.AdOrderRepository;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.pay.to.OrderVerify;
 import com.ad.admain.controller.pay.to.Value;
@@ -20,11 +21,11 @@ import java.util.Optional;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class OrderServiceImplTest {
+public class AdOrderServiceImplTest {
     @Autowired
-    OrderReposity orderReposity;
+    AdOrderRepository orderReposity;
     @Autowired
-    private OrderService orderService;
+    private AdOrderService orderService;
 
     @Test
     public void getList() {
@@ -34,7 +35,7 @@ public class OrderServiceImplTest {
 
     @Test
     public void get() {
-        Order order=orderReposity.findById(4).get();
+        Order order=orderReposity.findById(60).get();
         System.out.println(order);
     }
 
@@ -42,11 +43,11 @@ public class OrderServiceImplTest {
     public void save() {
         List<Value> valueList=new ArrayList<>();
         valueList.add(new Value("1232"));
-        Order order=new Order()
-                .setVerify(OrderVerify.WAIT_VERITY)
-                .setUid(1)
+        AdOrder order=(AdOrder) new AdOrder()
                 .setValueList(valueList)
-                .setStartTime(LocalDateTime.now());
+                .setStartTime(LocalDateTime.now())
+                .setUid(1)
+                .setVerify(OrderVerify.WAIT_VERITY);
         Order order1=orderReposity.save(order);
         System.out.println(Optional.ofNullable(order1).toString());
     }

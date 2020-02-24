@@ -3,6 +3,7 @@ package com.ad.admain.utils;
 import com.ad.admain.controller.account.AuthenticationEnum;
 import com.ad.admain.controller.account.SexEnum;
 import com.ad.admain.controller.account.entity.GenericUser;
+import com.wezhyn.project.utils.PropertyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -16,6 +17,18 @@ import static com.wezhyn.project.utils.PropertyUtils.copyProperties;
  */
 @Slf4j
 public class PropertyUtilsTest {
+
+
+    @Test
+    public void sex() {
+        GenericUser newObject=GenericUser.builder()
+                .sex(SexEnum.MALE).build();
+        GenericUser oldObject=GenericUser.builder()
+                .sex(SexEnum.UNKNOWN).build();
+        PropertyUtils.copyProperties(newObject, oldObject);
+
+        System.out.println(oldObject.getSex());
+    }
 
     @Test
     public void copyPropertiesTest() {

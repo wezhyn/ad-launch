@@ -1,9 +1,9 @@
 package com.ad.admain.to;
 
+import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoService;
-import com.ad.admain.controller.pay.OrderService;
-import com.ad.admain.controller.pay.to.BillInfo;
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.AdBillInfo;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.Value;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,23 +19,23 @@ import java.util.Collections;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class BillInfoTest {
+public class AdBillInfoTest {
 
 
     @Autowired
-    private OrderService orderService;
+    private AdOrderService orderService;
     @Autowired
     private BillInfoService orderInfoService;
 
     @Test
     public void saveOrderInfo() {
         Value value=new Value("test");
-        Order order=new Order()
+        AdOrder order=new AdOrder()
                 .setPrice(100D)
                 .setValueList(Collections.singletonList(value))
                 .setRate(5);
         order=orderService.save(order);
-        BillInfo orderInfo=BillInfo.builder()
+        AdBillInfo orderInfo=AdBillInfo.builder()
                 .orderId(order.getId())
                 .build();
         orderInfoService.save(orderInfo);

@@ -14,7 +14,7 @@ public enum PayType implements StringEnum, NumberEnum {
     /**
      * 支付的类型
      */
-    ALIPAY(0, "alipay"), WECHAT(1, "wechat");
+    ALI_PAY(0, "alipay"), WECHAT(1, "wechat");
 
     private Integer payNum;
     private String payName;

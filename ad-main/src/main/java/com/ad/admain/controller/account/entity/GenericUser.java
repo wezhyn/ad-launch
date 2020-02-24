@@ -5,6 +5,7 @@ import com.ad.admain.controller.account.SexEnum;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.wezhyn.project.BaseEnum;
 import com.wezhyn.project.annotation.UpdateIgnore;
+import com.wezhyn.project.utils.EnumUtils;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
@@ -111,6 +112,13 @@ public class GenericUser implements IUser {
         return this.sex==null ? SexEnum.UNKNOWN.getValue() : this.sex.getValue();
     }
 
+    public void setSex(String sex) {
+        this.sex=EnumUtils.valueOfStringEnumIgnoreCase(SexEnum.class, sex);
+    }
+
+    public void setSex(SexEnum sex) {
+        this.sex=sex;
+    }
 
     @Override
     public String getStatus() {

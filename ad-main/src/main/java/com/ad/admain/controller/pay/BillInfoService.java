@@ -1,7 +1,7 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.controller.pay.to.BillInfo;
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.AdBillInfo;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.PayType;
 import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author wezhyn
  * @since 12.01.2019
  */
-public interface BillInfoService extends BaseService<BillInfo, Integer> {
+public interface BillInfoService extends BaseService<AdBillInfo, Integer> {
 
 
     /**
@@ -23,10 +23,10 @@ public interface BillInfoService extends BaseService<BillInfo, Integer> {
      * @param payType 选择支付的类型
      * @return orderInfo
      */
-    BillInfo createOrder(Order order, PayType payType);
+    AdBillInfo createOrder(AdOrder order, PayType payType);
 
 
-    Optional<BillInfo> getByOrderId(Integer id);
+    Optional<AdBillInfo> getByOrderId(Integer id);
 
 
     /**
@@ -36,5 +36,5 @@ public interface BillInfoService extends BaseService<BillInfo, Integer> {
      * @param context 内容
      * @return orderList
      */
-    Page<BillInfo> search(BillInfoSearchType type, String context, Pageable pageable);
+    Page<AdBillInfo> search(BillInfoSearchType type, String context, Pageable pageable);
 }

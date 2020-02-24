@@ -1,29 +1,27 @@
 package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
-
-@Entity(name="ad_order")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@DynamicUpdate
+/**
+ * 包含一些Order 的基本属性，如： id,对应的User，账单金额，订单状态
+ *
+ * @author : wezhyn
+ * @date : 2020/2/24
+ */
 @Accessors(chain=true)
+@MappedSuperclass
+@Setter
+@Getter
 public class Order implements IBaseTo<Integer> {
 
     @Id
@@ -32,57 +30,14 @@ public class Order implements IBaseTo<Integer> {
     private Integer id;
 
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JoinColumn(name="uid", insertable=false, updatable=false)
     private GenericUser orderUser;
 
-    @OneToMany(cascade=CascadeType.ALL)
-    private List<Value> valueList;
-
-    @Column(nullable=false)
-    private LocalDateTime startTime;
-    @Column(nullable=false)
-    private LocalDateTime endTime;
-    @Column(nullable=false)
-    private LocalDateTime startDate;
-    @Column(nullable=false)
-    private LocalDateTime endDate;
-
-    /**
-     * 要求广告投放到车上的数量
-     */
-    private Integer deliverNum;
-
-    /**
-     * 订单单价
-     */
-    private Double price;
-
-    /**
-     * 订单数量
-     */
-    private Integer num;
-
-    private Double latitude;
-
-    private Double longitude;
-
-    /**
-     * 广告投放范围
-     */
-
-    private Double scope;
-
-    /**
-     * 广告投放频率
-     */
-    private Integer rate;
-
     private Integer uid;
 
-    @OneToMany(mappedBy = "order",targetEntity = JobEntity.class)
-    private List<JobEntity> jobEntities;
 
+    private Double totalAmount;
 
 
     /**
@@ -96,24 +51,13 @@ public class Order implements IBaseTo<Integer> {
     @Type(type="strategyEnum")
     @StrategyEnum(value=EnumType.NUMBER)
     private OrderVerify verify;
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                ", price=" + price +
-                ", num=" + num +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", scope=" + scope +
-                ", rate=" + rate +
-                ", uid=" + uid +
-                ", verify=" + verify +
-                '}';
+
+    public Order() {
     }
 
-
+    public Order(Integer uid, Double totalAmount, OrderVerify verify) {
+        this.uid=uid;
+        this.totalAmount=totalAmount;
+        this.verify=verify;
+    }
 }

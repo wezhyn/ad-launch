@@ -1,8 +1,8 @@
 package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.pay.dto.AppTradeNotification;
+import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
-import com.ad.admain.pay.ZfbPayHolder;
 import com.ad.admain.pay.ZfbTradeI;
 import com.ad.admain.pay.ZfbTradeResolver;
 import com.wezhyn.project.AbstractBaseMapAdapterModel;
@@ -38,7 +38,7 @@ public class ZfbController {
 
     @PostMapping("/zfb/notify_url")
     public String verify(HttpServletRequest request, HttpServletResponse response) {
-        Map<String, String> parsedMap=ZfbPayHolder.sraCheck(request.getParameterMap());
+        Map<String, String> parsedMap=AliPayHolder.sraCheck(request.getParameterMap());
         AlipayAsyncNotificationGetterI notificationGetter=AbstractBaseMapAdapterModel.createInstance(
                 parsedMap, AlipayAsyncNotificationGetterI.class, true);
         boolean isVerify=notificationGetter.isVerify();

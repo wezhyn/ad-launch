@@ -2,8 +2,8 @@ package com.ad.admain.controller.quartz.service;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.controller.pay.OrderService;
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.AdOrderService;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.quartz.dao.JobEntityRepository;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.job.DynamicJob;
@@ -30,7 +30,7 @@ public class DynamicServiceImpl implements DynamicJobService{
     @Autowired
     private EquipmentService equipmentService;
     @Autowired
-    OrderService orderService;
+    AdOrderService orderService;
 
     @Override
     public JobEntity insertOneJob(JobEntity jobEntity) {
@@ -105,18 +105,18 @@ public class DynamicServiceImpl implements DynamicJobService{
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void generateJobs(Order order) {
-        Integer rate = order.getRate();
-        Integer deliverNum = order.getDeliverNum();
-        Integer num = order.getNum();
-        Double lati = order.getLatitude();
-        Double lgti = order.getLongitude();
-        Double scope = order.getScope();
+    @Transactional(rollbackFor=Exception.class)
+    public void generateJobs(AdOrder order) {
+        Integer rate=order.getRate();
+        Integer deliverNum=order.getDeliverNum();
+        Integer num=order.getNum();
+        Double lati=order.getLatitude();
+        Double lgti=order.getLongitude();
+        Double scope=order.getScope();
         //订单要求的车辆数大于范围内可用的车辆数或投放的广告总数不是投放车辆数的整数倍
-        Long available = equipmentService.countAllAvailableEquips(true,rate,lgti,lati,scope);
-        if (available<deliverNum||num%deliverNum!=0){
-            return ;
+        Long available=equipmentService.countAllAvailableEquips(true, rate, lgti, lati, scope);
+        if (available < deliverNum || num%deliverNum!=0) {
+            return;
         }
 
         int amount = num/deliverNum;

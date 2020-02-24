@@ -1,7 +1,7 @@
 package com.ad.admain.controller.pay.impl;
 
-import com.ad.admain.controller.pay.OrderService;
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.AdOrderService;
+import com.ad.admain.controller.pay.to.AdOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +16,15 @@ import java.util.Optional;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class BillInfoServiceImplTest {
+public class AdBillInfoServiceImplTest {
 
     @Autowired
-    private OrderService orderService;
+    private AdOrderService orderService;
 
 
     @Test
     public void getOrder() {
-        Optional<Order> byId=orderService.getById(15);
+        Optional<AdOrder> byId=orderService.getById(15);
         System.out.println(byId.isPresent());
     }
 }

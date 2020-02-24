@@ -1,11 +1,9 @@
 package com.ad.admain.controller.quartz.entity;
 
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.AdOrder;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.checkerframework.checker.units.qual.C;
-import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,32 +17,32 @@ import java.io.Serializable;
  * @Version 1.0
  */
 @Entity
-@Table(name = "JOB_ENTITY")
+@Table(name="JOB_ENTITY")
 @Data
-@Accessors(chain = true)
+@Accessors(chain=true)
 public class JobEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "name")
+    @Column(name="name")
     private String name;          //job名称
-    @Column(name = "job_group")
+    @Column(name="job_group")
     private String jobGroup;      //job组名
-    @Column(name = "cron")
+    @Column(name="cron")
     private String cron;          //执行的cron
-    @Column(name = "description")
+    @Column(name="description")
     private String description;   //job描述信息
-    @Column(name = "status")
+    @Column(name="status")
     private String status;        //job的执行状态,这里我设置为OPEN/CLOSE且只有该值为OPEN才会执行该Job
-    @Column(name = "is_finished")
-    private Boolean isFinished = false;     //job的参数
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id",referencedColumnName = "id")
-    private Order order;      //与订单进行关联
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "equip_id",referencedColumnName = "id")
+    @Column(name="is_finished")
+    private Boolean isFinished=false;     //job的参数
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="order_id", referencedColumnName="id")
+    private AdOrder order;      //与订单进行关联
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="equip_id", referencedColumnName="id")
     private Equipment equip;
-    @Column(name = "amount")
+    @Column(name="amount")
     private Integer amount;
 //    @Column(name = "content")
 //    private String content;

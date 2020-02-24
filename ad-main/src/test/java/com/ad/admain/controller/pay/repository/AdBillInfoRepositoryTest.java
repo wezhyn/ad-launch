@@ -1,7 +1,7 @@
 package com.ad.admain.controller.pay.repository;
 
 import com.ad.admain.controller.pay.TradeStatus;
-import com.ad.admain.controller.pay.to.BillInfo;
+import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.controller.pay.to.PayType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +20,7 @@ import java.util.Random;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class BillInfoRepositoryTest {
+public class AdBillInfoRepositoryTest {
 
     @Autowired
     private BillInfoRepository billInfoRepository;
@@ -43,7 +43,7 @@ public class BillInfoRepositoryTest {
             for (int i=0; i < 24; i++) {
                 int r=random.nextInt(10);
                 for (int k=0; k < r; k++) {
-                    BillInfo billInfo=BillInfo.builder()
+                    AdBillInfo billInfo=AdBillInfo.builder()
                             .orderId(61)
                             .totalAmount(random.nextDouble()*200)
                             .tradeStatus(TradeStatus.TRADE_SUCCESS)
@@ -53,7 +53,7 @@ public class BillInfoRepositoryTest {
                             .gmtPayment(LocalDateTime.of(LocalDate.now().minusDays(10 - j), LocalTime.MIN.plusHours(i)
                                     .plusMinutes(datetime.nextInt(10) + 10*k/2)))
                             .sellerId("123")
-                            .payType(PayType.ALIPAY)
+                            .payType(PayType.ALI_PAY)
                             .build();
                     billInfoRepository.save(billInfo);
 

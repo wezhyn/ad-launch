@@ -2,7 +2,7 @@ package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.pay.dto.BillInfoDto;
-import com.ad.admain.controller.pay.to.BillInfo;
+import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.BillInfoMapper;
 import com.wezhyn.project.controller.ResponseResult;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/billinfo")
-public class BillInfoController extends AbstractBaseController<BillInfoDto, Integer, BillInfo> {
+public class BillInfoController extends AbstractBaseController<BillInfoDto, Integer, AdBillInfo> {
 
 
     private final BillInfoService billInfoService;
@@ -47,7 +47,7 @@ public class BillInfoController extends AbstractBaseController<BillInfoDto, Inte
             @PathVariable("type") BillInfoSearchType searchType,
             @RequestParam("context") String context) {
         Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<BillInfo> searchResult=getService().search(searchType, context, pageable);
+        Page<AdBillInfo> searchResult=getService().search(searchType, context, pageable);
         return doResponse(searchResult);
     }
 
@@ -58,7 +58,7 @@ public class BillInfoController extends AbstractBaseController<BillInfoDto, Inte
     }
 
     @Override
-    public AbstractMapper<BillInfo, BillInfoDto> getConvertMapper() {
+    public AbstractMapper<AdBillInfo, BillInfoDto> getConvertMapper() {
         return billInfoMapper;
     }
 }

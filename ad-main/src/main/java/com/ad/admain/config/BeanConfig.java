@@ -3,15 +3,14 @@ package com.ad.admain.config;
 import com.ad.admain.controller.FileUploadService;
 import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.controller.impl.QiNiuFileUploadServiceImpl;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.quartz.ee.servlet.QuartzInitializerServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Async;
@@ -48,6 +47,7 @@ public class BeanConfig {
     public void initObjectMappper() {
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         SimpleModule module=new SimpleModule("simpleModule");
         this.objectMapper.registerModule(module);
     }

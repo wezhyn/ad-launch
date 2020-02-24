@@ -1,12 +1,13 @@
 package com.ad.admain.controller.pay.impl;
 
+import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoSearchType;
 import com.ad.admain.controller.pay.BillInfoService;
-import com.ad.admain.controller.pay.OrderService;
 import com.ad.admain.controller.pay.TradeStatus;
 import com.ad.admain.controller.pay.exception.SearchException;
 import com.ad.admain.controller.pay.repository.BillInfoRepository;
-import com.ad.admain.controller.pay.to.BillInfo;
+import com.ad.admain.controller.pay.to.AdBillInfo;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.controller.pay.to.PayType;
 import com.wezhyn.project.AbstractBaseService;
@@ -25,14 +26,14 @@ import java.util.Optional;
  * @since 12.01.2019
  */
 @Service
-public class BillInfoServiceImpl extends AbstractBaseService<BillInfo, Integer> implements BillInfoService {
+public class BillInfoServiceImpl extends AbstractBaseService<AdBillInfo, Integer> implements BillInfoService {
 
-    private static final Page<BillInfo> EMPTY_BILL_PAGE=new PageImpl<BillInfo>(Collections.unmodifiableList(Collections.EMPTY_LIST));
-    private final OrderService orderService;
+    private static final Page<AdBillInfo> EMPTY_BILL_PAGE=new PageImpl<AdBillInfo>(Collections.unmodifiableList(Collections.EMPTY_LIST));
+    private final AdOrderService orderService;
     private final BillInfoRepository orderInfoRepository;
 
 
-    public BillInfoServiceImpl(BillInfoRepository orderInfoRepository, OrderService orderService) {
+    public BillInfoServiceImpl(BillInfoRepository orderInfoRepository, AdOrderService orderService) {
         this.orderInfoRepository=orderInfoRepository;
         this.orderService=orderService;
     }
@@ -44,24 +45,24 @@ public class BillInfoServiceImpl extends AbstractBaseService<BillInfo, Integer> 
     }
 
     @Override
-    public BillInfo createOrder(Order order, PayType payType) {
+    public AdBillInfo createOrder(AdOrder order, PayType payType) {
         Order createdOrder=orderService.save(order);
-        BillInfo orderInfo=BillInfo.builder()
+        AdBillInfo orderInfo=AdBillInfo.builder()
                 .orderId(createdOrder.getId())
-                .totalAmount(order.getPrice()*order.getNum())
+                .totalAmount(order.getTotalAmount())
                 .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
                 .build();
         return orderInfoRepository.save(orderInfo);
     }
 
     @Override
-    public Optional<BillInfo> getByOrderId(Integer id) {
+    public Optional<AdBillInfo> getByOrderId(Integer id) {
         return getRepository().findByOrderId(id);
     }
 
     @Override
-    public Page<BillInfo> search(BillInfoSearchType type, String context, Pageable pageable) {
-        BillInfo billInfo=new BillInfo();
+    public Page<AdBillInfo> search(BillInfoSearchType type, String context, Pageable pageable) {
+        AdBillInfo billInfo=new AdBillInfo();
         switch (type) {
             case TRADE_STATUS: {
                 final TradeStatus tradeStatus=EnumUtils.valueOfStringEnumIgnoreCase(TradeStatus.class, context);
@@ -72,7 +73,7 @@ public class BillInfoServiceImpl extends AbstractBaseService<BillInfo, Integer> 
                 throw new SearchException("无该搜索类型");
             }
         }
-        Page<BillInfo> searchResult=getRepository().findAll(Example.of(billInfo), pageable);
+        Page<AdBillInfo> searchResult=getRepository().findAll(Example.of(billInfo), pageable);
         return searchResult.getSize()==0 ? EMPTY_BILL_PAGE : searchResult;
     }
 }

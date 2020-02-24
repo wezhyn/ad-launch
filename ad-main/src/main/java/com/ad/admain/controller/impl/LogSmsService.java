@@ -13,4 +13,10 @@ public class LogSmsService extends AbstractSmsService {
     void doSend(String mobile, String code, SmsType type) throws SmsException {
         log.info("send code {} for {} to {}", code, type, mobile);
     }
+
+
+    @Override
+    protected String randomDigitalCode() {
+        return "111111";
+    }
 }

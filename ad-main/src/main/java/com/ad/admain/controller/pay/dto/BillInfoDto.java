@@ -1,11 +1,11 @@
 package com.ad.admain.controller.pay.dto;
 
-import com.ad.admain.controller.pay.OrderService;
+import com.ad.admain.controller.pay.AdOrderService;
 import com.wezhyn.project.IBaseTo;
 import lombok.*;
 
 /**
- * 由 {@link OrderService#save(Object)} 创建
+ * 由 {@link AdOrderService#save(Object)} 创建
  * 订单的支付情况，并保存 Alipay 的信息
  *
  * @author wezhyn
