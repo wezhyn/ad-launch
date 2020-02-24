@@ -14,4 +14,5 @@ import com.wezhyn.project.BaseService;
  */
 public interface RemoteInfoService extends BaseService<RemoteInfo,Integer> {
     RemoteInfo findByEquipId(int equipId);
+    RemoteInfo findByIpAndPort(String ip,int port);
 }
