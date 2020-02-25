@@ -9,10 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * T ：Dto
@@ -96,6 +99,15 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
         final Optional<U> idResult=getService().getById(currentId);
         return doResponse(idResult, "获取成功", "获取失败");
     }
+
+    protected ResponseResult handleBindingResult(BindingResult result) {
+        String field=result.getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("|"));
+        return ResponseResult.forFailureBuilder()
+                .withMessage(field).build();
+    }
+
 
     /**
      * 执行一些 在 save 之后的一些操作

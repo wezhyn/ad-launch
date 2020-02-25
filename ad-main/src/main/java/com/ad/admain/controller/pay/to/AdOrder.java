@@ -3,13 +3,20 @@ package com.ad.admain.controller.pay.to;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 /**
@@ -18,92 +25,101 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper=true)
 @DynamicUpdate
+@DynamicInsert
 @NoArgsConstructor
 @Entity(name="ad_order")
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
 @Accessors(chain=true)
-public class AdOrder extends Order {
+public class AdOrder extends Order implements IProduce {
 
 
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-    private List<Value> valueList;
+    @OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    private AdProduce produce;
 
     /**
      * 订单状态，订单被更新时，需要更新该属性
      */
     @StrategyEnum(value=EnumType.NUMBER)
     @Type(type="strategyEnum")
+    @ColumnDefault("'0'")
     private OrderStatus orderStatus;
-
-    /**
-     * 要求广告投放到车上的数量
-     */
-    private Integer deliverNum;
-
-    /**
-     * 订单单价
-     */
-    private Double price;
-
-    /**
-     * 订单数量
-     */
-    private Integer num;
-
-    private Double latitude;
-
-    private Double longitude;
-
-
-    /**
-     * 广告投放范围
-     */
-
-    private Double scope;
-
-    /**
-     * 广告投放频率
-     */
-    private Integer rate;
 
 
     @OneToMany(mappedBy="order", targetEntity=JobEntity.class)
     private List<JobEntity> jobEntities;
 
-    /**
-     * 投放时间，忽略date
-     */
-    @Column(nullable=false)
-    private LocalDateTime startTime;
-    @Column(nullable=false)
-    private LocalDateTime endTime;
-    /**
-     * 开始日期：忽略 time
-     */
-    @Column(nullable=false)
-    private LocalDateTime startDate;
-    @Column(nullable=false)
-    private LocalDateTime endDate;
 
+    /**
+     * 创建订单时使用
+     *
+     * @param uid     用户id
+     * @param produce 广告
+     */
+    public AdOrder(Integer uid, AdProduce produce) {
+        super(uid, produce.getPrice()*produce.getNum(), OrderVerify.WAIT_VERITY);
+        Assert.notNull(produce, "广告内容为空，不允许的操作");
+        this.produce=produce;
+    }
 
     @Override
-    public String toString() {
-        return "AdOrder{" +
-                "valueList=" + valueList +
-                ", deliverNum=" + deliverNum +
-                ", price=" + price +
-                ", num=" + num +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", scope=" + scope +
-                ", rate=" + rate +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate +
-                '}';
+    public List<String> getProduceContext() {
+        return produce.getProduceContext();
     }
+
+    @Override
+    public Integer getDeliverNum() {
+        return produce.getDeliverNum();
+    }
+
+    @Override
+    public Double getPrice() {
+        return this.produce.getPrice();
+    }
+
+    @Override
+    public Integer getNum() {
+        return produce.getNum();
+    }
+
+    @Override
+    public Double getLatitude() {
+        return produce.getLatitude();
+    }
+
+    @Override
+    public Double getLongitude() {
+        return produce.getLongitude();
+    }
+
+    @Override
+    public Double getScope() {
+        return produce.getScope();
+    }
+
+    @Override
+    public Integer getRate() {
+        return produce.getRate();
+    }
+
+    @Override
+    public LocalDate getStartDate() {
+        return produce.getStartDate();
+    }
+
+    @Override
+    public LocalDate getEndDate() {
+        return produce.getEndDate();
+    }
+
+    @Override
+    public LocalTime getStartTime() {
+        return produce.getStartTime();
+    }
+
+    @Override
+    public LocalTime getEndTime() {
+        return produce.getEndTime();
+    }
+
 }

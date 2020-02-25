@@ -3,18 +3,14 @@ package com.ad.admain.service.impl;
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
 import com.ad.admain.controller.pay.repository.AdOrderRepository;
-import com.ad.admain.controller.pay.to.*;
+import com.ad.admain.controller.pay.to.Order;
+import com.ad.admain.controller.pay.to.OrderStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -62,18 +58,6 @@ public class AdOrderServiceImplTest {
         }
     }
 
-    @Test
-    public void save() {
-        List<Value> valueList=new ArrayList<>();
-        valueList.add(new Value("1232"));
-        AdOrder order=(AdOrder) new AdOrder()
-                .setValueList(valueList)
-                .setStartTime(LocalDateTime.now())
-                .setUid(1)
-                .setVerify(OrderVerify.WAIT_VERITY);
-        Order order1=orderReposity.save(order);
-        System.out.println(Optional.ofNullable(order1).toString());
-    }
 
     @Test
     public void searchUser() {

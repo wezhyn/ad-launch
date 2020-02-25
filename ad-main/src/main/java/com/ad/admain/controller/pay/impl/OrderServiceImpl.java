@@ -4,10 +4,9 @@ import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
 import com.ad.admain.controller.pay.exception.OrderStatusException;
 import com.ad.admain.controller.pay.repository.AdOrderRepository;
-import com.ad.admain.controller.pay.repository.ValueReposity;
+import com.ad.admain.controller.pay.repository.ProduceRepository;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
-import com.ad.admain.controller.pay.to.Value;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -31,11 +28,11 @@ import java.util.Optional;
 public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> implements AdOrderService {
 
     private static final Page<AdOrder> EMPTY_ORDER_PAGE=new PageImpl<>(Collections.unmodifiableList(Collections.emptyList()));
-    private ValueReposity valueReposity;
+    private ProduceRepository valueReposity;
     private AdOrderRepository adOrderRepository;
 
     @Autowired
-    public OrderServiceImpl(AdOrderRepository adOrderRepository, ValueReposity valueReposity) {
+    public OrderServiceImpl(AdOrderRepository adOrderRepository, ProduceRepository valueReposity) {
         this.adOrderRepository=adOrderRepository;
         this.valueReposity=valueReposity;
     }
@@ -46,18 +43,19 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
-    public AdOrder save(AdOrder object) {
-        Assert.notNull(object.getPrice(), "无单价");
-        Assert.notNull(object.getNum(), "无商品数量");
-        object.setTotalAmount(object.getPrice()*object.getNum());
-        AdOrder order=adOrderRepository.save(object);
-        List<Value> values=order.getValueList();
-        Iterator<Value> iterator=values.iterator();
-        while (iterator.hasNext()) {
-            Value val=iterator.next();
-            valueReposity.save(val);
-        }
-        return order;
+    @Transactional(readOnly=true)
+    public Optional<AdOrder> findUserOrder(Integer orderId, Integer userId) {
+        AdOrder order=new AdOrder();
+        order.setId(orderId);
+        order.setUid(userId);
+        return getRepository().findOne(Example.of(order));
+    }
+
+
+    @Override
+    @Transactional(readOnly=true)
+    public Page<AdOrder> listUserOrders(Integer userId, Pageable pageable) {
+        return getRepository().findAdOrdersByUidOrderByIdDesc(userId, pageable);
     }
 
     @Override

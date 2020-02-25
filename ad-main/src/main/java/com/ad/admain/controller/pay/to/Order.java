@@ -11,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * 包含一些Order 的基本属性，如： id,对应的User，账单金额，订单状态
@@ -38,6 +39,13 @@ public class Order implements IBaseTo<Integer> {
 
 
     private Double totalAmount;
+
+    @Column(name="create_time", columnDefinition="timestamp  null  default current_timestamp")
+    private LocalDateTime createTime;
+
+
+    @Column(name="modify_time", columnDefinition="timestamp  null  default current_timestamp on update current_timestamp")
+    private LocalDateTime modifyTime;
 
 
     /**

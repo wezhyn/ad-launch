@@ -1,6 +1,16 @@
+GET http://{{url}}/api/order/list
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
+Accept: application/json
+
+###
+GET http://{{url}}/api/pay/76
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
+Accept: application/json
+
+###
 POST http://{{url}}/api/order/create
 Content-Type:  application/json
-X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODI1NzQwOTgsImlhdCI6MTU4MjUzODA5OCwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.BZnG7FIXymG_MKuOV6A2yWoFTf5eegga0BYZllyf_P0
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
 
 {
   "endDate": "2020-02-24T09:49:50.184Z",
@@ -10,6 +20,7 @@ X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleH
   "num": 100,
   "price": 1,
   "rate": 5,
+  "vertical": true,
   "scope": 5,
   "startDate": "2020-02-24T09:49:50.184Z",
   "startTime": "2020-02-23T16:00:00.000Z",

@@ -1,7 +1,9 @@
 package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderVerify;
+import com.ad.admain.controller.pay.to.PayType;
 import com.ad.admain.controller.pay.to.TransferOrder;
 import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.pay.WithDrawNotification;
@@ -9,18 +11,20 @@ import com.ad.admain.pay.exception.WithdrawException;
 import com.ad.admain.security.AdAuthentication;
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
+import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.Participant;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author wezhyn
@@ -32,6 +36,24 @@ public class PayController {
 
     @Autowired
     private GenericUserService userService;
+
+    private static final Function<AdOrder, AlipayTradeAppPayModel> ORDER_ALIPAY_MAPPER=o->{
+        AlipayTradeAppPayModel model=new AlipayTradeAppPayModel();
+        String body=o.getProduceContext().stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(","));
+        model.setBody(body);
+        model.setSubject("ad-order-" + o.getId() + o.getLatitude() + ":" + o.getLongitude());
+        model.setTotalAmount(String.valueOf(o.getPrice()*o.getNum()));
+        model.setOutTradeNo(String.valueOf(o.getId()));
+        model.setProductCode("QUICK_MSECURITY_PAY");
+        return model;
+    };
+    @Autowired
+    private BillInfoService billInfoService;
+    @Autowired
+    private AdOrderService orderService;
+
 
     private static final Function<TransferOrder, AlipayFundTransUniTransferModel> TRANSFER_MODEL_MAPPER=o->{
         AlipayFundTransUniTransferModel model=new AlipayFundTransUniTransferModel();
@@ -48,6 +70,26 @@ public class PayController {
         model.setRemark(o.getRemark());
         return model;
     };
+
+    @RequestMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseResult payOrder(
+            @PathVariable(name="id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
+        final Optional<AdOrder> userOrder=orderService.findUserOrder(orderId, authentication.getId());
+        return userOrder.map(o->{
+            billInfoService.createOrder(o, PayType.ALI_PAY);
+            final String sign=AliPayHolder.signZfb(o, ORDER_ALIPAY_MAPPER);
+            return ResponseResult.forSuccessBuilder()
+                    .withMessage("请支付")
+                    .withData("sign", sign)
+                    .build();
+        }).orElseGet(()->{
+            return ResponseResult.forFailureBuilder()
+                    .withMessage("订单不存在")
+                    .build();
+        });
+    }
+
 
     @PostMapping("/withdraw")
     public ResponseResult withdraw(@RequestBody JSONObject object, @AuthenticationPrincipal AdAuthentication authentication) throws WithdrawException {

@@ -13,7 +13,7 @@ import org.mapstruct.TargetType;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Mapper(componentModel="spring")
-class StringEnumMapper {
+public class StringEnumMapper {
 
     /**
      * 用于在 {@link StringEnum} 与 {@link String}

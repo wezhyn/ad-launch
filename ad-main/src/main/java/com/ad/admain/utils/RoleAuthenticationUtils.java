@@ -111,7 +111,7 @@ public final class RoleAuthenticationUtils {
      * @param grantedAuthority ROLE_XXX
      * @return XXX
      */
-    private static AuthenticationEnum grantedAuthority2AuthenticationEnum(String grantedAuthority) {
+    public static AuthenticationEnum grantedAuthority2AuthenticationEnum(String grantedAuthority) {
         if (grantedAuthority.startsWith(ROLE_PREFIX)) {
             String role=grantedAuthority.substring(ROLE_PREFIX.length());
             return EnumUtils.valueOfStringEnumIgnoreCase(AuthenticationEnum.class, role);

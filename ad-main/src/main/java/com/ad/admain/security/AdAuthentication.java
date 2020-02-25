@@ -1,5 +1,7 @@
 package com.ad.admain.security;
 
+import com.ad.admain.controller.account.AuthenticationEnum;
+import com.ad.admain.utils.RoleAuthenticationUtils;
 import com.wezhyn.project.utils.StringUtils;
 import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,5 +60,17 @@ public class AdAuthentication extends UsernamePasswordAuthenticationToken {
             return ((AdIdPrincipal) getPrincipal()).getId();
         }
         throw new RuntimeException("不支持的操作");
+    }
+
+    public boolean isAdmin() {
+        if (!isAuthenticated() || getAuthorities()==null || getAuthorities().size()==0) {
+            return false;
+        }
+        for (GrantedAuthority authority : getAuthorities()) {
+            if (RoleAuthenticationUtils.grantedAuthority2AuthenticationEnum(authority.getAuthority()).getNumber() > AuthenticationEnum.ADMIN.getNumber()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

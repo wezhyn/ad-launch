@@ -5,15 +5,14 @@ import com.ad.admain.controller.quartz.dto.ModifyCronDTO;
 import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.ad.admain.controller.quartz.service.DynamicJobService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.*;
 import org.quartz.Scheduler;
+import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.Set;
@@ -39,7 +38,7 @@ public class QuartzController {
     private JobEntityRepository repository;
 
     //初始化启动所有的Job，容器内依赖注入完成后便启动
-    @PostConstruct
+//    @PostConstruct
     public void initialize() {
         try {
             startJobPerFiveMins();

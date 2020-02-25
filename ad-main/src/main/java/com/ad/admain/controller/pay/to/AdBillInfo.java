@@ -2,10 +2,10 @@ package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.TradeStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,11 +17,11 @@ import java.time.LocalDateTime;
  * @author wezhyn
  * @since 12.01.2019
  */
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper=true)
 @NoArgsConstructor
+@Data
+@DynamicInsert
 @Entity(name="ad_bill_info")
-@Getter
-@Setter
 @Table(indexes={
         @Index(name="bill_info_id_total_amount", columnList="gmtPayment,tradeStatus,totalAmount")
 })

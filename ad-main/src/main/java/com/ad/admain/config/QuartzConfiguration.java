@@ -7,7 +7,6 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
@@ -24,7 +23,7 @@ import java.util.Properties;
  * @Date 2020/1/25 18:04
  * @Version 1.0
  */
-@Configuration
+//@Configuration
 public class QuartzConfiguration {
 
 

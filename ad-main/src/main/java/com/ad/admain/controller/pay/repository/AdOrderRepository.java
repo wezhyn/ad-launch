@@ -2,6 +2,8 @@ package com.ad.admain.controller.pay.repository;
 
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +28,14 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
     @Modifying
     @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.orderStatus=:originStatus")
     Integer updateOrderStatus(Integer orderId, OrderStatus originStatus, OrderStatus nextStatus);
+
+
+    /**
+     * 查找某个用户的最近订单列表
+     *
+     * @param uId      userId
+     * @param pageable page
+     * @return page
+     */
+    Page<AdOrder> findAdOrdersByUidOrderByIdDesc(Integer uId, Pageable pageable);
 }

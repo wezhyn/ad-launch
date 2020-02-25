@@ -1,33 +1,24 @@
 package com.ad.admain.controller.pay.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Accessors(chain=true)
+/**
+ * 商品内容
+ *
+ * @author : zlb
+ * @date : 2019/12/31
+ */
 @Data
-@AllArgsConstructor
 @Builder
-@NoArgsConstructor
-public class OrderDto {
+public class AdProduceDto {
 
-    private int id;
-
-
-    private int uid;
-
-    /**
-     * 代客服审核
-     */
-    private String verify;
-
-    private int produceId;
+    Integer id;
 
     /**
      * 广告内容, 前端返回 List<String>
@@ -76,6 +67,5 @@ public class OrderDto {
     private String endDate;
     private String startTime;
     private String endTime;
-
 
 }

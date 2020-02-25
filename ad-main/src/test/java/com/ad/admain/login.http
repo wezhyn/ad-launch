@@ -2,8 +2,8 @@ POST http://{{url}}/api/user/login
 Content-Type: application/json
 
 {
-  "username": "zhaoo",
-  "password": "zhaoo"
+  "username": "wezhyn",
+  "password": "wezhyn"
 }
 
 
