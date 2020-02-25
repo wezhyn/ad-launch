@@ -10,9 +10,7 @@ import io.netty.util.ResourceLeakDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 /**
@@ -24,7 +22,6 @@ import javax.annotation.PreDestroy;
  * @Version 1.0
  */
 @Slf4j
-@Component
 public class NettyTcpServer {
     @Value("${netty.server.address}")
     private String address;
@@ -43,7 +40,6 @@ public class NettyTcpServer {
      *
      * @throws InterruptedException
      */
-    @PostConstruct
     public void start() throws InterruptedException {
 
 

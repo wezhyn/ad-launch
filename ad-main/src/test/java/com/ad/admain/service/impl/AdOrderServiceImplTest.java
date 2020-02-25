@@ -3,10 +3,7 @@ package com.ad.admain.service.impl;
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
 import com.ad.admain.controller.pay.repository.AdOrderRepository;
-import com.ad.admain.controller.pay.to.AdOrder;
-import com.ad.admain.controller.pay.to.Order;
-import com.ad.admain.controller.pay.to.OrderVerify;
-import com.ad.admain.controller.pay.to.Value;
+import com.ad.admain.controller.pay.to.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,32 @@ public class AdOrderServiceImplTest {
     public void get() {
         Order order=orderReposity.findById(60).get();
         System.out.println(order);
+    }
+
+
+    @Test
+    public void modifyStatus() {
+
+        try {
+            orderService.modifyOrderStatus(75, OrderStatus.SUCCESS_PAYMENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            orderService.modifyOrderStatus(75, OrderStatus.REFUNDED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            orderService.modifyOrderStatus(75, OrderStatus.CANCEL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            orderService.modifyOrderStatus(75, OrderStatus.REFUNDING);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

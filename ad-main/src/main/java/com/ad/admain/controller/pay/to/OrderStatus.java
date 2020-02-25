@@ -12,10 +12,16 @@ public enum OrderStatus implements NumberEnum {
 
     /**
      * 订单状态,具体修改状态见 {@link com.ad.admain.controller.pay.impl.OrderServiceImpl#modifyOrderStatus}
+     * 三种完成状态：
+     * 等待付款-> 取消
+     * 等待付款 -> 付款成功 -> 退款
+     * 等待付款 -> 付款成功 -> 执行中 -> 退款 (部分退款)
+     * 等待付款 -> 付款成功 -> 执行完成
      */
-    WAITING_PAYMENT(0),
+    CANCEL(-10),
     REFUNDING(-3),
     REFUNDED(-2),
+    WAITING_PAYMENT(0),
     SUCCESS_PAYMENT(1),
     WAITING_EXECUTION(2),
     EXECUTING(3),

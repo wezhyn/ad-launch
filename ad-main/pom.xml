@@ -23,6 +23,14 @@
             <groupId>com.wezhyn.project</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <!--在pom.xml中添加依赖-->
+        <!--
+                <dependency>
+                    <groupId>org.apache.rocketmq</groupId>
+                    <artifactId>rocketmq-spring-boot-starter</artifactId>
+                    <version>2.1.0</version>
+                </dependency>
+        -->
 
         <!--        &lt;!&ndash;        通信&ndash;&gt;
                 <dependency>

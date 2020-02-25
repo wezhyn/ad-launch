@@ -1,9 +1,12 @@
 package com.ad.admain.controller.pay.to;
 
 import com.ad.admain.controller.quartz.entity.JobEntity;
+import com.wezhyn.project.annotation.StrategyEnum;
+import com.wezhyn.project.database.EnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +34,8 @@ public class AdOrder extends Order {
     /**
      * 订单状态，订单被更新时，需要更新该属性
      */
+    @StrategyEnum(value=EnumType.NUMBER)
+    @Type(type="strategyEnum")
     private OrderStatus orderStatus;
 
     /**

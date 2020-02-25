@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
@@ -60,6 +61,7 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public void modifyOrderStatus(Integer orderId, OrderStatus orderStatus) {
         final AdOrder one=getRepository().getOne(orderId);
         Assert.notNull(one, "无目标订单");
@@ -68,25 +70,33 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         if (orderStatus.getNumber()==currentStatus.getNumber() + 1) {
 //            正常升级
             nextStatus=orderStatus;
-        } else if (orderStatus.getNumber() <= 0) {
+        } else if (orderStatus.getNumber() < 0) {
             switch (orderStatus) {
-                case REFUNDED:
-                    throw new OrderStatusException("订单已经是退款完毕状态");
-                case WAITING_PAYMENT:
-                    throw new OrderStatusException("无法设置等待支付状态");
+                case CANCEL: {
+                    if (currentStatus!=OrderStatus.WAITING_PAYMENT) {
+                        throw new OrderStatusException("订单已经成功付款，无法取消");
+                    }
+                    nextStatus=OrderStatus.WAITING_PAYMENT;
+                    break;
+                }
                 case REFUNDING: {
-
+                    if (currentStatus.getNumber() > 0 && currentStatus.getNumber() < OrderStatus.EXECUTION_COMPLETED.getNumber()) {
+                        nextStatus=OrderStatus.REFUNDING;
+                    }
                     break;
                 }
                 default: {
-                    throw new OrderStatusException("无该状态判断");
+                    break;
                 }
             }
 
-        } else {
-            throw new OrderStatusException("无法越级更新");
         }
-
+        if (orderStatus==currentStatus) {
+        } else if (nextStatus==null) {
+            throw new OrderStatusException("无法越级更新订单状态");
+        } else {
+            getRepository().updateOrderStatus(orderId, currentStatus, nextStatus);
+        }
     }
 
     @Override
