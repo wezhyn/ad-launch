@@ -1,6 +1,7 @@
 package com.ad.admain.controller.pay.to;
 
 import com.wezhyn.project.NumberEnum;
+import com.wezhyn.project.StringEnum;
 import lombok.AllArgsConstructor;
 
 /**
@@ -8,7 +9,7 @@ import lombok.AllArgsConstructor;
  * @since 02.24.2020
  */
 @AllArgsConstructor
-public enum OrderStatus implements NumberEnum {
+public enum OrderStatus implements NumberEnum, StringEnum {
 
     /**
      * 订单状态,具体修改状态见 {@link com.ad.admain.controller.pay.impl.OrderServiceImpl#modifyOrderStatus}
@@ -32,5 +33,10 @@ public enum OrderStatus implements NumberEnum {
     @Override
     public Integer getNumber() {
         return orderCode;
+    }
+
+    @Override
+    public String getValue() {
+        return name().toLowerCase();
     }
 }

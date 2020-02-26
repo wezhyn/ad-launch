@@ -1,6 +1,6 @@
 package com.ad.admain.controller.pay.dto;
 
-import com.ad.admain.controller.pay.TradeStatus;
+import com.ad.admain.pay.TradeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

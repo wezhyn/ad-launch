@@ -52,8 +52,8 @@ custom:
       - /api/error
       - /api/test
     check-header: X-Token
-    default-hours: 10
-    remember-me-day: 1
+    default-hours: 360
+    remember-me-day: 360
     login-interception-include:
       user: /api/user/login
       admin: /api/admin/login

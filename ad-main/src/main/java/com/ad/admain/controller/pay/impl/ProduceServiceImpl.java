@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @date : 2019/12/31
  */
 @Service
-public class ValueServiceImpl extends AbstractBaseService<AdProduce, Integer> implements ProduceService {
+public class ProduceServiceImpl extends AbstractBaseService<AdProduce, Integer> implements ProduceService {
 
     @Autowired
     private ProduceRepository valueReposity;

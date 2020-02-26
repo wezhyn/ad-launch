@@ -28,13 +28,13 @@ import java.util.Optional;
 public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> implements AdOrderService {
 
     private static final Page<AdOrder> EMPTY_ORDER_PAGE=new PageImpl<>(Collections.unmodifiableList(Collections.emptyList()));
-    private ProduceRepository valueReposity;
+    private ProduceRepository produceRepository;
     private AdOrderRepository adOrderRepository;
 
     @Autowired
-    public OrderServiceImpl(AdOrderRepository adOrderRepository, ProduceRepository valueReposity) {
+    public OrderServiceImpl(AdOrderRepository adOrderRepository, ProduceRepository produceRepository) {
         this.adOrderRepository=adOrderRepository;
-        this.valueReposity=valueReposity;
+        this.produceRepository=produceRepository;
     }
 
     @Override

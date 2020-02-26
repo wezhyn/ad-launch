@@ -28,6 +28,7 @@ public class OrderDto {
     private String verify;
 
     private int produceId;
+    private long tradeOut;
 
     /**
      * 广告内容, 前端返回 List<String>
@@ -59,6 +60,7 @@ public class OrderDto {
 
     private boolean vertical;
 
+    private String orderStatus;
 
     /**
      * 广告投放范围
@@ -76,6 +78,8 @@ public class OrderDto {
     private String endDate;
     private String startTime;
     private String endTime;
+
+    private String createTime;
 
 
 }

@@ -1,8 +1,8 @@
 package com.ad.admain.controller.pay.repository;
 
-import com.ad.admain.controller.pay.TradeStatus;
 import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.controller.pay.to.PayType;
+import com.ad.admain.pay.TradeStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

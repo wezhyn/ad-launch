@@ -1,6 +1,6 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.pay.TradeStatus;
+import com.ad.admain.pay.TradeStatus;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import lombok.AllArgsConstructor;

@@ -1,5 +1,6 @@
 package com.ad.admain.controller.pay;
 
+import com.ad.admain.pay.TradeStatus;
 import org.junit.Test;
 
 /**

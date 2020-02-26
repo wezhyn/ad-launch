@@ -2,7 +2,7 @@ package com.ad.admain.controller.dashboard.repository;
 
 import com.ad.admain.controller.dashboard.BillAggregation;
 import com.ad.admain.controller.dashboard.DateType;
-import com.ad.admain.controller.pay.TradeStatus;
+import com.ad.admain.pay.TradeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

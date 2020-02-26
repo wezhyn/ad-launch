@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 /**
  * @author : lb
@@ -66,6 +67,12 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         return ResponseResult.forFailureBuilder()
                 .withMessage("系统异常")
                 .build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseResult userId(@PathVariable Integer id, @AuthenticationPrincipal AdAuthentication adAuthentication) {
+        final Optional<AdOrder> userOrder=getService().findUserOrder(id, adAuthentication.getId());
+        return doResponse(userOrder, "获取订单成功", "用户无该订单");
     }
 
     @GetMapping("/list")

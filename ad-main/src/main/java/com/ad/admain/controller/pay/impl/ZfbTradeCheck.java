@@ -2,10 +2,10 @@ package com.ad.admain.controller.pay.impl;
 
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoService;
-import com.ad.admain.controller.pay.TradeStatus;
-import com.ad.admain.controller.pay.repository.BillInfoRepository;
 import com.ad.admain.controller.pay.to.AdBillInfo;
+import com.ad.admain.controller.pay.to.OrderStatus;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
+import com.ad.admain.pay.TradeStatus;
 import com.ad.admain.pay.ZfbTradeI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,10 +25,7 @@ public class ZfbTradeCheck implements ZfbTradeI {
     private BillInfoService orderInfoService;
 
     @Autowired
-    private BillInfoRepository orderInfoRepository;
-
-    @Autowired
-    private AdOrderService adOrderService;
+    private AdOrderService orderService;
 
     @Override
     @Transactional(rollbackFor=Exception.class)
@@ -38,7 +35,7 @@ public class ZfbTradeCheck implements ZfbTradeI {
         if (tradeId <= 0) {
             return TradeStatus.TRADE_CANCEL_OTHER;
         }
-        Optional<AdBillInfo> orderInfo=orderInfoRepository.findByOrderId(tradeId);
+        Optional<AdBillInfo> orderInfo=orderInfoService.getByOrderId(tradeId);
         return orderInfo.map(o->{
             Double savedAmount=o.getTotalAmount();
             TradeStatus savedStatus=o.getTradeStatus();
@@ -52,7 +49,9 @@ public class ZfbTradeCheck implements ZfbTradeI {
     @Transactional(rollbackFor=Exception.class)
     public boolean successNotificationAware(AlipayAsyncNotificationGetterI alipayAsyncNotification) {
         int tradeId=Integer.parseInt(alipayAsyncNotification.getOutTradeNo());
-        Optional<AdBillInfo> savedOrderInfo=orderInfoRepository.findByOrderId(tradeId);
+//        修改订单状态并附加账单信息
+        orderService.modifyOrderStatus(tradeId, OrderStatus.SUCCESS_PAYMENT);
+        Optional<AdBillInfo> savedOrderInfo=orderInfoService.getByOrderId(tradeId);
         if (savedOrderInfo.isPresent()) {
             AdBillInfo oInfo=savedOrderInfo.get();
             oInfo.setTradeStatus(TradeStatus.TRADE_SUCCESS);

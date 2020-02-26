@@ -12,6 +12,7 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 包含一些Order 的基本属性，如： id,对应的User，账单金额，订单状态
@@ -40,6 +41,9 @@ public class Order implements IBaseTo<Integer> {
 
     private Double totalAmount;
 
+
+    private Long tradeOut;
+
     @Column(name="create_time", columnDefinition="timestamp  null  default current_timestamp")
     private LocalDateTime createTime;
 
@@ -67,5 +71,10 @@ public class Order implements IBaseTo<Integer> {
         this.uid=uid;
         this.totalAmount=totalAmount;
         this.verify=verify;
+        this.tradeOut=uniqueId();
+    }
+
+    protected Long uniqueId() {
+        return System.currentTimeMillis() + Thread.currentThread().getId() + ThreadLocalRandom.current().nextInt(10);
     }
 }

@@ -1,6 +1,5 @@
 package com.ad.admain.pay;
 
-import com.ad.admain.controller.pay.TradeStatus;
 import org.junit.Test;
 
 import java.time.LocalDateTime;

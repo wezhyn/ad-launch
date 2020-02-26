@@ -1,7 +1,5 @@
 package com.ad.admain.pay;
 
-import com.ad.admain.controller.pay.TradeStatus;
-
 import java.util.Objects;
 
 /**
@@ -58,7 +56,12 @@ public class ZfbTradeResolver {
         } else if (tradeStatus==TradeStatus.TRADE_CANCEL_OTHER) {
             return false;
         }
-        return zfbTrade.successNotificationAware(alipayAsyncNotification);
+        try {
+            return zfbTrade.successNotificationAware(alipayAsyncNotification);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 

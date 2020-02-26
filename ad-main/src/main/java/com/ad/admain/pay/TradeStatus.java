@@ -1,4 +1,4 @@
-package com.ad.admain.controller.pay;
+package com.ad.admain.pay;
 
 import com.wezhyn.project.NumberEnum;
 import com.wezhyn.project.StringEnum;

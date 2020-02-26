@@ -1,10 +1,7 @@
 package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.pay.dto.AppTradeNotification;
-import com.ad.admain.pay.AliPayHolder;
-import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
-import com.ad.admain.pay.ZfbTradeI;
-import com.ad.admain.pay.ZfbTradeResolver;
+import com.ad.admain.pay.*;
 import com.wezhyn.project.AbstractBaseMapAdapterModel;
 import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.utils.EnumUtils;

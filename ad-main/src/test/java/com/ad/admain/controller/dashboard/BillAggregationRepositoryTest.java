@@ -1,7 +1,7 @@
 package com.ad.admain.controller.dashboard;
 
 import com.ad.admain.controller.dashboard.repository.BillAggregationRepository;
-import com.ad.admain.controller.pay.TradeStatus;
+import com.ad.admain.pay.TradeStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

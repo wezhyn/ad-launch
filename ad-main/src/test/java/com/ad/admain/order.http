@@ -3,7 +3,7 @@ X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZX
 Accept: application/json
 
 ###
-GET http://{{url}}/api/pay/76
+GET http://{{url}}/api/order/76
 X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
 Accept: application/json
 
