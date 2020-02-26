@@ -24,7 +24,7 @@ public interface AbstractMapper<SOURCE, TARGET> {
      *
      * @param source mysql端对象
      * @return 前端对象
-     */
+*/
     TARGET toDto(SOURCE source);
 
     /**
