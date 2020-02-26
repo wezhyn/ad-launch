@@ -45,7 +45,7 @@ public class OrderDto {
      * 订单单价
      */
     @NotNull
-    private Double price;
+    private Double totalAmount;
 
     /**
      * 订单数量
