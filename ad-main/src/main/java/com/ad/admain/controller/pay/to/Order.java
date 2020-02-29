@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @MappedSuperclass
 @Setter
 @Getter
-public class Order implements IBaseTo<Integer> {
+public class Order implements IBaseTo<Integer>, ITradeInfo {
 
     @Id
     @Column(name="id")
@@ -51,6 +51,12 @@ public class Order implements IBaseTo<Integer> {
     @Column(name="modify_time", columnDefinition="timestamp  null  default current_timestamp on update current_timestamp")
     private LocalDateTime modifyTime;
 
+    /**
+     * 标识该订单是否为用户已经删除，不显示
+     */
+    @Column(name="order_delete", columnDefinition="bit(1) null default 0")
+    private Boolean isDelete;
+
 
     /**
      * 代客服审核
@@ -65,6 +71,7 @@ public class Order implements IBaseTo<Integer> {
     private OrderVerify verify;
 
     public Order() {
+        isDelete=false;
     }
 
     public Order(Integer uid, Double totalAmount, OrderVerify verify) {
@@ -72,9 +79,15 @@ public class Order implements IBaseTo<Integer> {
         this.totalAmount=totalAmount;
         this.verify=verify;
         this.tradeOut=uniqueId();
+        isDelete=false;
     }
 
     protected Long uniqueId() {
         return System.currentTimeMillis() + Thread.currentThread().getId() + ThreadLocalRandom.current().nextInt(10);
+    }
+
+    @Override
+    public Integer getTradeNo() {
+        return id;
     }
 }

@@ -1,5 +1,6 @@
 package com.ad.admain.pay;
 
+import com.ad.admain.pay.exception.RefundException;
 import com.ad.admain.pay.exception.WithdrawException;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -7,11 +8,14 @@ import com.alipay.api.CertAlipayRequest;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -143,4 +147,16 @@ public final class AliPayHolder {
 
     }
 
+    public static <T, R extends AlipayTradeRefundModel> RefundNotification refundAmount(T order, Function<T, R> orderMapper) throws RefundException {
+        final R model=orderMapper.apply(order);
+        AlipayTradeRefundRequest request=new AlipayTradeRefundRequest();
+        request.setBizModel(model);
+        try {
+            AlipayTradeRefundResponse response=ALI_PAY_CLIENT.certificateExecute(request);
+            return new RefundResponse(response);
+        } catch (AlipayApiException e) {
+            throw new RefundException(e);
+        }
+
+    }
 }

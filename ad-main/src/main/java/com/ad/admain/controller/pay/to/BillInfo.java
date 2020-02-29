@@ -1,24 +1,22 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.pay.TradeStatus;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
+ *
  * @author wezhyn
  * @since 02.24.2020
  */
 @MappedSuperclass
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class BillInfo implements IBaseTo<Integer> {
 
 
@@ -33,9 +31,6 @@ public class BillInfo implements IBaseTo<Integer> {
     private Integer orderId;
 
 
-    @Enumerated(value=EnumType.STRING)
-    private TradeStatus tradeStatus;
-
     private Double totalAmount;
 
     @Type(type="strategyEnum")
@@ -43,6 +38,8 @@ public class BillInfo implements IBaseTo<Integer> {
     @Column(nullable=false, name="pay_type", columnDefinition="smallint comment '0：Alipay,1:Wechat' ")
     private PayType payType;
 
+    @Column(name="bill_delete", columnDefinition="bit(1) default 0")
+    Boolean delete;
 
     /**
      * 常用回调字段
@@ -54,4 +51,7 @@ public class BillInfo implements IBaseTo<Integer> {
     private String buyerId;
     private String sellerId;
 
+    public BillInfo() {
+        delete=false;
+    }
 }

@@ -1,72 +1,74 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.account.entity.IUser;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 /**
+ * 非 Order
+ *
  * @author wezhyn
  * @since 02.24.2020
  */
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Entity(name = "Refund_order")
+@Setter
 public class RefundOrder extends Order {
-
+    /**
+     * 支付宝交易号
+     * 通过 AdBillInfo获取
+     */
+//    @Column(name="trade_no")
+    private String outTradeNo;
 
     /**
      * 广告订单编号
      */
-    @Column(name = "ad_order_id")
     private Integer adOrderId;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ad_order_id",insertable = false,updatable = false)
+/*
+    @OneToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name="ad_order_id", insertable=false, updatable=false)
     private AdOrder adOrder;
-
-    /**
-     * 支付宝交易号
-     */
-    @Column(name = "trade_no")
-    private String tradeNo;
+*/
     /**
      * 订单退款币种信息
      */
-    @Column(name = "refund_currency")
+//    @Column(name="refund_currency")
     private String refundCurrency;
     /**
      * 退款的原因
+     * 前台获取
      */
-    @Column(name = "refund_reason")
+//    @Column(name="refund_reason")
     private String refundReason;
-
     /**
      * 商户的操作员编号
      */
-    @Column(name = "operator_id")
+//    @Column(name="operator_id")
     private String operatorId;
+
+    public RefundOrder(Integer uid, Double totalAmount, OrderVerify verify) {
+        super(uid, totalAmount, verify);
+    }
+
+    public static RefundOrderBuilder createRefundOrder(Integer uid, Double refundAmount, String refundReason) {
+        return new RefundOrderBuilder().uid(uid).totalAmount(refundAmount).refundReason(refundReason)
+                .verify(OrderVerify.PASSING_VERIFY)
+                ;
+    }
 
 
     public static final class RefundOrderBuilder {
         private Integer adOrderId;
-        private AdOrder adOrder;
-        private String tradeNo;
+        private String outTradeNo;
         private Integer id;
         private String refundCurrency;
-        private GenericUser orderUser;
         private Integer uid;
-        private String refundReason;
         private Double totalAmount;
+        private String refundReason;
+        private Long tradeOut;
         private String operatorId;
-        private LocalDateTime createTime;
-        private LocalDateTime modifyTime;
         private OrderVerify verify;
 
         private RefundOrderBuilder() {
@@ -76,80 +78,66 @@ public class RefundOrder extends Order {
             return new RefundOrderBuilder();
         }
 
-        public RefundOrderBuilder withAdOrderId(Integer adOrderId) {
-            this.adOrderId = adOrderId;
+        public RefundOrderBuilder adOrderId(Integer adOrderId) {
+            this.adOrderId=adOrderId;
             return this;
         }
 
-        public RefundOrderBuilder withAdOrder(AdOrder adOrder) {
-            this.adOrder = adOrder;
+        public RefundOrderBuilder outTradeNo(String outTradeNo) {
+            this.outTradeNo=outTradeNo;
             return this;
         }
 
-        public RefundOrderBuilder withTradeNo(String tradeNo) {
-            this.tradeNo = tradeNo;
+        public RefundOrderBuilder id(Integer id) {
+            this.id=id;
             return this;
         }
 
-        public RefundOrderBuilder withId(Integer id) {
-            this.id = id;
+        public RefundOrderBuilder refundCurrency(String refundCurrency) {
+            this.refundCurrency=refundCurrency;
             return this;
         }
 
-        public RefundOrderBuilder withRefundCurrency(String refundCurrency) {
-            this.refundCurrency = refundCurrency;
+
+        public RefundOrderBuilder uid(Integer uid) {
+            this.uid=uid;
             return this;
         }
 
-        public RefundOrderBuilder withOrderUser(GenericUser orderUser) {
-            this.orderUser = orderUser;
+        public RefundOrderBuilder totalAmount(Double totalAmount) {
+            this.totalAmount=totalAmount;
             return this;
         }
 
-        public RefundOrderBuilder withUid(Integer uid) {
-            this.uid = uid;
+        public RefundOrderBuilder refundReason(String refundReason) {
+            this.refundReason=refundReason;
             return this;
         }
 
-        public RefundOrderBuilder withRefundReason(String refundReason) {
-            this.refundReason = refundReason;
+        public RefundOrderBuilder tradeOut(Long tradeOut) {
+            this.tradeOut=tradeOut;
             return this;
         }
 
-        public RefundOrderBuilder withTotalAmount(Double totalAmount) {
-            this.totalAmount = totalAmount;
+        public RefundOrderBuilder operatorId(String operatorId) {
+            this.operatorId=operatorId;
             return this;
         }
 
-        public RefundOrderBuilder withOperatorId(String operatorId) {
-            this.operatorId = operatorId;
-            return this;
-        }
-
-        public RefundOrderBuilder withCreateTime(LocalDateTime createTime) {
-            this.createTime = createTime;
-            return this;
-        }
-
-        public RefundOrderBuilder withModifyTime(LocalDateTime modifyTime) {
-            this.modifyTime = modifyTime;
-            return this;
-        }
-
-        public RefundOrderBuilder withVerify(OrderVerify verify) {
-            this.verify = verify;
+        public RefundOrderBuilder verify(OrderVerify verify) {
+            this.verify=verify;
             return this;
         }
 
         public RefundOrder build() {
-            RefundOrder refundOrder = new RefundOrder(adOrderId, adOrder, tradeNo, refundCurrency, refundReason, operatorId);
+            RefundOrder refundOrder=new RefundOrder(uid, totalAmount, verify);
+            refundOrder.setAdOrderId(adOrderId);
+            refundOrder.setOutTradeNo(outTradeNo);
+            refundOrder.setRefundCurrency(refundCurrency);
+            refundOrder.setRefundReason(refundReason);
+            refundOrder.setOperatorId(operatorId);
             refundOrder.setId(id);
-            refundOrder.setOrderUser(orderUser);
-            refundOrder.setUid(uid);
-            refundOrder.setTotalAmount(totalAmount);
-            refundOrder.setCreateTime(createTime);
-            refundOrder.setModifyTime(modifyTime);
-            refundOrder.setVerify(verify);
+            refundOrder.setTradeOut(tradeOut);
             return refundOrder;
         }
     }

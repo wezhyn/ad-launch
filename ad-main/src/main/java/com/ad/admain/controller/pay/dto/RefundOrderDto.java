@@ -1,6 +1,5 @@
 package com.ad.admain.controller.pay.dto;
 
-import com.wezhyn.project.IBaseTo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
+ * 退款：但每个订单只退款一次
+ *
  * @ClassName RefundDto
  * @Description TODO
  * @Param
@@ -20,11 +21,16 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class RefundOrderDto extends OrderDto{
+public class RefundOrderDto {
+
+
+    private int id;
+
     /**
      * 广告订单编号
      */
     private Integer adOrderId;
+
     /**
      * 支付宝交易号
      */
@@ -37,6 +43,8 @@ public class RefundOrderDto extends OrderDto{
      * 退款的原因
      */
     private String refundReason;
+
+    private Double refundAmount;
 
     /**
      * 商户的操作员编号

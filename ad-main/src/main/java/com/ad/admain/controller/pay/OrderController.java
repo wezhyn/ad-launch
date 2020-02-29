@@ -2,6 +2,8 @@ package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.equipment.dto.EquipmentDto;
+import com.ad.admain.controller.pay.convert.AdOrderMapper;
+import com.ad.admain.controller.pay.convert.ProduceMapper;
 import com.ad.admain.controller.pay.dto.AdProduceDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
@@ -11,6 +13,7 @@ import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -69,6 +72,18 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
                 .build();
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseResult deleteOrder(
+            @PathVariable(name="id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
+        if (!orderService.isUserOrder(orderId, authentication.getId())) {
+            throw new RuntimeException("非法访问订单");
+        }
+        orderService.delete(orderId);
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("删除订单成功").build();
+    }
+
     @GetMapping("/{id}")
     public ResponseResult userId(@PathVariable Integer id, @AuthenticationPrincipal AdAuthentication adAuthentication) {
         final Optional<AdOrder> userOrder=getService().findUserOrder(id, adAuthentication.getId());
@@ -84,7 +99,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         if (authentication.isAdmin()) {
             return listDto(limit, page);
         } else {
-            final Page<AdOrder> adOrders=getService().listUserOrders(authentication.getId(), PageRequest.of(page - 1, limit));
+            final Page<AdOrder> adOrders=getService().listUserOrders(authentication.getId(), PageRequest.of(page - 1, limit, Sort.by("id").descending()));
             return doResponse(adOrders);
         }
     }

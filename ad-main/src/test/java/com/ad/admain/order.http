@@ -1,5 +1,24 @@
-GET http://{{url}}/api/order/list
-X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
+DELETE http://{{url}}/api/order/87
+Content-Type: application/json
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODQwOTg5ODcsImlhdCI6MTU4MjgwMjk4NywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.bYrC5KYElJRs7tWPjQnRGK0OL-6beo2nHobk81bDT0Y
+
+
+
+###
+POST http://{{url}}/api/pay/refund/90
+Content-Type: application/json
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODQwOTg5ODcsImlhdCI6MTU4MjgwMjk4NywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.bYrC5KYElJRs7tWPjQnRGK0OL-6beo2nHobk81bDT0Y
+
+
+{
+  "adOrderId": 90,
+  "refundReason": "测试",
+  "refundAmount": 100
+}
+
+###
+GET http://{{url}}/api/order/list?limit=10
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODQwOTg5ODcsImlhdCI6MTU4MjgwMjk4NywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.bYrC5KYElJRs7tWPjQnRGK0OL-6beo2nHobk81bDT0Y
 Accept: application/json
 
 ###

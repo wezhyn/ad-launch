@@ -5,7 +5,6 @@ import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.ColumnDefault;
@@ -26,7 +25,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=true)
 @DynamicUpdate
 @DynamicInsert
-@NoArgsConstructor
 @Entity(name="ad_order")
 @Getter
 @Setter
@@ -60,6 +58,10 @@ public class AdOrder extends Order implements IProduce {
         super(uid, produce.getPrice()*produce.getNum(), OrderVerify.WAIT_VERITY);
         Assert.notNull(produce, "广告内容为空，不允许的操作");
         this.produce=produce;
+    }
+
+    public AdOrder() {
+        super();
     }
 
     @Override

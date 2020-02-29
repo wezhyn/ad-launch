@@ -25,10 +25,19 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      * @param nextStatus   下一个状态
      * @return 1
      */
-    @Modifying
+    @Modifying(clearAutomatically=true, flushAutomatically=true)
     @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.orderStatus=:originStatus")
     Integer updateOrderStatus(Integer orderId, OrderStatus originStatus, OrderStatus nextStatus);
 
+
+    /**
+     * 检查订单是否存在
+     *
+     * @param id  id
+     * @param uid uid
+     * @return true
+     */
+    Boolean existsByIdAndUid(Integer id, Integer uid);
 
     /**
      * 查找某个用户的最近订单列表
@@ -37,5 +46,5 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      * @param pageable page
      * @return page
      */
-    Page<AdOrder> findAdOrdersByUidOrderByIdDesc(Integer uId, Pageable pageable);
+    Page<AdOrder> findAdOrdersByUidAndIsDeleteIsFalse(Integer uId, Pageable pageable);
 }

@@ -28,7 +28,7 @@ public class OrderDto {
     private String verify;
 
     private int produceId;
-    private long tradeOut;
+    private String tradeOut;
 
     /**
      * 广告内容, 前端返回 List<String>
@@ -72,6 +72,8 @@ public class OrderDto {
      * 广告投放频率
      */
     private Integer rate;
+
+    private Double price;
 
 
     private String startDate;

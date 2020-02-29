@@ -28,6 +28,8 @@ import java.time.LocalDateTime;
 public class AdBillInfo extends BillInfo {
 
 
+    @Enumerated(value=EnumType.STRING)
+    private TradeStatus tradeStatus;
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="order_id", referencedColumnName="id", insertable=false, updatable=false)
     private AdOrder order;

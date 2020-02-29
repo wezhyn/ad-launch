@@ -23,6 +23,9 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
      */
     Page<AdOrder> search(OrderSearchType type, String context, Pageable pageable);
 
+
+    Boolean isUserOrder(Integer orderId, Integer UserId);
+
     /**
      * 查找某个用户的订单
      *
@@ -35,6 +38,15 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
 
     Page<AdOrder> listUserOrders(Integer userId, Pageable pageable);
 
-    void modifyOrderStatus(Integer orderId, OrderStatus orderStatus);
+    boolean modifyOrderStatus(Integer orderId, OrderStatus orderStatus);
+
+    /**
+     * 退款失败回退到原来的订单状态
+     *
+     * @param orderId      orderId
+     * @param originStatus 原状态
+     * @return 是否修改成功
+     */
+    boolean rollbackRefundOrderStatus(Integer orderId, OrderStatus originStatus);
 
 }

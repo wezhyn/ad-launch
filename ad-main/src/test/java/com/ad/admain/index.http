@@ -1,0 +1,4 @@
+GET http://{{url}}/api/config/shuffingList?limit=3&page=1
+Accept: application/json
+
+###

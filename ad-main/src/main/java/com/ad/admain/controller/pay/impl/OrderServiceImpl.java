@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -53,17 +52,25 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
 
 
     @Override
+    public Boolean isUserOrder(Integer orderId, Integer userId) {
+        return getRepository().existsByIdAndUid(orderId, userId);
+    }
+
+    @Override
     @Transactional(readOnly=true)
     public Page<AdOrder> listUserOrders(Integer userId, Pageable pageable) {
-        return getRepository().findAdOrdersByUidOrderByIdDesc(userId, pageable);
+        return getRepository().findAdOrdersByUidAndIsDeleteIsFalse(userId, pageable);
     }
 
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public void modifyOrderStatus(Integer orderId, OrderStatus orderStatus) {
-        final AdOrder one=getRepository().getOne(orderId);
-        Assert.notNull(one, "无目标订单");
-        OrderStatus currentStatus=one.getOrderStatus();
+    public boolean modifyOrderStatus(Integer orderId, OrderStatus orderStatus) {
+        final Optional<AdOrder> one=getRepository().findById(orderId);
+        if (!one.isPresent()) {
+            throw new OrderStatusException("无该订单信息");
+        }
+        AdOrder order=one.get();
+        OrderStatus currentStatus=order.getOrderStatus();
         OrderStatus nextStatus=null;
         if (orderStatus.getNumber()==currentStatus.getNumber() + 1) {
 //            正常升级
@@ -90,16 +97,32 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
 
         }
         if (orderStatus==currentStatus) {
+            return false;
         } else if (nextStatus==null) {
             throw new OrderStatusException("无法越级更新订单状态");
         } else {
-            getRepository().updateOrderStatus(orderId, currentStatus, nextStatus);
+            return getRepository().updateOrderStatus(orderId, currentStatus, nextStatus) > 0;
         }
     }
 
     @Override
     public AdOrderRepository getRepository() {
         return adOrderRepository;
+    }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public boolean rollbackRefundOrderStatus(Integer orderId, OrderStatus originStatus) {
+        return getRepository().updateOrderStatus(orderId, OrderStatus.REFUNDING, originStatus) > 0;
+    }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public void delete(Integer integer) {
+        AdOrder order=new AdOrder();
+        order.setId(integer);
+        order.setIsDelete(true);
+        update(order);
     }
 
     @Override

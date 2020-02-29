@@ -48,7 +48,7 @@ public class AliPayHolderTest {
         model.setTradeNo("2020022422001406181000040391");
         model.setRefundAmount("10");
         model.setRefundReason("测试用例");
-        model.setOutRequestNo("H1H1H2");
+        model.setOutRequestNo("H1H1H4");
         request.setBizModel(model);
         AlipayTradeRefundResponse response=AliPayHolder.ALI_PAY_CLIENT.certificateExecute(request);
         if (response.isSuccess()) {
