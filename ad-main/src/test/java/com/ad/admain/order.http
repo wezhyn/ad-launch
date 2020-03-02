@@ -29,13 +29,13 @@ Accept: application/json
 ###
 POST http://{{url}}/api/order/create
 Content-Type:  application/json
-X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTg0MjU0NDY3LCJpYXQiOjE1ODI5NTg0NjcsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IgX5AYu7JUlbBItMCI8jV0upQWEzi8mbzcNukqRJMvo
 
 {
   "endDate": "2020-02-24T09:49:50.184Z",
   "endTime": "2020-02-24T15:59:59.999Z",
-  "latitude": null,
-  "longitude": null,
+  "latitude": 30.22,
+  "longitude": 120.12,
   "num": 100,
   "price": 1,
   "rate": 5,

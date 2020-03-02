@@ -50,6 +50,11 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         return getRepository().findOne(Example.of(order));
     }
 
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public Boolean cancelOvertimeOrder(Integer orderId, Integer uid) {
+        return getRepository().updateOrderStatus(orderId, uid, OrderStatus.WAITING_PAYMENT, OrderStatus.CANCEL) > 0;
+    }
 
     @Override
     public Boolean isUserOrder(Integer orderId, Integer userId) {

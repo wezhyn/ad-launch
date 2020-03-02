@@ -29,6 +29,17 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
     @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.orderStatus=:originStatus")
     Integer updateOrderStatus(Integer orderId, OrderStatus originStatus, OrderStatus nextStatus);
 
+    /**
+     * 更新订单属性
+     *
+     * @param orderId      订单id
+     * @param originStatus 原状态
+     * @param nextStatus   下一个状态
+     * @return 1
+     */
+    @Modifying(clearAutomatically=true, flushAutomatically=true)
+    @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.uid=:uid and o.orderStatus=:originStatus")
+    Integer updateOrderStatus(Integer orderId, Integer uid, OrderStatus originStatus, OrderStatus nextStatus);
 
     /**
      * 检查订单是否存在

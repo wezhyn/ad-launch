@@ -1,15 +1,17 @@
 package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.AbstractBaseController;
-import com.ad.admain.controller.equipment.dto.EquipmentDto;
 import com.ad.admain.controller.pay.convert.AdOrderMapper;
 import com.ad.admain.controller.pay.convert.ProduceMapper;
 import com.ad.admain.controller.pay.dto.AdProduceDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.AdProduce;
+import com.ad.admain.mq.order.CancelOrderMessage;
+import com.ad.admain.mq.order.CancelOrderProduceI;
 import com.ad.admain.security.AdAuthentication;
 import com.wezhyn.project.controller.ResponseResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,8 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     private final AdOrderService orderService;
     private final BillInfoService orderInfoService;
     private final ProduceMapper produceMapper;
+    @Autowired
+    private CancelOrderProduceI cancelOrderProduce;
 
 
     public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper, ProduceMapper produceMapper) {
@@ -60,6 +64,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         }
         AdOrder order=new AdOrder(authentication.getId(), produce);
         AdOrder savedOrder=orderService.save(order);
+        cancelOrderProduce.cancelOrder(new CancelOrderMessage(savedOrder.getId(), savedOrder.getUid()));
         if (savedOrder.getId()!=null) {
             return ResponseResult.forSuccessBuilder()
                     .withData("id", savedOrder.getId())
@@ -123,12 +128,6 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
     }
 
-    @PostMapping("/delete")
-    public ResponseResult deleteUser(@RequestBody EquipmentDto equipmentDto) {
-        getService().delete(equipmentDto.getId());
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("删除成功").build();
-    }
 
     @Override
     public AdOrderService getService() {

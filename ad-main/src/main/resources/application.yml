@@ -3,10 +3,10 @@ server:
   address: 0.0.0.0
   tomcat:
     max-threads: 8
-#rocketmq:
-#  name-server: 47.111.185.61:9876
-#  producer:
-#    group: order-handler
+rocketmq:
+  name-server: 47.111.185.61:9876
+  producer:
+    group: order-group
 management:
   security:
     enabled: false

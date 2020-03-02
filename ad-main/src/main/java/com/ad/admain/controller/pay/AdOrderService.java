@@ -36,6 +36,9 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
     Optional<AdOrder> findUserOrder(Integer orderId, Integer userId);
 
 
+    Boolean cancelOvertimeOrder(Integer orderId, Integer uid);
+
+
     Page<AdOrder> listUserOrders(Integer userId, Pageable pageable);
 
     boolean modifyOrderStatus(Integer orderId, OrderStatus orderStatus);
