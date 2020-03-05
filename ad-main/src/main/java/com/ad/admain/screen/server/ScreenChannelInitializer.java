@@ -1,11 +1,12 @@
 package com.ad.admain.screen.server;
 
+import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.codec.ScreenProtocolOutEncoder;
 import com.ad.admain.screen.handler.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.checkerframework.checker.units.qual.A;
+import io.netty.util.AttributeKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,12 +40,17 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     @Autowired
     ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler;
 
+    @Autowired
+    private IdChannelPool idChannelPool;
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
+        final Long longId=idChannelPool.registerChannel(ch.pipeline());
+        ch.pipeline().channel().attr(AttributeKey.valueOf("registerId")).set(longId);
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
-        ch.pipeline().addLast(new IdleStateHandler(0,0,60));
+        ch.pipeline().addLast(new IdleStateHandler(0, 0, 60));
         ch.pipeline().addLast(typeHandler);
         ch.pipeline().addLast(heartBeatMsgHandler);
         ch.pipeline().addLast(gpsMsgHandler);

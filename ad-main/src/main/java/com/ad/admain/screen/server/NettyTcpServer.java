@@ -10,7 +10,9 @@ import io.netty.util.ResourceLeakDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 /**
@@ -22,6 +24,7 @@ import javax.annotation.PreDestroy;
  * @Version 1.0
  */
 @Slf4j
+@Component
 public class NettyTcpServer {
     @Value("${netty.server.address}")
     private String address;
@@ -35,15 +38,17 @@ public class NettyTcpServer {
 
     EventLoopGroup bossGroup=new NioEventLoopGroup();
     EventLoopGroup workerGroup=new NioEventLoopGroup();
+
     /**
      * 启动Server
      *
      * @throws InterruptedException
      */
+    @PostConstruct
     public void start() throws InterruptedException {
 
 
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        ServerBootstrap serverBootstrap=new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(screenChannelInitializer)
@@ -51,7 +56,7 @@ public class NettyTcpServer {
                 .childOption(ChannelOption.TCP_NODELAY, true)//立即写出
                 .childOption(ChannelOption.SO_KEEPALIVE, true);//长连接
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
-        ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+        ChannelFuture channelFuture=serverBootstrap.bind(port).sync();
         if (channelFuture.isSuccess()) {
             log.info("TCP服务启动完毕,port={}", this.port);
         }
