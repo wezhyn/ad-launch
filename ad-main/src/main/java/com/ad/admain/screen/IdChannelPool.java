@@ -1,10 +1,10 @@
 package com.ad.admain.screen;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.nio.channels.Channel;
 import java.util.Collection;
 import java.util.concurrent.*;
 
