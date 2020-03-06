@@ -1,7 +1,6 @@
 package com.ad.admain.controller.equipment.entity;
 
 import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -58,7 +57,7 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("0")
     private Double longitude;
 
-    @Column(name="`key`")
+    @Column(name = "key")
     private String key;
 
     @Column(insertable=false, updatable=false)
@@ -87,8 +86,6 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("10")
     private Integer remain;
 
-    @OneToMany(mappedBy = "equip",targetEntity = JobEntity.class,fetch = FetchType.EAGER)
-    private List<Job> jobs;
 
     public static Equipment createFromUid(Integer uid) {
         return Equipment.builder().uid(uid)
