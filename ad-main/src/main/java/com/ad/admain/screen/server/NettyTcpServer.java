@@ -1,11 +1,14 @@
 package com.ad.admain.screen.server;
 
+import com.ad.admain.screen.IdChannelPool;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.AttributeKey;
 import io.netty.util.ResourceLeakDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ public class NettyTcpServer {
     @Autowired
     ScreenChannelInitializer screenChannelInitializer;
 
+    @Autowired
+    IdChannelPool idChannelPool;
+
 
     EventLoopGroup bossGroup=new NioEventLoopGroup();
     EventLoopGroup workerGroup=new NioEventLoopGroup();
@@ -46,18 +52,19 @@ public class NettyTcpServer {
      */
     @PostConstruct
     public void start() throws InterruptedException {
-
-
         ServerBootstrap serverBootstrap=new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(screenChannelInitializer)
                 .option(ChannelOption.SO_BACKLOG, 1024) //服务端可连接队列数,对应TCP/IP协议listen函数中backlog参数
                 .childOption(ChannelOption.TCP_NODELAY, true)//立即写出
-                .childOption(ChannelOption.SO_KEEPALIVE, true);//长连接
+                .childOption(ChannelOption.SO_KEEPALIVE, true)//长连接
+                .attr(AttributeKey.newInstance("TASK_LIST"),null)//接收的任务列表
+                .attr(AttributeKey.newInstance("TASK_STATUS"),null);//任务的完成状态
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
         ChannelFuture channelFuture=serverBootstrap.bind(port).sync();
         if (channelFuture.isSuccess()) {
+
             log.info("TCP服务启动完毕,port={}", this.port);
         }
     }

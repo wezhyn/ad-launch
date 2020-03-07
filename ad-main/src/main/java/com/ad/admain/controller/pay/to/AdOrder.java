@@ -1,6 +1,5 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.quartz.entity.JobEntity;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
 import lombok.EqualsAndHashCode;
@@ -42,11 +41,6 @@ public class AdOrder extends Order implements IProduce {
     @Type(type="strategyEnum")
     @ColumnDefault("'0'")
     private OrderStatus orderStatus;
-
-
-    @OneToMany(mappedBy="order", targetEntity=JobEntity.class)
-    private List<JobEntity> jobEntities;
-
 
     /**
      * 创建订单时使用

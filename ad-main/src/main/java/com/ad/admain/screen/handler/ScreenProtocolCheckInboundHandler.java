@@ -2,8 +2,6 @@ package com.ad.admain.screen.handler;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.screen.entity.RemoteInfo;
-import com.ad.admain.screen.service.RemoteInfoService;
 import com.ad.admain.screen.vo.FrameType;
 import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
@@ -12,13 +10,13 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -34,8 +32,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
     @Autowired
     EquipmentService equipmentService;
 
-    @Autowired
-    RemoteInfoService remoteInfoService;
+
 
     /**
      * 帧开头: SOF
@@ -110,27 +107,15 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
                 String imei = request.getEquipmentName();
-                InetSocketAddress socketAddress = (InetSocketAddress)ctx.channel().remoteAddress();
-                InetAddress inetAddress = socketAddress.getAddress();
-                String clientIp=  inetAddress.getHostAddress();
-                int clientPort = socketAddress.getPort();
                 Equipment equipment = equipmentService.findEquipmentByIMEI(imei);
-                if (equipment!=null){
-                RemoteInfo remoteInfo = remoteInfoService.findByEquipId(equipment.getId());
-                if (remoteInfo==null){
-                    remoteInfoService.save(new RemoteInfo().builder()
-                    .ip(clientIp)
-                    .port(clientPort)
-                    .equipment(equipment)
-                    .build());
-                }else {
-                    remoteInfo.setIp(clientIp);
-                    remoteInfo.setPort(clientPort);
-                    remoteInfoService.save(remoteInfo);
-                }
-                }
-
+                equipmentService.save(equipment);
+                //如果设备存在，则在channel中保存当前设备信息
+                    if (equipment!=null) {
+                        equipment.setStatus(true);
+                        ctx.channel().attr(AttributeKey.newInstance("equip")).set(equipment);
+                    }
                 break;
+
             } catch (ParserException e) {
                 log.error("解析错误", e);
                 inboundMsg.resetReaderIndex();

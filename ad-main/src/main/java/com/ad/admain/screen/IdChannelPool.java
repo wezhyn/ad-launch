@@ -19,7 +19,7 @@ public class IdChannelPool {
 
 
     private IdGenerator idGenerator;
-    private ConcurrentMap<Long, ChannelPipeline> channelCache;
+    private ConcurrentMap<Long, Channel> channelCache;
     private BlockingQueue<Long> recycleId;
 
 
@@ -36,9 +36,9 @@ public class IdChannelPool {
         this.idGenerator=new FlakeIdGenerator();
     }
 
-    public Long registerChannel(ChannelPipeline channel) {
+    public Long registerChannel(Channel channel) {
         final Long id=getId();
-        final ChannelPipeline pre=channelCache.putIfAbsent(id, channel);
+        final Channel pre=channelCache.putIfAbsent(id, channel);
         if (pre!=null) {
 //            说明 当前生成的Id 与系统奔溃前遗留冲突
             return registerChannel(channel);
