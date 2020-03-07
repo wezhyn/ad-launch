@@ -1,9 +1,12 @@
 package com.ad.admain.screen.server;
 
+import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.codec.ScreenProtocolOutEncoder;
 import com.ad.admain.screen.entity.Task;
 import com.ad.admain.screen.handler.*;
+import com.ad.admain.screen.vo.resp.AdScreenResponse;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -71,9 +74,27 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                 new Runnable() {
                     @Override
                     public void run() {
-                        Long id = ch.attr(REGISTERED_ID).get();
+                        Long id = ch.pipeline().channel().attr(REGISTERED_ID).get();
                         log.debug("开始检查池中id为:{}任务列表",id);
-                        ch.attr(AttributeKey.valueOf("TASK_LIST")).get();
+                        List<Task> tasks = ch.pipeline().channel().attr(TASK_LIST).get();
+                        //若任务表内的数据不为空则发送数据
+                        if (tasks.size()==0){
+                            log.debug("id为:{}的设备还没收到任务");
+                        }
+                        else {
+                            for (int i = 1 ;i<=tasks.size();i++){
+                                Task task = tasks.get(i-1);
+                                AdOrder order = task.getOrder();
+                                AdScreenResponse adScreenResponse = AdScreenResponse.builder()
+                                        .entryId(task.getEntryId())
+                                        .view(task.getView())
+                                        .verticalView(task.getVerticalView())
+                                        .repeatNum(task.getRepeatNum())
+                                        .viewLength((byte) task.getView().getBytes().length)
+                                        .build();
+                                ch.pipeline().channel().write(adScreenResponse);
+                            }
+                        }
                     }
                 }
                 ,300,300, TimeUnit.SECONDS
