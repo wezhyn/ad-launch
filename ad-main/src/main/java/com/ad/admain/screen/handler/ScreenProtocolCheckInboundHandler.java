@@ -1,7 +1,9 @@
 package com.ad.admain.screen.handler;
 
+import com.ad.admain.cache.*;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.ad.admain.screen.server.ScreenChannelInitializer;
 import com.ad.admain.screen.vo.FrameType;
 import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
@@ -29,7 +31,18 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
     @Autowired
     EquipmentService equipmentService;
 
+    @Autowired
+    EquipmentCacheService equipmentCacheService;
 
+    @Autowired
+    PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
+    /*
+     * @Description //设备attr的key
+     * @Date 2020/3/7 21:09
+     * @param null
+     *@return
+     **/
+    private final static AttributeKey<Equipment> EQUIPMENT = AttributeKey.valueOf("EQUIPMENT");
 
     /**
      * 帧开头: SOF
@@ -104,12 +117,14 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
                 String imei = request.getEquipmentName();
-                Equipment equipment = equipmentService.findEquipmentByIMEI(imei);
-                equipmentService.save(equipment);
+                Equipment equipment = equipmentCacheService.get(imei);
                 //如果设备存在，则在channel中保存当前设备信息
                     if (equipment!=null) {
                         equipment.setStatus(true);
-                        ctx.channel().attr(AttributeKey.newInstance("equip")).set(equipment);
+                        ctx.channel().attr(EQUIPMENT).set(equipment);
+                        Long pooledId =  ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
+                        PooledIdAndEquipCache pooledIdAndEquipCache = new PooledIdAndEquipCache(pooledId,equipment);
+                        pooledIdAndEquipCacheService.getCache().put(imei,pooledIdAndEquipCache);
                     }
                 break;
 

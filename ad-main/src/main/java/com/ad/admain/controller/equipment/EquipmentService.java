@@ -17,7 +17,6 @@ import java.util.List;
  */
 public interface EquipmentService extends BaseService<Equipment, Integer> {
 
-    void quartzTest();
 
     Page<Equipment> getListByUid(Integer uid, Pageable pageable);
     /**

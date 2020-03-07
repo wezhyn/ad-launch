@@ -7,6 +7,6 @@ package com.ad.admain.cache;
  * @Date 2020/3/7 16:00
  * @Version V1.0
  **/
-public interface IlocalCache<K,V> {
+public interface IBaseLocalCache<K,V> {
     public V get(K key);
 }

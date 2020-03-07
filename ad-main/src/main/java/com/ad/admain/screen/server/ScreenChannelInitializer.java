@@ -1,7 +1,7 @@
 package com.ad.admain.screen.server;
 
+import com.ad.admain.cache.EquipmentCacheService;
 import com.ad.admain.controller.pay.to.AdOrder;
-import com.ad.admain.controller.pay.to.Order;
 import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.codec.ScreenProtocolOutEncoder;
 import com.ad.admain.screen.entity.Task;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Attr;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +55,15 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     @Autowired
     private IdChannelPool idChannelPool;
 
+    @Autowired
+    EquipmentCacheService equipmentCache;
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        //讲channel注册到id池中
+        //将channel注册到id池中
         final Long longId=idChannelPool.registerChannel(ch);
         ch.pipeline().channel().attr(REGISTERED_ID).setIfAbsent(longId);
+
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
