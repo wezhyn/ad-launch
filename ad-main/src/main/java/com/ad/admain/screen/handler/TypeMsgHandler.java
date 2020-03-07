@@ -5,6 +5,7 @@ import com.ad.admain.screen.vo.req.ConfirmMsg;
 import com.ad.admain.screen.vo.req.GpsMsg;
 import com.ad.admain.screen.vo.req.HeartBeatMsg;
 import com.ad.admain.screen.vo.req.ScreenRequest;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
  * @Version 1.0
  */
 @Component
+@ChannelHandler.Sharable
 public class TypeMsgHandler extends BaseMsgHandler<ScreenRequest> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ScreenRequest msg) throws Exception {

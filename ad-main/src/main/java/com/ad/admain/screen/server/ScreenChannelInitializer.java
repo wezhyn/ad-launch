@@ -46,7 +46,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         final Long longId=idChannelPool.registerChannel(ch.pipeline());
-        ch.pipeline().channel().attr(AttributeKey.valueOf("registerId")).set(longId);
+        ch.attr(AttributeKey.valueOf("registerId")).set(longId);
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);

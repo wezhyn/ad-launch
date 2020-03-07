@@ -2,7 +2,6 @@ package com.ad.admain.screen.handler;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.screen.dao.RemoteInfoRepository;
 import com.ad.admain.screen.entity.RemoteInfo;
 import com.ad.admain.screen.service.RemoteInfoService;
 import com.ad.admain.screen.vo.FrameType;
@@ -10,17 +9,16 @@ import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -29,6 +27,7 @@ import java.util.Objects;
  * @since 02.19.2020
  */
 @Slf4j
+@ChannelHandler.Sharable
 @Component
 public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdapter {
 

@@ -1,6 +1,7 @@
 package com.ad.admain.screen.handler;
 
 import com.ad.admain.screen.vo.req.ConfirmMsg;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@ChannelHandler.Sharable
 public class ConfirmMsgHandler extends BaseMsgHandler<ConfirmMsg> {
 
     @Override

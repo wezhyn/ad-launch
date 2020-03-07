@@ -1,5 +1,6 @@
 package com.ad.admain.screen;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import java.util.concurrent.*;
  * @since 03.04.2020
  */
 @Component
+@ChannelHandler.Sharable
 public class IdChannelPool {
 
 
