@@ -31,7 +31,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     /**
      * 帧开头: SOF
      */
-    private final static ByteBuf BEGIN_FIELD= Unpooled.copiedBuffer("SOF".getBytes());
+    private final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
     /**
      * 帧末尾：EOF
      */
@@ -70,9 +70,10 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     public ScreenProtocolInDecoder(int minLength, int lengthFieldOffset, int lengthFieldLength) {
         this(minLength, lengthFieldOffset, lengthFieldLength, true);
     }
+
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        ByteBuf inboundMsg= byteBuf ;
+        ByteBuf inboundMsg=byteBuf;
         ScreenRequest request=null;
         for (; ; ) {
             inboundMsg.markReaderIndex();
@@ -113,21 +114,21 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         readRequestEquipmentName(msg, request);
         readType(msg, request);
         readNetData(msg, request);
-        int type = request.type();
-        switch (type){
+        int type=request.type();
+        switch (type) {
             case 1: {
-                HeartBeatMsg heartBeatMsg = new HeartBeatMsg();
-                BeanUtils.copyProperties(request,heartBeatMsg);
+                HeartBeatMsg heartBeatMsg=new HeartBeatMsg();
+                BeanUtils.copyProperties(request, heartBeatMsg);
                 return heartBeatMsg;
             }
-            case 2:{
-                ConfirmMsg confirmMsg = new ConfirmMsg();
-                BeanUtils.copyProperties(request,confirmMsg);
+            case 2: {
+                ConfirmMsg confirmMsg=new ConfirmMsg();
+                BeanUtils.copyProperties(request, confirmMsg);
                 return confirmMsg;
             }
-            case 3:{
-                GpsMsg gpsMsg = new GpsMsg();
-                BeanUtils.copyProperties(request,gpsMsg);
+            case 3: {
+                GpsMsg gpsMsg=new GpsMsg();
+                BeanUtils.copyProperties(request, gpsMsg);
                 return gpsMsg;
             }
             default: {
@@ -146,23 +147,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     private void readType(ByteBuf msg, ScreenRequest request) throws ParserException {
         checkDelimiter(msg);
         final byte bType=msg.readByte();
-        switch (bType) {
-            case '1': {
-                request.setFrameType(FrameType.HEART_BEAT);
-                break;
-            }
-            case '2': {
-                request.setFrameType(FrameType.CONFIRM);
-                break;
-            }
-            case '3': {
-                request.setFrameType(FrameType.GPS);
-                break;
-            }
-            default: {
-                throw new ScreenProtocolInDecoder.ParserException();
-            }
-        }
+        request.setFrameType(FrameType.parse((char) bType));
     }
 
     private void readNetData(ByteBuf msg, ScreenRequest request) throws ParserException {
@@ -199,7 +184,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         checkDelimiter(msg);
     }
 
-    private void checkDelimiter(ByteBuf msg) throws  ParserException {
+    private void checkDelimiter(ByteBuf msg) throws ParserException {
         final byte delimiter=msg.readByte();
         if (!Objects.equals(delimiter, DELIMITER)) {
             throw new ScreenProtocolInDecoder.ParserException();
@@ -236,7 +221,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     }
 
 
-    private static class ParserException extends Exception {
+    public static class ParserException extends Exception {
         public ParserException() {
         }
     }
