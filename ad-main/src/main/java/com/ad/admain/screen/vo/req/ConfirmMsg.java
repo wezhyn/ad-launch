@@ -1,7 +1,6 @@
 package com.ad.admain.screen.vo.req;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @ClassName ConfirmMsg
@@ -12,5 +11,5 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @Version 1.0
  */
 @Data
-public class ConfirmMsg extends ScreenRequest {
+public class ConfirmMsg extends BaseScreenRequest<Void> {
 }

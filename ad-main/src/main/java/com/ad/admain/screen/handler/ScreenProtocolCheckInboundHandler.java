@@ -1,11 +1,13 @@
 package com.ad.admain.screen.handler;
 
-import com.ad.admain.cache.*;
+import com.ad.admain.cache.EquipmentCacheService;
+import com.ad.admain.cache.PooledIdAndEquipCache;
+import com.ad.admain.cache.PooledIdAndEquipCacheService;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.screen.server.ScreenChannelInitializer;
 import com.ad.admain.screen.vo.FrameType;
-import com.ad.admain.screen.vo.req.ScreenRequest;
+import com.ad.admain.screen.vo.req.BaseScreenRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -13,9 +15,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.AttributeKey;
-import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -45,7 +45,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
      * @param null
      *@return
      **/
-    private final static AttributeKey<Equipment> EQUIPMENT = AttributeKey.valueOf("EQUIPMENT");
+    private final static AttributeKey<Equipment> EQUIPMENT=AttributeKey.valueOf("EQUIPMENT");
 
     /**
      * 帧开头: SOF
@@ -90,14 +90,14 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
     }
 
     public ScreenProtocolCheckInboundHandler() {
-        this(27,3,4,true);
+        this(27, 3, 4, true);
     }
 
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf inboundMsg=(ByteBuf) msg;
-        ScreenRequest request=null;
+        BaseScreenRequest<?> request=null;
         for (; ; ) {
             inboundMsg.markReaderIndex();
             final int sof=findBeginOfLine(inboundMsg);
@@ -119,16 +119,16 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 //            解析数据
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
-                String imei = request.getEquipmentName();
-                Equipment equipment = equipmentCacheService.get(imei);
+                String imei=request.getEquipmentName();
+                Equipment equipment=equipmentCacheService.get(imei);
                 //如果设备存在，则在channel中保存当前设备信息
-                    if (equipment!=null) {
-                        equipment.setStatus(true);
-                        ctx.channel().attr(EQUIPMENT).set(equipment);
-                        Long pooledId =  ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
-                        PooledIdAndEquipCache pooledIdAndEquipCache = new PooledIdAndEquipCache(pooledId,equipment);
-                        pooledIdAndEquipCacheService.getCache().put(imei,pooledIdAndEquipCache);
-                    }
+                if (equipment!=null) {
+                    equipment.setStatus(true);
+                    ctx.channel().attr(EQUIPMENT).set(equipment);
+                    Long pooledId=ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
+                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment);
+                    pooledIdAndEquipCacheService.getCache().put(imei, pooledIdAndEquipCache);
+                }
                 break;
 
             } catch (ParserException e) {
@@ -140,8 +140,8 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         ctx.fireChannelRead(request);
     }
 
-    private ScreenRequest readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
-        final ScreenRequest request=new ScreenRequest();
+    private BaseScreenRequest<?> readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
+        final BaseScreenRequest<?> request=new BaseScreenRequest<>();
         msg.skipBytes(start + lengthFieldOffset + lengthFieldLength);
         readRequestEquipmentName(msg, request);
         readType(msg, request);
@@ -149,64 +149,25 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         return request;
     }
 
-    private void readRequestEquipmentName(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readRequestEquipmentName(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
         final CharSequence charSequence=msg.readCharSequence(15, StandardCharsets.US_ASCII);
         request.setEquipmentName(charSequence.toString());
     }
 
-    private void readType(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readType(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
         final byte bType=msg.readByte();
-        switch (bType) {
-            case '1': {
-                request.setFrameType(FrameType.HEART_BEAT);
-                break;
-            }
-            case '2': {
-                request.setFrameType(FrameType.CONFIRM);
-                break;
-            }
-            case '3': {
-                request.setFrameType(FrameType.GPS);
-                break;
-            }
-            default: {
-                throw new ParserException();
-            }
-        }
+        request.setFrameType(FrameType.parse((char) bType));
     }
 
-    private void readNetData(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readNetData(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
-        if (request.getFrameType()==FrameType.GPS) {
-            final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
-            String gpsString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
-            final String[] gpsSplit=gpsString.split(",");
-            if (gpsSplit.length!=4) {
-                throw new ParserException();
-            }
-            final double[] gpsDouble=new double[gpsSplit.length];
-            for (int i=0; i < gpsSplit.length; i++) {
-                switch (gpsSplit[i]) {
-                    case "N":
-                    case "E": {
-                        gpsDouble[i]=1;
-                        break;
-                    }
-                    case "W":
-                    case "S": {
-                        gpsDouble[i]=-1;
-                        break;
-                    }
-                    default: {
-                        gpsDouble[i]=Double.parseDouble(gpsSplit[i]);
-                    }
-                }
-            }
-            request.setNetData(new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]));
+        try {
+            request.getFrameType().netData(msg, request);
+        } catch (Exception e) {
+            throw new ParserException(e);
         }
-
         //            检验末尾 ','
         checkDelimiter(msg);
     }
@@ -250,6 +211,10 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     private static class ParserException extends Exception {
         public ParserException() {
+        }
+
+        public ParserException(Throwable cause) {
+            super(cause);
         }
     }
 

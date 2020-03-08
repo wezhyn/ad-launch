@@ -26,7 +26,6 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     private EquipmentRepository equipmentRepository;
 
 
-    @Override
     public void quartzTest() {
         System.out.println("quartz test");
     }

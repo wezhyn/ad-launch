@@ -1,7 +1,7 @@
 package com.ad.admain.screen.vo.req;
 
+import javafx.geometry.Point2D;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * @ClassName IpMsg
@@ -12,5 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @Version 1.0
  */
 @Data
-public class GpsMsg extends ScreenRequest {
+public class GpsMsg extends BaseScreenRequest<Point2D> {
+
+
 }

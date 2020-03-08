@@ -1,16 +1,15 @@
 package com.ad.admain.screen.codec;
 
 import com.ad.admain.screen.vo.FrameType;
+import com.ad.admain.screen.vo.req.BaseScreenRequest;
 import com.ad.admain.screen.vo.req.ConfirmMsg;
 import com.ad.admain.screen.vo.req.GpsMsg;
 import com.ad.admain.screen.vo.req.HeartBeatMsg;
-import com.ad.admain.screen.vo.req.ScreenRequest;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
@@ -31,11 +30,11 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     /**
      * 帧开头: SOF
      */
-    private final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
+    public final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
     /**
      * 帧末尾：EOF
      */
-    private final static ByteBuf END_FIELD=Unpooled.wrappedUnmodifiableBuffer(Unpooled.copiedBuffer("EOF".getBytes()));
+    public final static ByteBuf END_FIELD=Unpooled.wrappedUnmodifiableBuffer(Unpooled.copiedBuffer("EOF".getBytes()));
     /**
      * ,
      */
@@ -74,7 +73,7 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         ByteBuf inboundMsg=byteBuf;
-        ScreenRequest request=null;
+        BaseScreenRequest request=null;
         for (; ; ) {
             inboundMsg.markReaderIndex();
             final int sof=findBeginOfLine(inboundMsg);
@@ -108,8 +107,8 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
     }
 
 
-    private ScreenRequest readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
-        final ScreenRequest request=new ScreenRequest();
+    private BaseScreenRequest<?> readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
+        final BaseScreenRequest<?> request=new BaseScreenRequest<>();
         msg.skipBytes(start + lengthFieldOffset + lengthFieldLength);
         readRequestEquipmentName(msg, request);
         readType(msg, request);
@@ -138,48 +137,29 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
         }
     }
 
-    private void readRequestEquipmentName(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readRequestEquipmentName(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
         final CharSequence charSequence=msg.readCharSequence(15, StandardCharsets.US_ASCII);
         request.setEquipmentName(charSequence.toString());
     }
 
-    private void readType(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readType(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
         final byte bType=msg.readByte();
-        request.setFrameType(FrameType.parse((char) bType));
+        try {
+            request.setFrameType(FrameType.parse((char) bType));
+        } catch (Exception e) {
+            throw new ParserException(e);
+        }
     }
 
-    private void readNetData(ByteBuf msg, ScreenRequest request) throws ParserException {
+    private void readNetData(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
         checkDelimiter(msg);
-        if (request.getFrameType()==FrameType.GPS) {
-            final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
-            String gpsString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
-            final String[] gpsSplit=gpsString.split(",");
-            if (gpsSplit.length!=4) {
-                throw new ScreenProtocolInDecoder.ParserException();
-            }
-            final double[] gpsDouble=new double[gpsSplit.length];
-            for (int i=0; i < gpsSplit.length; i++) {
-                switch (gpsSplit[i]) {
-                    case "N":
-                    case "E": {
-                        gpsDouble[i]=1;
-                        break;
-                    }
-                    case "W":
-                    case "S": {
-                        gpsDouble[i]=-1;
-                        break;
-                    }
-                    default: {
-                        gpsDouble[i]=Double.parseDouble(gpsSplit[i]);
-                    }
-                }
-            }
-            request.setNetData(new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]));
+        try {
+            request.getFrameType().netData(msg, request);
+        } catch (Exception e) {
+            throw new ParserException(e);
         }
-
         //            检验末尾 ','
         checkDelimiter(msg);
     }
@@ -223,6 +203,10 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
 
     public static class ParserException extends Exception {
         public ParserException() {
+        }
+
+        public ParserException(Throwable cause) {
+            super(cause);
         }
     }
 }

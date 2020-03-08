@@ -1,5 +1,6 @@
 package com.ad.admain.screen.vo;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -11,6 +12,9 @@ public class FrameTypeTest {
     @Test
     public void parse() {
         final FrameType parse=FrameType.parse('1');
-        System.out.println(parse);
+        Assert.assertEquals(parse, FrameType.CONFIRM);
+
+        final FrameType parse3=FrameType.parse('3');
+        Assert.assertEquals(parse3, FrameType.GPS);
     }
 }
