@@ -4,6 +4,7 @@ import com.ad.admain.controller.account.entity.GenericUser;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.pay.to.AdOrder;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

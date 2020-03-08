@@ -20,6 +20,7 @@ public class OrderProduceImpl implements CancelOrderProduceI, PaymentOrderProduc
     @Resource
     private RocketMQTemplate rocketMQTemplate;
 
+
     @Override
     public void cancelOrder(CancelOrderMessage message) {
         rocketMQTemplate.asyncSend(CancelOrderMessage.MESSAGE_TOPIC, new GenericMessage<>(message),

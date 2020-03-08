@@ -39,8 +39,9 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
     private Integer uid;
 
 
-    private Double totalAmount;
+    private Integer totalAmount;
 
+    private Integer numPerEquip;
 
     private Long tradeOut;
 
@@ -74,7 +75,7 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
         isDelete=false;
     }
 
-    public Order(Integer uid, Double totalAmount, OrderVerify verify) {
+    public Order(Integer uid, Integer totalAmount, OrderVerify verify) {
         this.uid=uid;
         this.totalAmount=totalAmount;
         this.verify=verify;

@@ -30,8 +30,6 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     EquipmentService equipmentService;
     @Autowired
     IdChannelPool idChannelPool;
-    @Autowired
-    RocketMQTemplate rocketMQTemplate;
 
     //消息流水号
     private static final AttributeKey<Short> SERIAL_NUMBER = AttributeKey.newInstance("serialNumber");
