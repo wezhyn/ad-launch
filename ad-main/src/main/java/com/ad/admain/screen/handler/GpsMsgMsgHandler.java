@@ -3,6 +3,7 @@ package com.ad.admain.screen.handler;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.screen.vo.req.GpsMsg;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@ChannelHandler.Sharable
 public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
     @Autowired
     EquipmentService equipmentService;

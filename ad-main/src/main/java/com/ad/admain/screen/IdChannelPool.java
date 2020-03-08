@@ -1,7 +1,7 @@
 package com.ad.admain.screen;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +13,15 @@ import java.util.concurrent.*;
  * @since 03.04.2020
  */
 @Component
+@ChannelHandler.Sharable
 public class IdChannelPool {
 
 
     private IdGenerator idGenerator;
     private ConcurrentMap<Long, Channel> channelCache;
+    /**
+     * 系统重启后，需要扫描未完成任务，将已分配的订单的id重新注入
+     */
     private BlockingQueue<Long> recycleId;
 
 

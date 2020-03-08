@@ -6,7 +6,7 @@ import com.ad.admain.screen.handler.HeartBeatMsgMsgHandler;
 import com.ad.admain.screen.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.admain.screen.handler.TypeMsgHandler;
 import com.ad.admain.screen.vo.FrameType;
-import com.ad.admain.screen.vo.req.ScreenRequest;
+import com.ad.admain.screen.vo.req.BaseScreenRequest;
 import com.ad.admain.screen.vo.resp.AdScreenResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
 @Slf4j
 @SpringBootTest
 @ComponentScan("com.ad")
@@ -52,14 +52,14 @@ HeartBeatMsgMsgHandler heartBeatMsgHandler;
 //        派生缓冲区，具有自己的读写索引，在在底层数据上共享
         ByteBuf input=buffer.duplicate();
         channel.writeInbound(input);
-        final ScreenRequest result=channel.readInbound();
-        ScreenRequest origin=ScreenRequest.builder()
+        final BaseScreenRequest result=channel.readInbound();
+        BaseScreenRequest origin=BaseScreenRequest.builder()
                 .equipmentName("863987031739406")
                 .frameType(FrameType.GPS)
                 .netData(new Point2D(12000.84339, 3013.18313)).build();
         assertNotEquals(origin, result);
 
-        ScreenRequest request=ScreenRequest.builder()
+        BaseScreenRequest request=BaseScreenRequest.builder()
                 .equipmentName("863987031739406").build();
         AdScreenResponse data=AdScreenResponse.builder()
                 .entryId(1)

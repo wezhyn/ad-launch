@@ -2,7 +2,6 @@ package com.ad.admain.screen.server;
 
 import com.ad.admain.screen.IdChannelPool;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -59,8 +58,8 @@ public class NettyTcpServer {
                 .option(ChannelOption.SO_BACKLOG, 1024) //服务端可连接队列数,对应TCP/IP协议listen函数中backlog参数
                 .childOption(ChannelOption.TCP_NODELAY, true)//立即写出
                 .childOption(ChannelOption.SO_KEEPALIVE, true)//长连接
-                .attr(AttributeKey.newInstance("TASK_LIST"),null)//接收的任务列表
-                .attr(AttributeKey.newInstance("TASK_STATUS"),null);//任务的完成状态
+                .attr(AttributeKey.valueOf("TASK_LIST"), null)//接收的任务列表
+                .attr(AttributeKey.valueOf("TASK_STATUS"), null);//任务的完成状态
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
         ChannelFuture channelFuture=serverBootstrap.bind(port).sync();
         if (channelFuture.isSuccess()) {

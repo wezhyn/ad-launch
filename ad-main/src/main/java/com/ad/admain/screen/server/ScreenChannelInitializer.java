@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class ScreenChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
-    public static final AttributeKey<Long> REGISTERED_ID = AttributeKey.valueOf("REGISTERED_ID");
-    public static final AttributeKey<List<Task>> TASK_LIST = AttributeKey.valueOf("TASK_LIST");
-    public static final AttributeKey<boolean[]> TASK_STATUS = AttributeKey.valueOf("TASK_STATUS");
+    public static final AttributeKey<Long> REGISTERED_ID=AttributeKey.valueOf("REGISTERED_ID");
+    public static final AttributeKey<List<Task>> TASK_LIST=AttributeKey.valueOf("TASK_LIST");
+    public static final AttributeKey<boolean[]> TASK_STATUS=AttributeKey.valueOf("TASK_STATUS");
 
     @Value("${netty.server.allTimeout}")
     private int allTimeOut;
@@ -77,18 +77,17 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                 new Runnable() {
                     @Override
                     public void run() {
-                        Long id = ch.pipeline().channel().attr(REGISTERED_ID).get();
-                        log.debug("开始检查池中id为:{}任务列表",id);
-                        List<Task> tasks = ch.pipeline().channel().attr(TASK_LIST).get();
+                        Long id=ch.pipeline().channel().attr(REGISTERED_ID).get();
+                        log.debug("开始检查池中id为:{}任务列表", id);
+                        List<Task> tasks=ch.pipeline().channel().attr(TASK_LIST).get();
                         //若任务表内的数据不为空则发送数据
-                        if (tasks.size()==0){
-                            log.debug("id为:{}的设备还没收到任务");
-                        }
-                        else {
-                            for (int i = 1 ;i<=tasks.size();i++){
-                                Task task = tasks.get(i-1);
-                                AdOrder order = task.getOrder();
-                                AdScreenResponse adScreenResponse = AdScreenResponse.builder()
+                        if (tasks.size()==0) {
+                            log.debug("id为:{}的设备还没收到任务", id);
+                        } else {
+                            for (int i=1; i <= tasks.size(); i++) {
+                                Task task=tasks.get(i - 1);
+                                AdOrder order=task.getOrder();
+                                AdScreenResponse adScreenResponse=AdScreenResponse.builder()
                                         .entryId(task.getEntryId())
                                         .view(task.getView())
                                         .verticalView(task.getVerticalView())
@@ -100,7 +99,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         }
                     }
                 }
-                ,300,300, TimeUnit.SECONDS
+                , 300, 300, TimeUnit.SECONDS
         );
     }
 }

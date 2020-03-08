@@ -2,12 +2,10 @@ package com.ad.admain.screen.vo.req;
 
 import com.ad.admain.screen.vo.FrameType;
 import com.ad.admain.screen.vo.IScreenFrame;
-import javafx.geometry.Point2D;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 /**
  * @author wezhyn
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Builder
 @Data
-public class ScreenRequest implements IScreenFrame {
+public class BaseScreenRequest<T> implements IScreenFrame {
 
 
     /**
@@ -34,7 +32,7 @@ public class ScreenRequest implements IScreenFrame {
      * 前一个数表示经度
      * 后一个数表示维度：+
      */
-    private Point2D netData;
+    private T netData;
 
     @Override
     public int type() {
