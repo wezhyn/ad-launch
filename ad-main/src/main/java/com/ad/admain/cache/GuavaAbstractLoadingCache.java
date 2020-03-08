@@ -1,5 +1,6 @@
 package com.ad.admain.cache;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -26,14 +28,14 @@ public abstract class GuavaAbstractLoadingCache<K,V> {
     private Date resetTime;     //Cache初始化或被重置的时间
     private long highestSize=0; //历史最高记录数
     private Date highestTime;   //创造历史记录的时间
-    private LoadingCache<K, V> cache;
+    private Cache<K, V> cache;
 
 /**
  * @Description //通过cache.get(key)的方式来获取值
  * @Date 2020/3/7 15:47
  *@return cache实例 {@link com.google.common.cache.LoadingCache<K,V>}
  **/
-    public LoadingCache<K,V> getCache(){
+    public Cache<K,V> getCache(){
         if (cache==null){
             synchronized (this){
                 if (cache ==null){
@@ -70,7 +72,12 @@ public abstract class GuavaAbstractLoadingCache<K,V> {
      *@return V
      **/
     protected  V getValue(K key) throws ExecutionException{
-        V result = cache.get(key);
+        V result = cache.get(key, new Callable<V>() {
+            @Override
+            public V call() throws Exception {
+                return fetchData(key);
+            }
+        });
         if (cache.size()>highestSize){
             highestSize = getCache().size();
             highestTime = new Date();

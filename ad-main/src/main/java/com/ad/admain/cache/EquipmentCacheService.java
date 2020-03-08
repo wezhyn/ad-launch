@@ -2,9 +2,15 @@ package com.ad.admain.cache;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
 
 /**
  * @ClassName EquipmentCache
@@ -13,14 +19,15 @@ import org.springframework.stereotype.Component;
  * @Date 2020/3/7 15:54
  * @Version V1.0
  **/
-@Component
+@Component("equipCache")
 @Slf4j
-public class EquipmentCache extends GuavaAbstractLoadingCache<String, Equipment> implements IlocalCache<String,Equipment>{
+public class EquipmentCacheService extends GuavaAbstractLoadingCache<String, Equipment> implements IEquipmentCache {
     private EquipmentService equipmentService;
 
-    public EquipmentCache(EquipmentService equipmentService){
+    public EquipmentCacheService(EquipmentService equipmentService){
         this.equipmentService = equipmentService;
     }
+
 
 
     @Override
