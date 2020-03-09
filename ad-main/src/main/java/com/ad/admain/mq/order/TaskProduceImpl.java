@@ -4,7 +4,6 @@ import com.ad.admain.cache.PooledIdAndEquipCache;
 import com.ad.admain.cache.PooledIdAndEquipCacheService;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.pay.to.AdOrder;
-import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.entity.Task;
 import com.ad.admain.utils.SquareUtils;
 import com.google.common.cache.Cache;
@@ -73,7 +72,7 @@ public class TaskProduceImpl implements DistributeTaskI {
                     e.printStackTrace();
                 }
             }
-            rocketMQTemplate.asyncSend("task_topic",taskList,new OrderProduceImpl.CommonSendCallback<List<Task>>(taskList));
+            rocketMQTemplate.asyncSend("task_topic",taskList,new CommonSendCallback<List<Task>>(taskList));
         }
     }
 

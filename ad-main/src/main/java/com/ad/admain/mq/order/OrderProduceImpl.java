@@ -24,32 +24,15 @@ public class OrderProduceImpl implements CancelOrderProduceI, PaymentOrderProduc
     @Override
     public void cancelOrder(CancelOrderMessage message) {
         rocketMQTemplate.asyncSend(CancelOrderMessage.MESSAGE_TOPIC, new GenericMessage<>(message),
-                new CommonSendCallback<>(message), 3000, 16);
+                new com.ad.admain.mq.order.CommonSendCallback<>(message), 3000, 16);
     }
 
     @Override
     public void paymentOrder(PaymentOrderMessage orderMessage) {
         rocketMQTemplate.asyncSend(PaymentOrderMessage.TOPIC_TAG, orderMessage,
-                new CommonSendCallback<>(orderMessage));
+                new com.ad.admain.mq.order.CommonSendCallback<>(orderMessage));
     }
 
-    public static class CommonSendCallback<T> implements SendCallback {
 
-        private final T message;
 
-        protected CommonSendCallback(T message) {
-            this.message=message;
-        }
-
-        @Override
-        public void onSuccess(SendResult sendResult) {
-            log.debug("send cancel order : {} success", sendResult.getMsgId());
-        }
-
-        @Override
-        public void onException(Throwable e) {
-            // todo: 保存失败信息，补偿机制
-            log.error("send message error: {}", message);
-        }
-    }
 }

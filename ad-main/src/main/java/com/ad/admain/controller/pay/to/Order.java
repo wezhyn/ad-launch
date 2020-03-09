@@ -39,7 +39,7 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
     private Integer uid;
 
 
-    private Integer totalAmount;
+    private Double totalAmount;
 
     private Integer numPerEquip;
 
@@ -75,7 +75,7 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
         isDelete=false;
     }
 
-    public Order(Integer uid, Integer totalAmount, OrderVerify verify) {
+    public Order(Integer uid, Double totalAmount, OrderVerify verify) {
         this.uid=uid;
         this.totalAmount=totalAmount;
         this.verify=verify;

@@ -35,14 +35,5 @@ public class AdLaunchApplication {
         return new BCryptPasswordEncoder();
     }
 
-//    //添加quartz启动servlet
-//    @Bean
-//    public ServletRegistrationBean servletRegistrationBean(){
-//        ServletRegistrationBean servletRegistrationBean =  new ServletRegistrationBean(
-//                new QuartzInitializerServlet());
-//        servletRegistrationBean.addInitParameter("shutdown-on-unload","true");
-//        servletRegistrationBean.setLoadOnStartup(2);
-//        return  servletRegistrationBean;
-//    }
 
 }

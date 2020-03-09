@@ -1,10 +1,7 @@
 package com.ad.admain.screen.handler;
 
 import com.ad.admain.screen.vo.FrameType;
-import com.ad.admain.screen.vo.req.BaseScreenRequest;
-import com.ad.admain.screen.vo.req.ConfirmMsg;
-import com.ad.admain.screen.vo.req.GpsMsg;
-import com.ad.admain.screen.vo.req.HeartBeatMsg;
+import com.ad.admain.screen.vo.req.*;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.BeanUtils;
@@ -12,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @ClassName TypeHandler
- * @Description TODO
+ * @Description 基础消息处理类
  * @Param
  * @Author ZLB
  * @Date 2020/2/22 19:23
@@ -41,6 +38,12 @@ public class TypeMsgHandler extends BaseMsgHandler<BaseScreenRequest> {
                 ConfirmMsg confirmMsg = new ConfirmMsg();
                 BeanUtils.copyProperties(msg,confirmMsg);
                 ctx.fireChannelRead(confirmMsg);
+                break;
+            }
+            case COMPLETE_NOTIFICATION:{
+                CompleteNotificationMsg completeNotificationMsg = new CompleteNotificationMsg();
+                BeanUtils.copyProperties(msg,completeNotificationMsg);
+                ctx.fireChannelRead(completeNotificationMsg);
                 break;
             }
         }

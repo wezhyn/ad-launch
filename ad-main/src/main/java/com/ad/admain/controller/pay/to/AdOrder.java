@@ -50,7 +50,7 @@ public class AdOrder extends Order implements IProduce {
      * @param produce 广告
      */
     public AdOrder(Integer uid, AdProduce produce) {
-        super(uid, (int) (produce.getPrice()*produce.getNum()), OrderVerify.WAIT_VERITY);
+        super(uid, (produce.getPrice()*produce.getNum()), OrderVerify.WAIT_VERITY);
         Assert.notNull(produce, "广告内容为空，不允许的操作");
         this.produce=produce;
     }

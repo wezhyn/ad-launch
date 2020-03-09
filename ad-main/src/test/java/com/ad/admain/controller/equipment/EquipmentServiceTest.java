@@ -16,9 +16,6 @@ import static org.junit.Assert.*;
 public class EquipmentServiceTest {
 @Autowired
     EquipmentService equipmentService;
-    @Test
-    public void quartzTest() {
-    }
 
     @Test
     public void getListByUid() {

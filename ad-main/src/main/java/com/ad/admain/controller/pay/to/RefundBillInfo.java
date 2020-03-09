@@ -49,7 +49,7 @@ public class RefundBillInfo extends BillInfo {
                 .refundReason(order.getRefundReason())
                 .outBizNo(order.getOutTradeNo())
                 .payType(PayType.ALI_PAY)
-                .totalAmount(order.getTotalAmount());
+                .totalAmount(Double.valueOf(order.getTotalAmount()));
 
     }
 
