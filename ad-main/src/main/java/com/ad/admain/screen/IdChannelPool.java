@@ -64,6 +64,8 @@ public class IdChannelPool {
         }
         return cycleId;
     }
-
+    public Channel getChannel(){
+        return null;
+    }
 
 }

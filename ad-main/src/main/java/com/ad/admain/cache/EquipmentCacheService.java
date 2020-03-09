@@ -2,15 +2,8 @@ package com.ad.admain.cache;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Date;
 
 /**
  * @ClassName EquipmentCache

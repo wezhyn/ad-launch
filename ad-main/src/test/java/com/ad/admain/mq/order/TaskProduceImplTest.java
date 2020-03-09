@@ -31,7 +31,6 @@ public class TaskProduceImplTest {
     @Test
     public void testSend(){
         FailTask failTask = FailTask.builder()
-                .id(1)
                 .orderId(1)
                 .uid(2)
                 .num(100)

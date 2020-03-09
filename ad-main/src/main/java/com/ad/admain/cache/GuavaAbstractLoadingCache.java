@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -84,4 +86,34 @@ public abstract class GuavaAbstractLoadingCache<K,V> {
         }
         return result;
     }
+    /**
+     * @Description //存放缓存
+     * @Date 2020/3/9 20:43
+     * @param key
+     * @param value
+     *@return V
+     **/
+    public V setValue(K key,V value){
+        if (cache!=null){
+            synchronized (cache){
+                cache.put(key,value);
+            }
+        }
+        return value;
+    }
+    /**
+     * @Description //统计缓存数据
+     * @Date 2020/3/9 20:45
+     * @param
+     *@return java.lang.Integer
+     **/
+    public Integer count(){
+
+        synchronized (cache){
+            return cache.asMap().size();
+        }
+
+    }
+
+
 }

@@ -11,9 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-import java.util.concurrent.Callable;
 
 /**
  * @ClassName TaskProducer
@@ -37,7 +35,7 @@ public class TaskProduceImpl implements DistributeTaskI {
         Integer deliverNum = adOrder.getDeliverNum();
         Integer numPerEquip = adOrder.getNumPerEquip();
         Integer numPerTask = numPerEquip / rate;
-        int onlinenum = countOnlineNums();
+        int onlinenum = pooledIdAndEquipCacheService.count();
         if (onlinenum < deliverNum) {
             log.debug("目前没有这么多的在线车辆数");
         } else {
@@ -64,6 +62,7 @@ public class TaskProduceImpl implements DistributeTaskI {
                             .adOrderId(adOrder.getId())
                             .entryId(i++)
                             .repeatNum(numPerTask)
+                            .pooledId(pooledIdAndEquipCache.getPooledId())
                             .status(false)
                             .verticalView(adOrder.getProduce().getVertical())
                             .build();
@@ -77,11 +76,7 @@ public class TaskProduceImpl implements DistributeTaskI {
     }
 
 
-    @Override
-    public int countOnlineNums() {
-        Set<Map.Entry<String, PooledIdAndEquipCache>> cacheSet = pooledIdAndEquipCacheService.getCache().asMap().entrySet();
-        return cacheSet.size();
-    }
+
 
     @Override
     public HashMap<Long, PooledIdAndEquipCache> freeEquips() {

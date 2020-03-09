@@ -27,17 +27,18 @@ import java.util.List;
 @Table(name="ad_generic_user")
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @DynamicUpdate
 @DynamicInsert
 @Builder
 public class GenericUser implements IUser {
 
     /*
-        /**********************************************************
-        /* 静态成员变量初始化
-        /**********************************************************
-    */
+            /**********************************************************
+            /* 静态成员变量初始化
+            /**********************************************************
+        */
     static {
     }
 
@@ -156,5 +157,29 @@ public class GenericUser implements IUser {
         }
 
 
+    }
+
+    @Override
+    public String toString() {
+        return "GenericUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", password='" + password + '\'' +
+                ", sex=" + sex +
+                ", mobilePhone='" + mobilePhone + '\'' +
+                ", email='" + email + '\'' +
+                ", wechat='" + wechat + '\'' +
+                ", intro='" + intro + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", birthDay=" + birthDay +
+                ", roles=" + roles +
+                ", enable=" + enable +
+                ", realName='" + realName + '\'' +
+                ", idCard='" + idCard + '\'' +
+                ", regTime=" + regTime +
+                ", loginTime=" + loginTime +
+                ", lastModified=" + lastModified +
+                '}';
     }
 }

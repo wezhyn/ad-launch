@@ -39,7 +39,7 @@ public class Equipment implements IBaseTo<Integer> {
 
     private Integer uid;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="uid", insertable=false, updatable=false)
     private GenericUser orderUser;
 

@@ -3,11 +3,15 @@ package com.ad.admain.screen.mq;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.entity.Task;
+import com.ad.admain.screen.server.ScreenChannelInitializer;
+import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @Description //mq任务消息监听
@@ -20,14 +24,19 @@ import org.springframework.stereotype.Component;
 )
 @Component
 @Slf4j
-public class TaskMessageListener implements RocketMQListener<Task> {
+public class TaskMessageListener implements RocketMQListener<List<Task>> {
     @Autowired
     IdChannelPool idChannelPool;
 
     @Override
-    public void onMessage(Task task) {
-        log.debug("收到消息{}",task.getId());
-        task.getUid();
-        Equipment equipment = task.getEquipment();
+    public void onMessage(List<Task> tasks) {
+        Long pooledId = tasks.get(0).getPooledId();
+        log.debug("收到消息{}",pooledId);
+        Channel channel = idChannelPool.getChannel();
+        List<Task> received = channel.attr(ScreenChannelInitializer.TASK_LIST).get();
+        for (int i = 0; i < tasks.size(); i++) {
+            received.add(tasks.get(i));
+        }
+        channel.attr(ScreenChannelInitializer.TASK_LIST).set(received);
     }
 }

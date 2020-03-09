@@ -2,8 +2,6 @@ package com.ad.admain.screen.handler;
 
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
-import com.ad.admain.mq.order.CommonSendCallback;
-import com.ad.admain.mq.order.OrderProduceImpl;
 import com.ad.admain.screen.FailTaskService;
 import com.ad.admain.screen.IdChannelPool;
 import com.ad.admain.screen.entity.FailTask;
@@ -84,7 +82,6 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
         if (evt instanceof IdleStateEvent) {
             //需要在这里判断是否有未处理的任务   直接在ctx里存放两个hashmap 一个存放每个条目编号的对应在消息队列中的
             //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
-            Long pooledId = ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
             List<Task> tasks = ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
             HashMap<Integer, FailTask> hashMap = new HashMap<>();
             for (Task task : tasks){

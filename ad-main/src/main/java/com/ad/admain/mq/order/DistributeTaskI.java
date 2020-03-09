@@ -27,15 +27,6 @@ public interface DistributeTaskI {
 
 
     /**
-     * @Description //统计在线车辆数目
-     * @Date 2020/3/8 16:46
-     * @param
-     *@return int
-     **/
-    int countOnlineNums();
-
-
-    /**
      * @Description //返回空闲车辆的hashmap
      * @Date 2020/3/8 16:47
      * @param

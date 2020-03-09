@@ -84,6 +84,20 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         if (tasks.size()==0) {
                             log.debug("id为:{}的设备还没收到任务", id);
                         } else {
+                            //总任务数目小于25，填充空白帧
+                            if (tasks.size()<25){
+
+                                int index = 25-tasks.size();
+                                for (int i =tasks.size();i<25;i++){
+                                    Task blankTask = Task.builder()
+                                            .adOrderId(0)
+                                            .entryId(i)
+                                            .verticalView(false)
+                                            .order(null)
+                                            .build();
+                                    tasks.add(blankTask);
+                                }
+                            }
                             for (int i=1; i <= tasks.size(); i++) {
                                 Task task=tasks.get(i - 1);
                                 AdOrder order=task.getOrder();
