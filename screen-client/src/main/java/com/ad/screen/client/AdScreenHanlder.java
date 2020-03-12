@@ -6,10 +6,12 @@ import com.ad.screen.client.vo.resp.AdEntry;
 import com.ad.screen.client.vo.resp.AdScreenResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -19,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenResponse> {
 
-    private final ConcurrentHashMap<Integer, AdEntry> cache=new ConcurrentHashMap<>();
+    private final ArrayBlockingQueue<AdEntry> cache=new ArrayBlockingQueue<>(1000);
     private final AtomicBoolean isStart=new AtomicBoolean(false);
 
 
@@ -32,33 +34,44 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                 new Thread(new ConsumerClass(cache, channelHandlerContext)).start();
             }
         }
-        cache.put(adScreenResponse.getNetData().getEntryId(), adScreenResponse.getNetData());
+        cache.put(adScreenResponse.getNetData());
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
 
     private static class ConsumerClass implements Runnable {
-        private final ConcurrentHashMap<Integer, AdEntry> cache;
+        private final ArrayBlockingQueue<AdEntry> cache;
         private ChannelHandlerContext context;
-        private int current;
+        private int currentEntry=0;
 
-        public ConsumerClass(ConcurrentHashMap<Integer, AdEntry> cache, ChannelHandlerContext context) {
+        public ConsumerClass(ArrayBlockingQueue<AdEntry> cache, ChannelHandlerContext context) {
             this.cache=cache;
             this.context=context;
-            current=0;
         }
 
 
+        @SneakyThrows
         @Override
         public void run() {
+            while (true) {
+                String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
+                AdEntry entry=null;
+                while (entry==null) {
+                    entry=cache.peek();
+                    currentEntry++;
+                }
+                Integer repeatNum=entry.getRepeatNum();
+                repeatNum--;
+                entry.setRepeatNum(repeatNum);
+                log.info("consumer 第 {} 次： {} at {} ", currentEntry, entry, LocalDateTime.now());
+                if (repeatNum==0) {
+                    cache.poll();
+                    currentEntry=0;
+                    context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                }
+                TimeUnit.SECONDS.sleep(12);
 
-            String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
-            AdEntry entry=null;
-            while (entry==null) {
-                entry=cache.get(current++);
             }
-            log.info("consumer {} at {} ", entry, LocalDateTime.now());
-            context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
         }
     }
 }

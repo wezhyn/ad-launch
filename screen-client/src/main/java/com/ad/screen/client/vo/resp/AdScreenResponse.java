@@ -14,6 +14,7 @@ public class AdScreenResponse extends AbstractScreenResponse<AdEntry> {
 
     public AdScreenResponse(AdEntry entry) {
         super();
+        setNetData(entry);
     }
 
     public static AdScreenResponseBuilder createInstance() {

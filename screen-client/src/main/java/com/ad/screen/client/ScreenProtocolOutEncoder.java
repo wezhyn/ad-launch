@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrame> {
 
 
-    private final static int BASE_NUM=47;
+    private final static int BASE_NUM=32;
     private final static DateTimeFormatter DATA_TIME_FORMATTER=DateTimeFormatter.ofPattern("YYYYMMddHHmmss");
 
     @Override

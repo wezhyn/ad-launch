@@ -1,6 +1,7 @@
 package com.ad.screen.client;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 /**
  * @author wezhyn
@@ -40,7 +41,7 @@ public class AdStringUtils {
         for (int i=0; i < code.length(); i+=2) {
             int a;
 
-            int b=Integer.parseInt(code.substring(i, i + 2));
+            int b=Integer.valueOf(code.substring(i, i + 2), 16);
             if (b > 0 && b < 127) {
                 a=b;
             } else {
@@ -48,7 +49,7 @@ public class AdStringUtils {
             }
             buf[i/2]=(byte) a;
         }
-        return new String(buf);
+        return new String(buf, Charset.forName("gb2312"));
     }
 
     public static String gb2312Code(String str) {

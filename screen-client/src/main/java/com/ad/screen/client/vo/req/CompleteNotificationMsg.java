@@ -16,6 +16,6 @@ public class CompleteNotificationMsg extends BaseScreenRequest<Integer> {
 
     @Override
     public String netData() {
-        return AdStringUtils.getNum(getNetData(), 5);
+        return AdStringUtils.getNum(getNetData(), 4);
     }
 }

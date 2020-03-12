@@ -3,7 +3,9 @@ package com.ad.screen.client.vo;
 import com.ad.screen.client.AdStringUtils;
 import com.ad.screen.client.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.client.vo.req.BaseScreenRequest;
+import com.ad.screen.client.vo.req.ConfirmMsg;
 import com.ad.screen.client.vo.resp.AdEntry;
+import com.ad.screen.client.vo.resp.AdScreenResponse;
 import io.netty.buffer.ByteBuf;
 import javafx.geometry.Point2D;
 import lombok.Getter;
@@ -27,7 +29,7 @@ public enum FrameType {
     HEART_BEAT(2), CONFIRM(1), GPS(3) {
         @Override
         @SuppressWarnings("unchecked")
-        public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
+        public Object netData(ByteBuf msg) throws Exception {
             final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
             String gpsString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
             final String[] gpsSplit=gpsString.split(",");
@@ -52,34 +54,34 @@ public enum FrameType {
                     }
                 }
             }
-            U data=(U) new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]);
-            request.setNetData(data);
+            Object data=new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]);
+            return data;
         }
     }, COMPLETE_NOTIFICATION(4) {
         @Override
         @SuppressWarnings("unchecked")
-        public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
-            U data=(U) msg.readCharSequence(4, StandardCharsets.US_ASCII).toString();
-            request.setNetData(data);
+        public Object netData(ByteBuf msg) throws Exception {
+            Object data=msg.readCharSequence(4, StandardCharsets.US_ASCII).toString();
+            return data;
         }
     }, IP(2), AD(3) {
         @Override
         @SuppressWarnings("unchecked")
-        public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
+        public Object netData(ByteBuf msg) throws Exception {
             final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
-            String adString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
+            String adString=msg.readCharSequence(readableLength - 2, StandardCharsets.US_ASCII).toString();
             final String[] adSplits=adString.split(",");
-            if (adSplits.length!=5) {
+            if (adSplits.length < 5) {
                 throw new ScreenProtocolCheckInboundHandler.ParserException();
             }
-            U entry=(U) new AdEntry.AdEntryBuilder()
+            Object entry=new AdEntry.AdEntryBuilder()
                     .entryId(Integer.parseInt(adSplits[0]))
                     .repeatNum(AdStringUtils.parseNum(adSplits[1]))
                     .verticalView(Integer.parseInt(adSplits[2])!=1)
                     .viewLength((byte) AdStringUtils.parseNum(adSplits[3]))
                     .view(AdStringUtils.code2String(adSplits[4]))
                     .build();
-            request.setNetData(entry);
+            return entry;
         }
     };
 
@@ -108,7 +110,31 @@ public enum FrameType {
     }
 
 
-    public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
+    public Object netData(ByteBuf msg) throws Exception {
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends BaseScreenRequest<?>> T generateRequest(Object data) {
+        T t;
+        switch (this) {
+            case AD: {
+                t=(T) new AdScreenResponse((AdEntry) data);
+                break;
+            }
+
+            case CONFIRM: {
+                t=(T) new ConfirmMsg();
+                break;
+            }
+            default:
+                t=null;
+
+        }
+        if (t!=null) {
+            t.setFrameType(this);
+        }
+        return t;
     }
 
 

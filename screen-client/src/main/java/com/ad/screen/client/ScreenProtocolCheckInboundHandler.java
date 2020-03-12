@@ -110,36 +110,41 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     }
 
-    private BaseScreenRequest<?> readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
-        final BaseScreenRequest<?> request=new BaseScreenRequest<>();
+    @SuppressWarnings("unchecked")
+    private <T extends BaseScreenRequest<?>> T readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
         msg.skipBytes(start + lengthFieldOffset + lengthFieldLength);
-        readRequestEquipmentName(msg, request);
-        readType(msg, request);
-        readNetData(msg, request);
-        return request;
+        String equipmentName=readRequestEquipmentName(msg);
+        FrameType type=readType(msg);
+        Object data=readNetData(msg, type);
+        final BaseScreenRequest<?> baseScreenRequest=type.generateRequest(data);
+        baseScreenRequest.setEquipmentName(equipmentName);
+        return (T) baseScreenRequest;
+
     }
 
-    private void readRequestEquipmentName(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
+
+    private String readRequestEquipmentName(ByteBuf msg) throws ParserException {
         checkDelimiter(msg);
         final CharSequence charSequence=msg.readCharSequence(15, StandardCharsets.US_ASCII);
-        request.setEquipmentName(charSequence.toString());
+        return charSequence.toString();
     }
 
-    private void readType(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
+    private FrameType readType(ByteBuf msg) throws ParserException {
         checkDelimiter(msg);
         final byte bType=msg.readByte();
-        request.setFrameType(FrameType.parseServer((char) bType));
+        return (FrameType.parseServer((char) bType));
     }
 
-    private void readNetData(ByteBuf msg, BaseScreenRequest<?> request) throws ParserException {
+    private Object readNetData(ByteBuf msg, FrameType type) throws ParserException {
         checkDelimiter(msg);
         try {
-            request.getFrameType().netData(msg, request);
+            Object u=type.netData(msg);
+            //            检验末尾 ','
+            checkDelimiter(msg);
+            return u;
         } catch (Exception e) {
             throw new ParserException(e);
         }
-        //            检验末尾 ','
-        checkDelimiter(msg);
     }
 
     private void checkDelimiter(ByteBuf msg) throws ParserException {
