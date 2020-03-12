@@ -1,7 +1,7 @@
 package com.ad.admain.controller;
 
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;

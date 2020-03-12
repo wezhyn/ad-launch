@@ -1,8 +1,8 @@
 package com.ad.admain.service.impl;
 
-import com.ad.admain.controller.account.AdminService;
-import com.ad.admain.controller.account.AuthenticationEnum;
-import com.ad.admain.controller.account.entity.Admin;
+import com.ad.admain.controller.account.administrator.Admin;
+import com.ad.admain.controller.account.administrator.AdminService;
+import com.ad.launch.user.AuthenticationEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

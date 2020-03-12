@@ -1,6 +1,6 @@
 package com.ad.admain.controller;
 
-import com.ad.admain.controller.account.dto.UserDto;
+import com.ad.admain.controller.account.user.UserDto;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

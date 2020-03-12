@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication(scanBasePackages="com.ad.*", exclude={SecurityAutoConfiguration.class})
 @EnableCaching
 @EnableTransactionManagement()
+@ImportResource(locations={"classpath:provoder.xml"})
 @EnableConfigurationProperties(value={JwtProperties.class, QiNiuProperties.class, QqCloudSmsProperties.class})
 public class AdLaunchApplication {
 

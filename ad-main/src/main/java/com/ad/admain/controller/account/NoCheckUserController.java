@@ -1,9 +1,8 @@
 package com.ad.admain.controller.account;
 
 import com.ad.admain.controller.AbstractBaseController;
-import com.ad.admain.controller.account.dto.RegisterDto;
-import com.ad.admain.controller.account.dto.UserDto;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.UserDto;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.GenericUserMapper;
 import com.wezhyn.project.BaseService;

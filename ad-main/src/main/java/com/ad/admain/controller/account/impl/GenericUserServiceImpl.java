@@ -1,9 +1,9 @@
 package com.ad.admain.controller.account.impl;
 
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.dto.UserDto;
-import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.account.repository.GenericUserRepository;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.GenericUserRepository;
+import com.ad.admain.controller.account.user.UserDto;
 import com.ad.admain.security.jwt.JwtDetailService;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;

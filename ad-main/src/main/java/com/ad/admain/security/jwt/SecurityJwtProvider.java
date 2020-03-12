@@ -1,10 +1,11 @@
 package com.ad.admain.security.jwt;
 
 import com.ad.admain.config.web.JwtProperties;
-import com.ad.admain.controller.account.entity.IUser;
 import com.ad.admain.security.AdAuthentication;
 import com.ad.admain.security.exception.JwtParseException;
-import com.ad.admain.utils.RoleAuthenticationUtils;
+import com.ad.launch.user.AdSimpleGrantedAuthority;
+import com.ad.launch.user.IUser;
+import com.ad.launch.user.RoleAuthenticationUtils;
 import com.wezhyn.project.utils.StringUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -13,11 +14,14 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.wezhyn.project.utils.StringUtils.getRandomString;
 
@@ -63,7 +67,10 @@ public class SecurityJwtProvider {
         String authority=(String) claims.get("auth");
         Integer id=Integer.valueOf(claims.getId());
         String username=(String) claims.get("username");
-        Collection<? extends GrantedAuthority> grantedAuthorities=RoleAuthenticationUtils.forGrantedAuthorities(authority);
+        Collection<? extends GrantedAuthority> grantedAuthorities=RoleAuthenticationUtils.forGrantedAuthorities(authority)
+                .stream()
+                .map(adg->new SimpleGrantedAuthority(adg.getAuthority()))
+                .collect(Collectors.toList());
         return AdAuthentication.createByJwt(id, username, grantedAuthorities);
     }
 
@@ -81,7 +88,11 @@ public class SecurityJwtProvider {
         } else {
             time=new Date(time.getTime() + this.tokenValidTime);
         }
-        String authority=RoleAuthenticationUtils.grantedAuthorities2SingleString(adAuthentication.getAuthorities());
+        List<AdSimpleGrantedAuthority> adSimpleGrantedAuthorities=adAuthentication.getAuthorities()
+                .stream()
+                .map(x->new AdSimpleGrantedAuthority(x.getAuthority()))
+                .collect(Collectors.toList());
+        String authority=RoleAuthenticationUtils.grantedAuthorities2SingleString(adSimpleGrantedAuthorities);
         Claims claims=new DefaultClaims();
         claims
                 .setExpiration(time)

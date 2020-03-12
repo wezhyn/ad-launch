@@ -1,6 +1,6 @@
 package com.ad.admain.controller.equipment.entity;
 
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;
@@ -13,10 +13,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @author wezhyn
@@ -39,7 +37,7 @@ public class Equipment implements IBaseTo<Integer> {
 
     private Integer uid;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="uid", insertable=false, updatable=false)
     private GenericUser orderUser;
 
@@ -57,7 +55,7 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("0")
     private Double longitude;
 
-    @Column(name = "key")
+    @Column(name="key")
     private String key;
 
     @Column(insertable=false, updatable=false)
@@ -82,7 +80,7 @@ public class Equipment implements IBaseTo<Integer> {
     private String feedback;
 
 
-    @Column(name = "remain")
+    @Column(name="remain")
     @ColumnDefault("10")
     private Integer remain;
 

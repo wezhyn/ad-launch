@@ -1,6 +1,6 @@
 package com.ad.admain.controller.activity;
 
-import com.ad.admain.controller.account.entity.Admin;
+import com.ad.admain.controller.account.administrator.Admin;
 import com.wezhyn.project.IBaseTo;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;

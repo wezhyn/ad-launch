@@ -1,8 +1,8 @@
 package com.ad.admain.service;
 
-import com.ad.admain.controller.account.AuthenticationEnum;
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.launch.user.AuthenticationEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

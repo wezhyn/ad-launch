@@ -1,6 +1,6 @@
 package com.ad.admain.controller.activity;
 
-import com.ad.admain.controller.account.dto.AdminDto;
+import com.ad.admain.controller.account.administrator.AdminDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

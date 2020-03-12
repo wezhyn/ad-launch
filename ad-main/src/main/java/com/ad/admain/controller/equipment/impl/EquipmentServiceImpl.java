@@ -4,7 +4,7 @@ import com.ad.admain.controller.equipment.EquipmentRepository;
 import com.ad.admain.controller.equipment.EquipmentService;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.equipment.entity.EquipmentVerify;
-import com.ad.admain.utils.SquareUtils;
+import com.ad.launch.order.SquareUtils;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -26,8 +26,6 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     private EquipmentRepository equipmentRepository;
 
 
-
-
     @Override
     public Page<Equipment> getListByUid(Integer uid, Pageable pageable) {
         Equipment equipment=Equipment.createFromUid(uid);
@@ -37,34 +35,34 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
 
     @Override
     public Long getEquipmentByRegion(Double longitude, Double latitude, Double square) {
-      Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.countByLongitudeBetweenAndLatitudeBetween(info[0],info[1],info[2],info[3]);
-                }
-
-    @Override
-    public Long countAllByVerifyAndStatusAndRegion(EquipmentVerify equipmentVerify,Boolean status, Double longitude, Double latitude, Double square){
-        Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.countByVerifyEqualsAndStatusEqualsAndLongitudeBetweenAndLatitudeBetween(EquipmentVerify.PASSING_VERIFY,true,info[0],info[1],info[2],info[3]);
+        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, square);
+        return equipmentRepository.countByLongitudeBetweenAndLatitudeBetween(info[0], info[1], info[2], info[3]);
     }
 
     @Override
-    public Long countAllOnlineByRegionAndStatus (Boolean status, Double longitude, Double latitude, Double square) {
-        Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        Long nums = equipmentRepository.countByStatusEqualsAndLongitudeBetweenAndLatitudeBetween(status,info[0],info[1],info[2],info[3]);
+    public Long countAllOnlineByRegionAndStatus(Boolean status, Double longitude, Double latitude, Double square) {
+        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, square);
+        Long nums=equipmentRepository.countByStatusEqualsAndLongitudeBetweenAndLatitudeBetween(status, info[0], info[1], info[2], info[3]);
 
         return nums;
     }
 
     @Override
-    public Long countAllAvailableEquips(Boolean status, Integer rate, Double longitude, Double latitude, Double square) {
-        Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(true,rate,info[0],info[1],info[2],info[3],EquipmentVerify.PASSING_VERIFY);
+    public Long countAllByVerifyAndStatusAndRegion(EquipmentVerify equipmentVerify, Boolean status, Double longitude, Double latitude, Double square) {
+        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, square);
+        return equipmentRepository.countByVerifyEqualsAndStatusEqualsAndLongitudeBetweenAndLatitudeBetween(EquipmentVerify.PASSING_VERIFY, true, info[0], info[1], info[2], info[3]);
     }
 
     @Override
-    public List<Equipment> findAllAvailableEquips(Boolean status,Integer rate, Double longitude, Double latitude, Double square) {
-        Double[] info = SquareUtils.getSquareInfo(longitude,latitude,square);
-        return equipmentRepository.findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(true,rate,info[0],info[1],info[2],info[3], EquipmentVerify.PASSING_VERIFY);
+    public Long countAllAvailableEquips(Boolean status, Integer rate, Double longitude, Double latitude, Double square) {
+        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, square);
+        return equipmentRepository.countAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEquals(true, rate, info[0], info[1], info[2], info[3], EquipmentVerify.PASSING_VERIFY);
+    }
+
+    @Override
+    public List<Equipment> findAllAvailableEquips(Boolean status, Integer rate, Double longitude, Double latitude, Double square) {
+        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, square);
+        return equipmentRepository.findAllByStatusEqualsAndRemainGreaterThanEqualAndLongitudeBetweenAndLatitudeBetweenAndVerifyEqualsOrderByRemainDesc(true, rate, info[0], info[1], info[2], info[3], EquipmentVerify.PASSING_VERIFY);
     }
 
     @Override
@@ -77,4 +75,4 @@ public class EquipmentServiceImpl extends AbstractBaseService<Equipment, Integer
     public EquipmentRepository getRepository() {
         return equipmentRepository;
     }
-        }
+}

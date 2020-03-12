@@ -115,7 +115,7 @@
             <scope>compile</scope>
             <optional>true</optional>
         </dependency>
-<!--        netty所有的依赖-->
+        <!--        netty所有的依赖-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>

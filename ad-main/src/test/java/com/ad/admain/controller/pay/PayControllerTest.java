@@ -1,12 +1,12 @@
 package com.ad.admain.controller.pay;
 
-import com.ad.admain.controller.account.entity.GenericUser;
-import com.ad.admain.controller.account.entity.IUser;
+import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.pay.to.OrderVerify;
 import com.ad.admain.controller.pay.to.TransferOrder;
 import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.pay.WithDrawNotification;
 import com.ad.admain.pay.exception.WithdrawException;
+import com.ad.launch.user.IUser;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.Participant;
 import com.wezhyn.project.controller.ResponseResult;

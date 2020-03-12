@@ -8,7 +8,7 @@ package com.ad.admain.mq.order;
  * @Version V1.0
  **/
 public class TaskMessage {
-    public static final String TOPIC_TAG = "task_topic";
+    public static final String TOPIC_TAG="task_topic";
 
 
 }

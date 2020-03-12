@@ -19,13 +19,16 @@
         <java.version>1.8</java.version>
         <mapstruct.version>1.3.1.Final</mapstruct.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dubbo.version>2.7.5</dubbo.version>
+        <spring-boot.version>2.0.4.RELEASE</spring-boot.version>
+        <nacos.version>1.1.1</nacos.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
 
-        <!--自动映射 dto -> do -->
+        <!-- 自动映射 dto -> do -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-jdk8</artifactId>
@@ -35,6 +38,56 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.ad</groupId>
+                <artifactId>launch-order-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <!-- Spring Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Apache Dubbo  -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-dependencies-bom</artifactId>
+                <version>${dubbo.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-spring-boot-starter</artifactId>
+                <version>2.7.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ad</groupId>
+                <artifactId>launch-user-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
             <dependency>
                 <groupId>com.github.qcloudsms</groupId>
                 <artifactId>qcloudsms</artifactId>
@@ -47,7 +100,6 @@
                 <artifactId>alipay-sdk-java</artifactId>
                 <version>4.9.28.ALL</version>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -64,11 +116,14 @@
     <modules>
         <module>ad-main</module>
         <module>common</module>
+        <module>launch-user-api</module>
+        <module>launch-order-api</module>
+        <module>screen-client</module>
+        <module>comsumer-test</module>
     </modules>
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

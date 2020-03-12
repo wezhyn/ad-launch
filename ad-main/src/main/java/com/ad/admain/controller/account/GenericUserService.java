@@ -1,7 +1,7 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.controller.account.dto.UserDto;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.UserDto;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.wezhyn.project.BaseService;
 

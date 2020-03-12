@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- *
  * @author wezhyn
  * @since 02.24.2020
  */

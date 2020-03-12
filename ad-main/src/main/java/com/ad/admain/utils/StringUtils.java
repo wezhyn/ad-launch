@@ -11,13 +11,13 @@ import java.util.List;
  * @Version 1.0
  */
 public class StringUtils {
-    public static final String rawCron = "0 0/5 * * *？";
-    public static final int carRate =10;
+    public static final String rawCron="0 0/5 * * *？";
+    public static final int carRate=10;
 
-    public static String getContent(String rawContent){
-        String content = "";
-        String[] part = rawContent.split("#");
-        for (int i = 0; i < part.length; i++) {
+    public static String getContent(String rawContent) {
+        String content="";
+        String[] part=rawContent.split("#");
+        for (int i=0; i < part.length; i++) {
             content+=part[i];
         }
         return content;
@@ -25,7 +25,7 @@ public class StringUtils {
 
     //获取List参数值
     public static String getListString(List<String> list) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result=new StringBuilder();
         for (String s : list) {
             result.append(s).append(" ");
         }

@@ -1,7 +1,7 @@
 package com.ad.admain.aop;
 
 import com.ad.admain.controller.ISmsService;
-import com.ad.admain.controller.account.dto.RegisterDto;
+import com.ad.admain.controller.account.RegisterDto;
 import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.utils.Strings;
 import org.aspectj.lang.ProceedingJoinPoint;

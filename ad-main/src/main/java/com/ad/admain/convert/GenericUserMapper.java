@@ -1,8 +1,8 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.config.QiNiuProperties;
-import com.ad.admain.controller.account.dto.UserDto;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.UserDto;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 

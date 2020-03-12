@@ -1,8 +1,6 @@
 package com.ad.admain.mq.order;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.SendCallback;
-import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ public class OrderProduceImpl implements CancelOrderProduceI, PaymentOrderProduc
         rocketMQTemplate.asyncSend(PaymentOrderMessage.TOPIC_TAG, orderMessage,
                 new com.ad.admain.mq.order.CommonSendCallback<>(orderMessage));
     }
-
 
 
 }

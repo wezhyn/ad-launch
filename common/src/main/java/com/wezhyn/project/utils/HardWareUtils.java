@@ -1,7 +1,6 @@
 package com.wezhyn.project.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.criterion.Order;
 
 /**
  * @ClassName HardWareUtils
@@ -13,7 +12,7 @@ import org.hibernate.criterion.Order;
  */
 @Slf4j
 public class HardWareUtils {
-    public static void distribute(){
+    public static void distribute() {
         log.info("发送广告");
         return;
     }

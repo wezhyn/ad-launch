@@ -1,7 +1,7 @@
 package com.ad.admain.to;
 
-import com.ad.admain.controller.account.SexEnum;
 import com.wezhyn.project.StringEnum;
+import com.wezhyn.project.account.SexEnum;
 import com.wezhyn.project.database.JpaHibernateEnumConverter;
 import lombok.Getter;
 import lombok.Setter;

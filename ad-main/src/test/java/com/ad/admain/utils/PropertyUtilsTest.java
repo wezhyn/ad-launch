@@ -1,8 +1,8 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.controller.account.AuthenticationEnum;
-import com.ad.admain.controller.account.SexEnum;
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.launch.user.AuthenticationEnum;
+import com.wezhyn.project.account.SexEnum;
 import com.wezhyn.project.utils.PropertyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

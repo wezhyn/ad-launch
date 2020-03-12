@@ -1,6 +1,8 @@
 package com.ad.admain.controller.account;
 
-import com.ad.admain.controller.account.entity.Admin;
+import com.ad.admain.controller.account.administrator.Admin;
+import com.ad.admain.controller.account.administrator.AdminService;
+import com.wezhyn.project.account.SexEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

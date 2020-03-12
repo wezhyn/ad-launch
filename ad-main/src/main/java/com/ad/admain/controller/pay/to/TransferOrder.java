@@ -1,6 +1,6 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.account.entity.IUser;
+import com.ad.launch.user.IUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
@@ -59,8 +59,6 @@ public class TransferOrder extends Order {
             totalAmount(totalAmount)
                     .orderName(user);
         }
-
-
 
 
         public TransferOrderBuilder identify(String identify) {

@@ -1,6 +1,6 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.admain.controller.account.entity.GenericUser;
+import com.ad.admain.controller.account.user.GenericUser;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
 import com.wezhyn.project.database.EnumType;

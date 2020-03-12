@@ -13,15 +13,15 @@ import java.net.InetSocketAddress;
  * @Version 1.0
  */
 public class RemoteAddressUtils {
-    public static String getIp(ChannelHandlerContext channelHandlerContext){
-        InetSocketAddress ipSocket = (InetSocketAddress)channelHandlerContext.channel().remoteAddress();
-        String clientIp = ipSocket.getAddress().getHostAddress();
+    public static String getIp(ChannelHandlerContext channelHandlerContext) {
+        InetSocketAddress ipSocket=(InetSocketAddress) channelHandlerContext.channel().remoteAddress();
+        String clientIp=ipSocket.getAddress().getHostAddress();
         return clientIp;
     }
 
-    public static int getPort(ChannelHandlerContext channelHandlerContext){
-        InetSocketAddress ipSocket = (InetSocketAddress)channelHandlerContext.channel().remoteAddress();
-        int clientIp = ipSocket.getPort();
-        return clientIp ;
+    public static int getPort(ChannelHandlerContext channelHandlerContext) {
+        InetSocketAddress ipSocket=(InetSocketAddress) channelHandlerContext.channel().remoteAddress();
+        int clientIp=ipSocket.getPort();
+        return clientIp;
     }
 }

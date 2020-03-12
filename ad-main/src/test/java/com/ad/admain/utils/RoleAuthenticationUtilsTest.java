@@ -1,6 +1,7 @@
 package com.ad.admain.utils;
 
-import com.ad.admain.controller.account.AuthenticationEnum;
+import com.ad.launch.user.AuthenticationEnum;
+import com.ad.launch.user.RoleAuthenticationUtils;
 import org.junit.Test;
 
 import java.util.Arrays;

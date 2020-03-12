@@ -1,12 +1,16 @@
 package com.ad.admain.security.impl;
 
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.entity.IUser;
 import com.ad.admain.security.AdUserDetails;
 import com.ad.admain.security.AdUserDetailsService;
+import com.ad.launch.user.IUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : wezhyn
@@ -29,7 +33,11 @@ public class AdUserDetailServiceImpl extends AdUserDetailsService {
         if (log.isDebugEnabled()) {
             log.debug("找到用户 : " + user);
         }
-        return new AdUser(user.getId(), user.getUsername(), user.getPassword(), user.isLock(), user.getAuthorities());
+        List<SimpleGrantedAuthority> authorities=user.getAuthorities()
+                .stream()
+                .map(x->new SimpleGrantedAuthority(x.getAuthority()))
+                .collect(Collectors.toList());
+        return new AdUser(user.getId(), user.getUsername(), user.getPassword(), user.isLock(), authorities);
     }
 
     @Override

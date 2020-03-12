@@ -2,12 +2,12 @@ package com.ad.admain.controller.impl;
 
 import com.ad.admain.config.QiNiuProperties;
 import com.ad.admain.controller.FileUploadService;
-import com.ad.admain.controller.account.AdminService;
 import com.ad.admain.controller.account.CommonAccountService;
 import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.account.administrator.AdminService;
 import com.ad.admain.controller.exception.FileUploadException;
 import com.ad.admain.security.AdAuthentication;
-import com.ad.admain.utils.RoleAuthenticationUtils;
+import com.ad.launch.user.RoleAuthenticationUtils;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
@@ -18,6 +18,7 @@ import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,7 +83,7 @@ public class QiNiuFileUploadServiceImpl implements FileUploadService {
         String userName=authentication.getName();
 //        读取历史头像地址
         CommonAccountService<?, ?> commonAccountService;
-        if (RoleAuthenticationUtils.isAuthentication(authentication.getAuthorities())) {
+        if (RoleAuthenticationUtils.isAuthentication(authentication.getAuthorities(), SimpleGrantedAuthority::new)) {
             commonAccountService=adminService;
         } else {
             commonAccountService=genericUserService;
