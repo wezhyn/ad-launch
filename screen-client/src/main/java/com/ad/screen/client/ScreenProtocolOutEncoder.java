@@ -4,6 +4,7 @@ import com.ad.screen.client.vo.IScreenFrame;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  * @author wezhyn
  * @since 02.19.2020
  */
+@Slf4j
 public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrame> {
 
 
@@ -31,7 +33,10 @@ public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrame>
                 .append(msg.netData())
                 .append(",")
                 .append("EOF\r\n");
-        out.writeBytes(sb.toString().getBytes());
+        String result=sb.toString();
+        log.warn("输出{}帧：{}", msg.type(), result);
+        out.writeBytes(result.getBytes());
+        ctx.flush();
     }
 
     private String getResponseNum(IScreenFrame msg) throws UnsupportedEncodingException {

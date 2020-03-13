@@ -9,8 +9,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
+import lombok.extern.slf4j.Slf4j;
 
 import java.text.DecimalFormat;
 import java.util.Random;
@@ -20,27 +22,36 @@ import java.util.concurrent.TimeUnit;
  * @author wezhyn
  * @since 03.12.2020
  */
+@Slf4j
 public class ScreenClient {
 
     public static final AttributeKey<String> REGISTERED_ID=AttributeKey.valueOf("equipment");
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup client=new NioEventLoopGroup();
-        String equipName="1111111111111" + AdStringUtils.getNum(new Random().nextInt(100), 2);
+        String address="server.natappfree.cc";
+        int port=42910;
+        String equipName="11111111111111" + AdStringUtils.getNum(new Random().nextInt(10), 1);
+        log.info("当前设备 IEMI： {}", equipName);
         try {
             Bootstrap b=new Bootstrap()
                     .channel(NioSocketChannel.class)
                     .group(client)
-                    .remoteAddress("localhost", 28888)
+                    .remoteAddress(address, port)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().channel().attr(REGISTERED_ID).set(equipName);
-                            socketChannel.pipeline().addLast(new ScreenProtocolCheckInboundHandler(27, 3, 4, true))
+                            socketChannel.pipeline()
+                                    .addLast(new ScreenProtocolCheckInboundHandler(27, 3, 4, true))
                                     .addLast(new ScreenProtocolOutEncoder())
+                                    .addLast(new IdleStateHandler(70, 70, 80))
+                                    .addLast(new ConfirmHandler())
                                     .addLast(new AdScreenHanlder());
                             socketChannel.eventLoop().scheduleAtFixedRate(()->{
+                                log.info("发送心跳帧");
                                 socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
+
                             }, 0, 1, TimeUnit.MINUTES);
                             socketChannel.eventLoop().scheduleAtFixedRate(()->{
                                 Random r=new Random();
@@ -48,7 +59,8 @@ public class ScreenClient {
                                 double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10000)*0.0001d));
                                 double y=Double.parseDouble(df.format(3013.16405 + r.nextInt(10000)*0.0001d));
                                 socketChannel.pipeline().writeAndFlush(new GpsMsg(new Point2D(x, y), equipName));
-                            }, 0, 5, TimeUnit.MINUTES);
+                                log.info("发送GPS帧：{},{}", x, y);
+                            }, 0, 2, TimeUnit.MINUTES);
                         }
                     });
             ChannelFuture f=b.connect().sync();
