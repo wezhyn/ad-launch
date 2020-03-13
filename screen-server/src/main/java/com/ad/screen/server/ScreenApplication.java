@@ -1,5 +1,6 @@
 package com.ad.screen.server;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @SpringBootApplication
 @ImportResource(locations={"classpath:consumer.xml"})
+@EnableDubbo
 public class ScreenApplication {
 
 

@@ -120,6 +120,7 @@
         <module>launch-order-api</module>
         <module>screen-client</module>
         <module>comsumer-test</module>
+        <module>screen-server</module>
     </modules>
 
     <build>

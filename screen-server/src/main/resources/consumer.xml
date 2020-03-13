@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd        http://dubbo.apache.org/schema/dubbo        http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
-    <dubbo:application name="ad-consumer-test"/>
+    <dubbo:application name="ad-consumer"/>
 
     <!-- 使用multicast广播注册中心暴露服务地址 -->
     <dubbo:registry address="nacos://47.111.185.61:8848"/>

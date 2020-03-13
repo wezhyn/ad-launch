@@ -1,30 +1,16 @@
-server:
-  port: 28080
-  address: 0.0.0.0
-  tomcat:
-    max-threads: 8
-rocketmq:
-  name-server: 47.111.185.61:9876
-  producer:
-    group: order-group
-management:
-  security:
-    enabled: false
 spring:
-  profiles:
-    active: zhaoo
-  #     active: dev
+  application:
+    name: ad-comsumer
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
-    username: ${custom.mysql.username}
-    password: ${custom.mysql.password}
+    url: jdbc:mysql://ecs.izhaoo.com:3306/fkz?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
+    username: fkz
+    password: fkz
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-
   jackson:
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
     time-zone: GMT+8
@@ -34,5 +20,15 @@ netty:
     address: localhost
     port: 8888
     allTimeout: 60
-
-
+dubbo:
+  registry:
+    username: nacos
+    password: nacos
+    address: nacos://47.111.185.61
+  protocol:
+    name: dubbo
+    port: 12345
+rocketmq:
+  name-server: 47.111.185.61:9876
+  producer:
+    group: order-group
