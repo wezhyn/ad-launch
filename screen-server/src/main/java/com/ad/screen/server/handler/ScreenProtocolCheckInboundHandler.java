@@ -34,7 +34,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
     /**
      * 设备attr的key
      */
-    private final static AttributeKey<AdEquipment> EQUIPMENT=AttributeKey.valueOf("EQUIPMENT");
+    public final static AttributeKey<AdEquipment> EQUIPMENT=AttributeKey.valueOf("EQUIPMENT");
 
     @Autowired
     EquipmentCacheService equipmentCacheService;
@@ -117,7 +117,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                 request=readRequest(inboundMsg, sof, frameLength);
                 String imei=request.getEquipmentName();
                 AdEquipment equipment=equipmentCacheService.get(imei);
-                //如果设备存在，则在channel中保存当前设备信息
+                //如果设备存在，则在缓存中中保存当前设备信息
                 if (equipment!=null) {
                     equipment.setStatus(true);
                     ctx.channel().attr(EQUIPMENT).set(equipment);

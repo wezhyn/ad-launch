@@ -1,5 +1,6 @@
 package com.ad.screen.server.entity;
 
+import com.ad.launch.order.AdOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,10 +36,8 @@ public class Completion {
     @Column(name="ad_order_id")
     Integer adOrderId;
 
-
     @Column(name="uid")
     Integer uid;
-
     /**
      * 是否已经提现
      */

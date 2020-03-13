@@ -25,6 +25,6 @@ public class CompletionImpl implements CompletionI {
 
     @Override
     public Completion findByOidAndUid(Integer oid, Integer uid) {
-        return completionRepository.findCompletionByAdOrderIdAndGenericUserId(oid, uid);
+        return completionRepository.findCompletionByAdOrderIdAndUid(oid, uid);
     }
 }

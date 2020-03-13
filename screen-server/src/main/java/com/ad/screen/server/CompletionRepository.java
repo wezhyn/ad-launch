@@ -11,5 +11,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Version V1.0
  **/
 public interface CompletionRepository extends JpaRepository<Completion, Integer> {
-    Completion findCompletionByAdOrderIdAndGenericUserId(Integer orderId, Integer uid);
+    Completion findCompletionByAdOrderIdAndUid(Integer orderId, Integer uid);
 }

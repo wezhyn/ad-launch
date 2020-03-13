@@ -78,33 +78,35 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
             //需要在这里判断是否有未处理的任务   直接在ctx里存放两个hashmap 一个存放每个条目编号的对应在消息队列中的
             //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
             List<Task> tasks=ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
-            HashMap<Integer, FailTask> hashMap=new HashMap<>();
-            for (Task task : tasks) {
-                Integer id=task.getAdOrderId();
-                if (id==0) {
-                    continue;
-                } else {
-                    //整合一个FailTask持久化
-                    FailTask failTask=hashMap.get(id);
-                    if (failTask==null) {
-                        failTask.setOrderId(id);
-                        failTask.setNum(task.getRepeatNum());
-                        failTask.setUid(task.getUid());
-                        hashMap.put(id, failTask);
+            if (tasks!=null){
+                HashMap<Integer, FailTask> hashMap=new HashMap<>();
+                for (Task task : tasks) {
+                    Integer id=task.getAdOrderId();
+                    if (id==0) {
+                        continue;
                     } else {
-                        failTask.setNum(failTask.getNum() + task.getRepeatNum());
-                        hashMap.put(id, failTask);
+                        //整合一个FailTask持久化
+                        FailTask failTask=hashMap.get(id);
+                        if (failTask==null) {
+                            failTask.setOrderId(id);
+                            failTask.setNum(task.getRepeatNum());
+                            failTask.setUid(task.getUid());
+                            hashMap.put(id, failTask);
+                        } else {
+                            failTask.setNum(failTask.getNum() + task.getRepeatNum());
+                            hashMap.put(id, failTask);
+                        }
                     }
                 }
-            }
-            for (Map.Entry<Integer, FailTask> entry :
-                    hashMap.entrySet()) {
-                FailTask failTask=failTaskService.findById(entry.getKey());
-                if (failTask==null) {
-                    failTaskService.save(entry.getValue());
-                } else {
-                    failTask.setNum(entry.getValue().getNum() + failTask.getNum());
-                    failTaskService.save(failTask);
+                for (Map.Entry<Integer, FailTask> entry :
+                        hashMap.entrySet()) {
+                    FailTask failTask=failTaskService.findById(entry.getKey());
+                    if (failTask==null) {
+                        failTaskService.save(entry.getValue());
+                    } else {
+                        failTask.setNum(entry.getValue().getNum() + failTask.getNum());
+                        failTaskService.save(failTask);
+                    }
                 }
             }
 
@@ -113,17 +115,13 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
             //更新设备的在线状态
             AdEquipment equipment=(AdEquipment) ctx.channel().attr(AttributeKey.valueOf("equip")).get();
             equipment.setStatus(false);
-            equipmentService.mergeEquip(equipment);
+            //保存设备的最终信息
+            preserveEquipInfo(equipment);
 
             //此实例项目只设置了全部超时时间,可以通过state分别做处理,客户端发送心跳维持连接
             IdleState state=((IdleStateEvent) evt).state();
             //关闭连接
-            if (state==IdleState.READER_IDLE) {
-                log.warn("客户端{}读取超时,关闭连接", ctx.channel().remoteAddress());
-                ctx.close();
-            } else if (state==IdleState.WRITER_IDLE) {
-                log.warn("客户端{}写入超时", ctx.channel().remoteAddress());
-            } else if (state==IdleState.ALL_IDLE) {
+            if (state==IdleState.ALL_IDLE) {
                 log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
             }
         } else {
@@ -135,6 +133,15 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("exceptionCaught", cause);
         ctx.close();
+    }
+    /**
+     * @Description //保存超时时设备最后的状态信息
+     * @Date 2020/3/13 20:58
+     * @param adEquipment
+     *@return void
+     **/
+    public void preserveEquipInfo(AdEquipment adEquipment){
+        equipmentService.mergeEquip(adEquipment);
     }
 
 }

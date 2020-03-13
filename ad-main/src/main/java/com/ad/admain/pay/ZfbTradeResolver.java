@@ -52,6 +52,7 @@ public class ZfbTradeResolver {
     public boolean handle(AlipayAsyncNotificationGetterI alipayAsyncNotification) {
         TradeStatus tradeStatus=handleOrderStatus(alipayAsyncNotification);
         if (tradeStatus==TradeStatus.TRADE_SUCCESS) {
+
             return true;
         } else if (tradeStatus==TradeStatus.TRADE_CANCEL_OTHER) {
             return false;

@@ -10,9 +10,9 @@ import org.springframework.context.annotation.ImportResource;
  * @author wezhyn
  * @since 03.12.2020
  */
-@SpringBootApplication
-@ImportResource(locations={"classpath:consumer.xml"})
 @EnableDubbo
+@SpringBootApplication(scanBasePackages = "com.ad.screen.server")
+@ImportResource(locations={"classpath:consumer.xml"})
 public class ScreenApplication {
 
 
