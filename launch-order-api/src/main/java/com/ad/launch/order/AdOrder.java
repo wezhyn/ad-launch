@@ -13,10 +13,10 @@ import java.util.List;
  * @since 03.12.2020
  */
 @Getter
+
 public class AdOrder {
 
     private Integer id;
-
 
     private AdUser orderUser;
 

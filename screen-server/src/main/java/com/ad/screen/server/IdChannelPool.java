@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.concurrent.*;
+import static com.ad.screen.server.server.ScreenChannelInitializer.REGISTERED_ID;
 
 /**
  * @author wezhyn
@@ -49,7 +50,10 @@ public class IdChannelPool {
     }
 
     public boolean unregisterChannel(Channel channel) {
-//        channelCache.remove()
+        final long id = channel.attr(REGISTERED_ID).get();
+        channelCache.remove(id);
+        recycleId.offer(id);
+
         return true;
     }
 
@@ -66,7 +70,7 @@ public class IdChannelPool {
     }
 
     public Channel getChannel(Long id) {
-        return null;
+       return channelCache.get(id);
     }
 
 }

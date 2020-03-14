@@ -25,6 +25,21 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 @Getter
 public class Order implements IBaseTo<Integer>, ITradeInfo {
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", orderUser=" + orderUser +
+                ", uid=" + uid +
+                ", totalAmount=" + totalAmount +
+                ", numPerEquip=" + numPerEquip +
+                ", tradeOut=" + tradeOut +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", isDelete=" + isDelete +
+                ", verify=" + verify +
+                '}';
+    }
 
     @Id
     @Column(name="id")

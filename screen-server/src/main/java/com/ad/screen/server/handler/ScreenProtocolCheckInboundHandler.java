@@ -122,7 +122,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                     equipment.setStatus(true);
                     ctx.channel().attr(EQUIPMENT).set(equipment);
                     Long pooledId=ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
-                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment, true, 0);
+                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment, false, 25);
                     pooledIdAndEquipCacheService.getCache().put(imei, pooledIdAndEquipCache);
                 }
                 break;

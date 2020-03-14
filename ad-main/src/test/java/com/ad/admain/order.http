@@ -1,3 +1,9 @@
+POST http://{{url}}/test/order
+Accept: application/json
+
+{   "id": 64,   "uid": 1,   "totalAmount": 100,   "numPerEquip": 10  }
+
+###
 DELETE http://{{url}}/api/order/87
 Content-Type: application/json
 X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODQwOTg5ODcsImlhdCI6MTU4MjgwMjk4NywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.bYrC5KYElJRs7tWPjQnRGK0OL-6beo2nHobk81bDT0Y

@@ -29,8 +29,10 @@ public class ScreenClient {
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup client=new NioEventLoopGroup();
-        String address="server.natappfree.cc";
-        int port=42910;
+//        String address="server.natappfree.cc";
+        String address ="127.0.0.1";
+//        int port=42910;
+        int port =8888;
         String equipName="11111111111111" + AdStringUtils.getNum(new Random().nextInt(10), 1);
         log.info("当前设备 IEMI： {}", equipName);
         try {

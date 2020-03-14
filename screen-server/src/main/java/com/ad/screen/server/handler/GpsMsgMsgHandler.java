@@ -51,8 +51,8 @@ public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
             //获取缓存内该设备对应的信息
             PooledIdAndEquipCache cache = cacheService.getValue(imei);
             //更新channel内部和缓存当中的设备信息
-            equip.setLongitude(x);
-            equip.setLatitude(y);
+            equip.setLongitude(x/100);
+            equip.setLatitude(y/100);
             cache.setEquipment(equip);
             ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).set(equip);
             cacheService.setValue(imei,cache);
