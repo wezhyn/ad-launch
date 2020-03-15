@@ -70,8 +70,8 @@ public class IdChannelPool {
         return cycleId;
     }
 
-    public Channel getChannel() {
-        return null;
+    public Channel getChannel(Long id) {
+       return channelCache.get(id);
     }
 
 }

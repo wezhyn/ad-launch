@@ -24,20 +24,24 @@ public class AdScreenResponse extends AbstractScreenResponse<AdEntry> {
 
     @Override
     public String netData() {
+        String view = getView();
         StringBuilder sb=new StringBuilder();
+        final String code = com.ad.launch.order.AdStringUtils.gb2312Code(view);
         sb.append(getNetData().getEntryId())
                 .append(",")
                 .append(getRepeatNum())
                 .append(",")
                 .append(getViewMode())
                 .append(",")
-                .append(getViewLength())
+                .append(code.length())
                 .append(",")
-                .append(AdStringUtils.gb2312Code(getNetData().getView()));
+                .append(code);
         return sb.toString();
 
     }
-
+    private String getView(){
+       return getNetData().getView();
+    }
     private String getViewLength() {
         StringBuilder s=new StringBuilder(String.valueOf(getNetData().getViewLength()));
         for (int i=0; i < 3 - s.length(); i++) {

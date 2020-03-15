@@ -28,16 +28,22 @@ public class AdScreenResponse extends AbstractScreenResponse {
      */
     private boolean verticalView;
 
-
+    /**
+     * 显示字符长度（3个字节，表示显示数据字节数，最大112)
+     * 每个汉字为两个字节，其它字母及数字为一个字节
+     * UTF-8 编码？
+     */
+    private byte viewLength;
 
     private String view;
 
 
-    public AdScreenResponse(IScreenFrame request, Integer entryId, Integer repeatNum, boolean verticalView, String view) {
-        super(request, FrameType.AD);
+    public AdScreenResponse(String imei, Integer entryId, Integer repeatNum, boolean verticalView, byte viewLength, String view) {
+        super(imei, FrameType.AD);
         this.entryId=entryId;
         this.repeatNum=repeatNum;
         this.verticalView=verticalView;
+        this.viewLength=viewLength;
         this.view=view;
     }
 
@@ -49,20 +55,26 @@ public class AdScreenResponse extends AbstractScreenResponse {
     @Override
     public String netData() {
         StringBuilder sb=new StringBuilder();
-        final String code=AdStringUtils.gb2312Code(view);
         sb.append(entryId)
                 .append(",")
                 .append(getRepeatNum())
                 .append(",")
                 .append(getViewMode())
                 .append(",")
-                .append(code.length())
+                .append(getViewLength())
                 .append(",")
-                .append(code);
+                .append(AdStringUtils.gb2312Code(view));
         return sb.toString();
 
     }
 
+    private String getViewLength() {
+        StringBuilder s=new StringBuilder(String.valueOf(viewLength));
+        for (int i=0; i < 3 - s.length(); i++) {
+            s.insert(0, "0");
+        }
+        return s.toString();
+    }
 
     private String getViewMode() {
         if (verticalView) {
@@ -82,13 +94,12 @@ public class AdScreenResponse extends AbstractScreenResponse {
     }
 
     public static final class AdScreenResponseBuilder {
-        private IScreenFrame request;
         private Integer entryId;
         private Integer repeatNum;
         private boolean verticalView;
         private byte viewLength;
         private String view;
-
+        private String imei;
         private AdScreenResponseBuilder() {
         }
 
@@ -96,10 +107,6 @@ public class AdScreenResponse extends AbstractScreenResponse {
             return new AdScreenResponseBuilder();
         }
 
-        public AdScreenResponseBuilder request(IScreenFrame request) {
-            this.request=request;
-            return this;
-        }
 
         public AdScreenResponseBuilder entryId(Integer entryId) {
             this.entryId=entryId;
@@ -126,8 +133,13 @@ public class AdScreenResponse extends AbstractScreenResponse {
             return this;
         }
 
+        public AdScreenResponseBuilder imei(String imei){
+            this.imei=imei;
+            return this;
+        }
+
         public AdScreenResponse build() {
-            return new AdScreenResponse(request, entryId, repeatNum, verticalView, view);
+            return new AdScreenResponse(imei, entryId, repeatNum, verticalView, viewLength, view);
         }
     }
 }

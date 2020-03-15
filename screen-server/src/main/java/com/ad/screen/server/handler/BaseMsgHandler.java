@@ -4,6 +4,8 @@ import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.RemoteEquipmentServiceI;
 import com.ad.screen.server.FailTaskService;
 import com.ad.screen.server.IdChannelPool;
+import com.ad.screen.server.cache.PooledIdAndEquipCache;
+import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.server.ScreenChannelInitializer;
@@ -43,6 +45,8 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     RocketMQTemplate rocketMQTemplate;
     @Autowired
     FailTaskService failTaskService;
+    @Autowired
+    PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
     @Resource
     private RemoteEquipmentServiceI equipmentService;
 
@@ -88,16 +92,19 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                         //整合一个FailTask持久化
                         FailTask failTask=hashMap.get(id);
                         if (failTask==null) {
+                            failTask = new FailTask();
                             failTask.setOrderId(id);
                             failTask.setNum(task.getRepeatNum());
                             failTask.setUid(task.getUid());
                             hashMap.put(id, failTask);
                         } else {
+                            //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
                             failTask.setNum(failTask.getNum() + task.getRepeatNum());
                             hashMap.put(id, failTask);
                         }
                     }
                 }
+                //遍历失败任务的hashmap 并将其整合持久化到数据库
                 for (Map.Entry<Integer, FailTask> entry :
                         hashMap.entrySet()) {
                     FailTask failTask=failTaskService.findById(entry.getKey());
@@ -113,12 +120,13 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
             //从id-channel池中删除掉这个channel
             idChannelPool.unregisterChannel(ctx.channel());
             //更新设备的在线状态
-            AdEquipment equipment=(AdEquipment) ctx.channel().attr(AttributeKey.valueOf("equip")).get();
+            AdEquipment equipment= ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
             equipment.setStatus(false);
             //保存设备的最终信息
             preserveEquipInfo(equipment);
-
-            //此实例项目只设置了全部超时时间,可以通过state分别做处理,客户端发送心跳维持连接
+            //在缓存中移除该信息
+            pooledIdAndEquipCacheService.remove(equipment.getKey());
+            //项目只设置了全部超时时间
             IdleState state=((IdleStateEvent) evt).state();
             //关闭连接
             if (state==IdleState.ALL_IDLE) {

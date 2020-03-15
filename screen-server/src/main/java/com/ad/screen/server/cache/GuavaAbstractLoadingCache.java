@@ -115,5 +115,11 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
 
     }
 
+    public void remove(K key){
+        synchronized (cache){
+            cache.asMap().remove(key);
+        }
+    }
+
 
 }

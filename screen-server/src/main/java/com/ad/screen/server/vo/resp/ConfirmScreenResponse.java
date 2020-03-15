@@ -11,8 +11,8 @@ import com.ad.screen.server.vo.IScreenFrame;
 
 public class ConfirmScreenResponse extends AbstractScreenResponse {
 
-    public ConfirmScreenResponse(IScreenFrame request) {
-        super(request, FrameType.CONFIRM);
+    public ConfirmScreenResponse(String imei) {
+        super(imei, FrameType.CONFIRM);
     }
 
     @Override

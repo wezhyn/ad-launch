@@ -87,20 +87,25 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
                     }else {
                         entryId = received.size();
                     }
+                    List<String> views = taskMessage.getProduceContext();
+                    StringBuilder sb = new StringBuilder();
+                    for (String str : views){
+                        sb.append(str);
+                    }
 
-                    //将任务加入对应channel的received列表中
-                    Task task=Task.builder()
-                            .adOrderId(taskMessage.getOid())
-                            .entryId(entryId)
-                            .repeatNum(numPerTask)
-                            .pooledId(pooledIdAndEquipCache.getPooledId())
-                            .status(false)
-                            .verticalView(taskMessage.getVertical())
-                            .build();
 
                     //单个设备内添加rate个数个task
                     for (int i = 1; i <=rate ; i++) {
-                        task.setEntryId(entryId++);
+                        //将任务加入对应channel的received列表中
+                        Task task=Task.builder()
+                                .adOrderId(taskMessage.getOid())
+                                .entryId(entryId++)
+                                .repeatNum(numPerTask)
+                                .pooledId(pooledIdAndEquipCache.getPooledId())
+                                .status(false)
+                                .view(sb.toString())
+                                .verticalView(taskMessage.getVertical())
+                                .build();
                         received.add(task);
                     }
                     log.info("已经往pooledId为:{}的channel中安排了{}个task",pooledId,rate);

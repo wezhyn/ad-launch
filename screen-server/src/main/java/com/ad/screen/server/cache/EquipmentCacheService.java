@@ -21,9 +21,7 @@ public class EquipmentCacheService extends GuavaAbstractLoadingCache<String, AdE
     @Resource
     private RemoteEquipmentServiceI equipmentService;
 
-    public EquipmentCacheService(RemoteEquipmentServiceI equipmentService) {
-        this.equipmentService=equipmentService;
-    }
+
 
 
     @Override

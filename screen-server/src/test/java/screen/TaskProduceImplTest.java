@@ -22,28 +22,28 @@ import org.springframework.test.context.junit4.SpringRunner;
 @Slf4j
 @RunWith(SpringRunner.class)
 public class TaskProduceImplTest {
-    @Autowired
-    RocketMQTemplate rocketMQTemplate;
-
-    @Test
-    public void testSend() {
-        FailTask failTask=FailTask.builder()
-                .orderId(1)
-                .uid(2)
-                .num(100)
-                .build();
-        rocketMQTemplate.asyncSend("fail-task", failTask, new SendCallback() {
-            @Override
-            public void onSuccess(SendResult sendResult) {
-                log.debug("发送成功");
-            }
-
-            @Override
-            public void onException(Throwable throwable) {
-                log.debug("发送失败");
-            }
-        });
-    }
+//    @Autowired
+//    RocketMQTemplate rocketMQTemplate;
+//
+//    @Test
+//    public void testSend() {
+//        FailTask failTask=FailTask.builder()
+//                .orderId(1)
+//                .uid(2)
+//                .num(100)
+//                .build();
+//        rocketMQTemplate.asyncSend("fail-task", failTask, new SendCallback() {
+//            @Override
+//            public void onSuccess(SendResult sendResult) {
+//                log.debug("发送成功");
+//            }
+//
+//            @Override
+//            public void onException(Throwable throwable) {
+//                log.debug("发送失败");
+//            }
+//        });
+//    }
 
     @Test
     public void sendTask() {

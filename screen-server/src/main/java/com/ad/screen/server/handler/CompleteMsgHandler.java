@@ -6,6 +6,7 @@ import com.ad.screen.server.entity.Completion;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.req.CompleteNotificationMsg;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.List;
  **/
 @Component
 @Slf4j
+@ChannelHandler.Sharable
 public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> {
     @Autowired
     CompletionI completionI;

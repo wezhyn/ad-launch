@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
  * @author wezhyn
  * @since 02.19.2020
  */
-public abstract class AbstractScreenResponse implements IScreenFrameServer {
+public abstract class  AbstractScreenResponse implements IScreenFrameServer {
 
-    private IScreenFrame request;
+    private String imei;
     private FrameType responseType;
     private LocalDateTime createTime=LocalDateTime.now();
 
-    public AbstractScreenResponse(IScreenFrame request, FrameType responseType) {
-        this.request=request;
+    public AbstractScreenResponse(String imei, FrameType responseType) {
+        this.imei=imei;
         this.responseType=responseType;
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractScreenResponse implements IScreenFrameServer {
 
     @Override
     public String equipmentImei() {
-        return request.equipmentImei();
+        return imei;
     }
 
     @Override

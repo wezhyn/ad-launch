@@ -61,7 +61,7 @@ public class NettyTcpServer {
                 .attr(AttributeKey.valueOf("TASK_LIST"), null)//接收的任务列表
                 .attr(AttributeKey.valueOf("TASK_STATUS"), null);//任务的完成状态
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
-        ChannelFuture channelFuture=serverBootstrap.bind(port).sync();
+        ChannelFuture channelFuture=serverBootstrap.bind(address,port).sync();
         if (channelFuture.isSuccess()) {
 
             log.info("TCP服务启动完毕,port={}", this.port);

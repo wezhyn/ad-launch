@@ -1,11 +1,14 @@
 package com.ad.screen.server.server;
 
 
+import com.ad.launch.order.AdEquipment;
 import com.ad.screen.server.IdChannelPool;
 import com.ad.screen.server.cache.EquipmentCacheService;
 import com.ad.screen.server.codec.ScreenProtocolOutEncoder;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.handler.*;
+import com.ad.screen.server.vo.IScreenFrame;
+import com.ad.screen.server.vo.req.BaseScreenRequest;
 import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.SocketChannel;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler.EQUIPMENT;
 
 /**
  * @ClassName ChannelInitializer
@@ -58,7 +63,8 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 
     @Autowired
     EquipmentCacheService equipmentCache;
-
+    @Autowired
+    CompleteMsgHandler completeMsgHandler;
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         //将channel注册到id池中
@@ -73,6 +79,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(heartBeatMsgHandler);
         ch.pipeline().addLast(gpsMsgHandler);
         ch.pipeline().addLast(confirmMsgHandler);
+        ch.pipeline().addLast(completeMsgHandler);
 
         ch.eventLoop().scheduleAtFixedRate(
                 new Runnable() {
@@ -80,6 +87,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                     public void run() {
                         try {
                             Long id=ch.pipeline().channel().attr(REGISTERED_ID).get();
+                            AdEquipment equipment = ch.pipeline().channel().attr(EQUIPMENT).get();
                             log.debug("开始检查池中id为:{}任务列表", id);
                             Channel channel = idChannelPool.getChannel(id);
                             List<Task> tasks = channel.attr(TASK_LIST).get();
@@ -93,13 +101,14 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                                     for (int i=tasks.size(); i < 25; i++) {
                                         Task blankTask=Task.builder()
                                                 .adOrderId(0)
-                                                .entryId(i)
+                                                .entryId(i+1)
                                                 .repeatNum(Integer.MAX_VALUE)
                                                 .verticalView(false)
                                                 .build();
                                         tasks.add(blankTask);
                                     }
                                 }
+
                                 for (int i=0; i <tasks.size(); i++) {
                                     Task task=tasks.get(i);
                                     AdScreenResponse adScreenResponse=AdScreenResponse.builder()
@@ -107,7 +116,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                                             .view(task.getView())
                                             .verticalView(task.getVerticalView())
                                             .repeatNum(task.getRepeatNum())
-                                            .view("比划比划")
+                                            .imei(equipment.getKey())
                                             .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
                                             .build();
                                     channel.writeAndFlush(adScreenResponse);

@@ -15,8 +15,8 @@ public class IpScreenResponse extends AbstractScreenResponse {
     private InetSocketAddress inetAddress;
 
 
-    public IpScreenResponse(IScreenFrame request, InetSocketAddress address) {
-        super(request, FrameType.IP);
+    public IpScreenResponse(String imei, InetSocketAddress address) {
+        super(imei, FrameType.IP);
         this.inetAddress=address;
     }
 
