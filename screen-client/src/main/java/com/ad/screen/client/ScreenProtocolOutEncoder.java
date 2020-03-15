@@ -34,10 +34,11 @@ public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrame>
                 .append(",")
                 .append("EOF\r\n");
         String result=sb.toString();
-        log.warn("输出{}帧：{}", msg.type(), result);
+        log.warn("输出{}帧：{}", msg, result);
         out.writeBytes(result.getBytes());
         ctx.flush();
     }
+
 
     private String getResponseNum(IScreenFrame msg) throws UnsupportedEncodingException {
         return AdStringUtils.getNum((msg.netData().getBytes("GBK").length + BASE_NUM), 4);

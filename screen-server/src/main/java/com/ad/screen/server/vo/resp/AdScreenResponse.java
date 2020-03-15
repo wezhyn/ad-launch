@@ -28,22 +28,16 @@ public class AdScreenResponse extends AbstractScreenResponse {
      */
     private boolean verticalView;
 
-    /**
-     * 显示字符长度（3个字节，表示显示数据字节数，最大112)
-     * 每个汉字为两个字节，其它字母及数字为一个字节
-     * UTF-8 编码？
-     */
-    private byte viewLength;
+
 
     private String view;
 
 
-    public AdScreenResponse(IScreenFrame request, Integer entryId, Integer repeatNum, boolean verticalView, byte viewLength, String view) {
+    public AdScreenResponse(IScreenFrame request, Integer entryId, Integer repeatNum, boolean verticalView, String view) {
         super(request, FrameType.AD);
         this.entryId=entryId;
         this.repeatNum=repeatNum;
         this.verticalView=verticalView;
-        this.viewLength=viewLength;
         this.view=view;
     }
 
@@ -55,26 +49,20 @@ public class AdScreenResponse extends AbstractScreenResponse {
     @Override
     public String netData() {
         StringBuilder sb=new StringBuilder();
+        final String code=AdStringUtils.gb2312Code(view);
         sb.append(entryId)
                 .append(",")
                 .append(getRepeatNum())
                 .append(",")
                 .append(getViewMode())
                 .append(",")
-                .append(getViewLength())
+                .append(code.length())
                 .append(",")
-                .append(AdStringUtils.gb2312Code(view));
+                .append(code);
         return sb.toString();
 
     }
 
-    private String getViewLength() {
-        StringBuilder s=new StringBuilder(String.valueOf(viewLength));
-        for (int i=0; i < 3 - s.length(); i++) {
-            s.insert(0, "0");
-        }
-        return s.toString();
-    }
 
     private String getViewMode() {
         if (verticalView) {
@@ -139,7 +127,7 @@ public class AdScreenResponse extends AbstractScreenResponse {
         }
 
         public AdScreenResponse build() {
-            return new AdScreenResponse(request, entryId, repeatNum, verticalView, viewLength, view);
+            return new AdScreenResponse(request, entryId, repeatNum, verticalView, view);
         }
     }
 }

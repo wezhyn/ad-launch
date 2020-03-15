@@ -69,7 +69,7 @@ public enum FrameType {
         @SuppressWarnings("unchecked")
         public Object netData(ByteBuf msg) throws Exception {
             final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
-            String adString=msg.readCharSequence(readableLength - 2, StandardCharsets.US_ASCII).toString();
+            String adString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
             final String[] adSplits=adString.split(",");
             if (adSplits.length < 5) {
                 throw new ScreenProtocolCheckInboundHandler.ParserException();

@@ -2,6 +2,7 @@ package com.ad.launch.order;
 
 import com.ad.launch.user.AdUser;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.List;
  * @since 03.12.2020
  */
 @Getter
+@Setter
 public class AdOrder {
 
     private Integer id;
