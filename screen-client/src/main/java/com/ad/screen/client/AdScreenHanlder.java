@@ -9,6 +9,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,6 +63,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                 Integer repeatNum=entry.getRepeatNum();
                 repeatNum--;
                 entry.setRepeatNum(repeatNum);
+                log.error("consumer 第 {} 次： {} at {} ", currentEntry, entry, LocalDateTime.now());
                 if (repeatNum==0) {
                     cache.poll();
                     currentEntry=0;
