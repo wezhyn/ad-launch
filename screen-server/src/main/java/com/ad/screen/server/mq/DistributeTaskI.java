@@ -31,9 +31,10 @@ public interface DistributeTaskI {
      * @Description //返回空闲车辆的hashmap
      * @Date 2020/3/8 16:47
      **/
-    HashMap<Long, PooledIdAndEquipCache> freeEquips();
+//    HashMap<Long, PooledIdAndEquipCache> freeEquips();
+    HashMap<Long, PooledIdAndEquipCache> scopeEquips(Double longitude, Double latitude, Double scope);
 
-    HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope);
+//    HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope);
 
     HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate);
 

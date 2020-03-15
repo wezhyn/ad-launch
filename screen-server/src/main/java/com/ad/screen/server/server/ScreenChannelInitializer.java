@@ -37,9 +37,9 @@ import static com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler.EQU
 @Component
 @Slf4j
 public class ScreenChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
-    public static final AttributeKey<Long> REGISTERED_ID=AttributeKey.valueOf("REGISTERED_ID");
-    public static final AttributeKey<List<Task>> TASK_LIST=AttributeKey.valueOf("TASK_LIST");
-    public static final AttributeKey<boolean[]> TASK_STATUS=AttributeKey.valueOf("TASK_STATUS");
+    public static final AttributeKey<Long> REGISTERED_ID = AttributeKey.valueOf("REGISTERED_ID");
+    public static final AttributeKey<List<Task>> TASK_LIST = AttributeKey.valueOf("TASK_LIST");
+    public static final AttributeKey<boolean[]> TASK_STATUS = AttributeKey.valueOf("TASK_STATUS");
 
     @Value("${netty.server.allTimeout}")
     private int allTimeOut;
@@ -66,10 +66,11 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     EquipmentCacheService equipmentCache;
     @Autowired
     CompleteMsgHandler completeMsgHandler;
+
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         //将channel注册到id池中
-        final Long longId=idChannelPool.registerChannel(ch);
+        final Long longId = idChannelPool.registerChannel(ch);
         ch.pipeline().channel().attr(REGISTERED_ID).setIfAbsent(longId);
 
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
@@ -83,57 +84,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(completeMsgHandler);
 
 //dev
-         ch.eventLoop().schedule(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Long id=ch.pipeline().channel().attr(REGISTERED_ID).get();
-                            AdEquipment equipment = ch.pipeline().channel().attr(EQUIPMENT).get();
-                            log.debug("开始检查池中id为:{}任务列表", id);
-                            Channel channel = idChannelPool.getChannel(id);
-                            List<Task> tasks = channel.attr(TASK_LIST).get();
-                            //若任务表内的数据不为空则发送数据
-                            if (tasks==null||tasks.size()==0) {
-                                log.debug("id为:{}的设备还没收到任务", id);
-                            } else {
-                                //总任务数目小于25，填充空白帧
-                                if (tasks.size() < 25) {
-                                    int index=25 - tasks.size();
-                                    for (int i=tasks.size(); i < 25; i++) {
-                                        Task blankTask=Task.builder()
-                                                .adOrderId(0)
-                                                .entryId(i+1)
-                                                .view("")
-                                                .repeatNum(Integer.MAX_VALUE)
-                                                .verticalView(false)
-                                                .build();
-                                        tasks.add(blankTask);
-                                    }
-                                }
-
-                                for (int i=0; i <tasks.size(); i++) {
-                                    Task task=tasks.get(i);
-                                    AdScreenResponse adScreenResponse=AdScreenResponse.builder()
-                                            .entryId(task.getEntryId())
-                                            .view(task.getView())
-                                            .verticalView(task.getVerticalView())
-                                            .repeatNum(task.getRepeatNum())
-                                            .imei(equipment.getKey())
-                                            .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
-                                            .build();
-                                    channel.write(adScreenResponse);
-                                }
-                                channel.flush();
-                                log.info("发送25条广告到设备上");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }                    }
-                }, 30, TimeUnit.SECONDS);
-
-//pro
-//        ch.eventLoop().scheduleAtFixedRate(
+//         ch.eventLoop().schedule(
 //                new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -152,8 +103,9 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 //                                    int index=25 - tasks.size();
 //                                    for (int i=tasks.size(); i < 25; i++) {
 //                                        Task blankTask=Task.builder()
-//                                                .adOrderId(0)
+//                                                .oid(0)
 //                                                .entryId(i+1)
+//                                                .view("")
 //                                                .repeatNum(Integer.MAX_VALUE)
 //                                                .verticalView(false)
 //                                                .build();
@@ -171,16 +123,101 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 //                                            .imei(equipment.getKey())
 //                                            .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
 //                                            .build();
-//                                    channel.writeAndFlush(adScreenResponse);
-//                                    log.info("发送第{}条广告",i+1);
+//                                    channel.write(adScreenResponse);
 //                                }
+//                                channel.flush();
+//                                log.info("发送25条广告到设备上");
 //                            }
 //                        } catch (Exception e) {
 //                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//                , 20, 20, TimeUnit.SECONDS
-//        );
+//                        }                    }
+//                }, 30, TimeUnit.SECONDS);
+
+//pro
+        ch.eventLoop().scheduleAtFixedRate(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Long id = ch.pipeline().channel().attr(REGISTERED_ID).get();
+                            AdEquipment equipment = ch.pipeline().channel().attr(EQUIPMENT).get();
+                            log.debug("开始检查池中id为:{}任务列表", id);
+                            Channel channel = idChannelPool.getChannel(id);
+                            List<Task> received = channel.attr(TASK_LIST).get();
+                            //若任务表内的数据不为空则发送数据
+                            if (received == null || received.size() == 0) {
+                                log.debug("id为:{}的设备还没收到任务", id);
+                            } else {
+//                                //总任务数目小于25，填充空白帧
+//                                if (tasks.size() < 25) {
+//                                    int index=25 - tasks.size();
+//                                    for (int i=tasks.size(); i < 25; i++) {
+//                                        Task blankTask=Task.builder()
+//                                                .adOrderId(0)
+//                                                .entryId(i+1)
+//                                                .repeatNum(Integer.MAX_VALUE)
+//                                                .verticalView(false)
+//                                                .build();
+//                                        tasks.add(blankTask);
+//                                    }
+//                                }
+
+//                                for (int i=0; i <tasks.size(); i++) {
+//                                    Task task=tasks.get(i);
+//                                    AdScreenResponse adScreenResponse=AdScreenResponse.builder()
+//                                            .entryId(task.getEntryId())
+//                                            .view(task.getView())
+//                                            .verticalView(task.getVerticalView())
+//                                            .repeatNum(task.getRepeatNum())
+//                                            .imei(equipment.getKey())
+//                                            .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
+//                                            .build();
+//                                    channel.writeAndFlush(adScreenResponse);
+//                                    log.info("发送第{}条广告",i+1);
+//                                }
+                                //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
+                                for (Task task :
+                                        received) {
+                                    AdScreenResponse adScreenResponse = AdScreenResponse.builder()
+                                            .entryId(task.getEntryId())
+                                            .view(task.getView())
+                                            .verticalView(task.getVerticalView())
+                                            .repeatNum(task.getRepeatNum())
+                                            .imei(equipment.getKey())
+                                            .viewLength(task.getView() == null ? (byte) 0 : (byte) task.getView().getBytes().length)
+                                            .build();
+                                    //先将数据放入缓冲区
+                                    channel.write(adScreenResponse);
+                                }
+                                //补充空白帧并将其写入缓冲区(该操作可以满足有新任务未发送时的情况)
+                                for (int i = received.size(); i < 25; i++) {
+                                    AdScreenResponse blankResponse = AdScreenResponse.builder()
+                                            .entryId(i)
+                                            .view("")
+                                            .verticalView(false)
+                                            .repeatNum(9999)
+                                            .imei(equipment.getKey())
+                                            .viewLength((byte) 0)
+                                            .build();
+                                    channel.write(blankResponse);
+                                }
+                                //将消息推送到设备上
+                                channel.flush();
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , 20, 20, TimeUnit.SECONDS
+        );
+
     }
 }
+
+
+
+
+
+

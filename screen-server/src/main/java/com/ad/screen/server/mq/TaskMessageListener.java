@@ -14,10 +14,12 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.tomcat.jni.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @Description //mq任务消息监听
@@ -50,13 +52,14 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
             log.debug("目前没有这么多的在线车辆数");
             return;
         } else {
-            //目前的空闲车辆小于订单投放的车辆数，退出
-            HashMap<Long, PooledIdAndEquipCache> freeEquips=freeEquips();
-            int freeCount=freeEquips.size();
-            if (freeCount < deliverNum) {
-                log.info("目前空闲车数为:{},小于投放车辆数{}", freeCount, deliverNum);
-                return;
-            }
+//            //目前的空闲车辆小于订单投放的车辆数，退出
+//            HashMap<Long, PooledIdAndEquipCache> freeEquips=freeEquips();
+//            int freeCount=freeEquips.size();
+//            if (freeCount < deliverNum) {
+//                log.info("目前空闲车数为:{},小于投放车辆数{}", freeCount, deliverNum);
+//                return;
+//            }
+
             //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
             HashMap<Long, PooledIdAndEquipCache> available=scopeAvailableFreeEquips(taskMessage.getLongitude(), taskMessage.getLatitude(), taskMessage.getScope(), taskMessage.getRate());
             if (available.size() < deliverNum) {
@@ -87,6 +90,8 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
                     }else {
                         entryId = received.size();
                     }
+
+                    //组合广告内容
                     List<String> views = taskMessage.getProduceContext();
                     StringBuilder sb = new StringBuilder();
                     for (String str : views){
@@ -98,11 +103,10 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
                     for (int i = 1; i <=rate ; i++) {
                         //将任务加入对应channel的received列表中
                         Task task=Task.builder()
-                                .adOrderId(taskMessage.getOid())
+                                .oid(taskMessage.getOid())
                                 .entryId(entryId++)
                                 .repeatNum(numPerTask)
-                                .pooledId(pooledIdAndEquipCache.getPooledId())
-                                .status(false)
+                                .sendIf(false)
                                 .uid(taskMessage.getUid())
                                 .view(sb.toString())
                                 .verticalView(taskMessage.getVertical())
@@ -128,41 +132,67 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
 //        channel.attr(ScreenChannelInitializer.TASK_LIST).set(received);
     }
 
-    @Override
-    public HashMap<Long, PooledIdAndEquipCache> freeEquips() {
-        HashMap<Long, PooledIdAndEquipCache> equipmentHashMap=new HashMap<>();
-        for (Map.Entry<String, PooledIdAndEquipCache> entry : pooledIdAndEquipCacheService.getCache().asMap().entrySet()) {
-            PooledIdAndEquipCache cache=entry.getValue();
-            if (!entry.getValue().getStatus()) {
-                equipmentHashMap.put(cache.getPooledId(), cache);
-            }
-        }
-        return equipmentHashMap;
-    }
+//    @Override
+//    public HashMap<Long, PooledIdAndEquipCache> freeEquips() {
+//        HashMap<Long, PooledIdAndEquipCache> equipmentHashMap=new HashMap<>();
+//        for (Map.Entry<String, PooledIdAndEquipCache> entry : pooledIdAndEquipCacheService.getCache().asMap().entrySet()) {
+//            PooledIdAndEquipCache cache=entry.getValue();
+//            if (!entry.getValue().getStatus()) {
+//                equipmentHashMap.put(cache.getPooledId(), cache);
+//            }
+//        }
+//        return equipmentHashMap;
+//    }
 
+
+    /**
+     * @Description //返回区域内的在线车辆hashmap
+     * @Date 2020/3/16 1:33
+     * @param longitude
+     * @param latitude
+     * @param scope
+     *@return java.util.HashMap<java.lang.Long,com.ad.screen.server.cache.PooledIdAndEquipCache>
+     **/
     @Override
-    public HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope) {
-        Double[] info= SquareUtils.getSquareInfo(longitude, latitude, scope);
-        HashMap<Long, PooledIdAndEquipCache> freeEquips=freeEquips();
-        for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
-        ) {
+    public HashMap<Long, PooledIdAndEquipCache> scopeEquips(Double longitude, Double latitude, Double scope) {
+        HashMap<Long,PooledIdAndEquipCache> scopeEquips = new HashMap<>();
+
+        Double[] info = SquareUtils.getSquareInfo(longitude, latitude, scope);
+        ConcurrentMap<String, PooledIdAndEquipCache> cache = pooledIdAndEquipCacheService.getCache().asMap();
+        for (Map.Entry<String, PooledIdAndEquipCache> entry:cache.entrySet()){
             PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
             AdEquipment equipment=entry.getValue().getEquipment();
             Double lgt=equipment.getLongitude();
             Double lat=equipment.getLatitude();
             if (lgt >= info[0] && lgt <= info[1] && lat >= info[2] && lat <= info[3]) {
-                freeEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
+                scopeEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
             }
         }
-        return freeEquips;
+        return scopeEquips;
     }
+//
+//    @Override
+//    public HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope) {
+//        Double[] info= SquareUtils.getSquareInfo(longitude, latitude, scope);
+//        HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeEquips(longitude,latitude,scope);
+//        for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
+//        ) {
+//            PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
+//            AdEquipment equipment=entry.getValue().getEquipment();
+//            Double lgt=equipment.getLongitude();
+//            Double lat=equipment.getLatitude();
+//            if (lgt >= info[0] && lgt <= info[1] && lat >= info[2] && lat <= info[3]) {
+//                freeEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
+//            }
+//        }
+//        return freeEquips;
+//    }
 
 
     //获取区域范围内符合调度要求的车辆缓存
     @Override
     public HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate) {
-        Double[] info=SquareUtils.getSquareInfo(longitude, latitude, scope);
-        HashMap<Long, PooledIdAndEquipCache> freeEquips=freeEquips();
+        HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeEquips(longitude,latitude,scope);
         HashMap<Long, PooledIdAndEquipCache> availableEquips = new HashMap<>();
         for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
         ) {
@@ -172,13 +202,11 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
             if (pooledIdAndEquipCache.getRest() < rate) {
                 continue;
             }
-            AdEquipment equipment=entry.getValue().getEquipment();
-            Double lgt=equipment.getLongitude();
-            Double lat=equipment.getLatitude();
-            if (lgt >= info[0] && lgt <= info[1] && lat >= info[2] && lat <= info[3]) {
-                availableEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
-            }
+
+            availableEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
         }
         return availableEquips;
     }
+
+
 }

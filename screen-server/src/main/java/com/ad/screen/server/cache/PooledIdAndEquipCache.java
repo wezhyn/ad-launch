@@ -26,10 +26,10 @@ public class PooledIdAndEquipCache {
     设备信息
     */
     AdEquipment equipment;
-    /**
-     * 设备的工作状态  若为true则表示正在执行任务  若为false为表示设备空闲
-     */
-    Boolean status;
+//    /**
+//     * 设备的工作状态  若为true则表示正在执行任务  若为false为表示设备空闲
+//     */
+//    Boolean status;
 
     /**
      * 频率余量

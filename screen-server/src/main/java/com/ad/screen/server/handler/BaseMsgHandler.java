@@ -85,7 +85,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
             if (tasks!=null){
                 HashMap<Integer, FailTask> hashMap=new HashMap<>();
                 for (Task task : tasks) {
-                    Integer id=task.getAdOrderId();
+                    Integer id=task.getOid();
                     if (id==0) {
                         continue;
                     } else {

@@ -8,6 +8,8 @@ import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.req.CompleteNotificationMsg;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,28 +35,39 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
         log.warn("收到了imei号为{}的第{}项任务完成的消息",msg.getEquipmentName(),msg.getNetData());
-        List<Task> tasks=ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
+        Attribute<List<Task>> attr = ctx.channel().attr(ScreenChannelInitializer.TASK_LIST);
+        List<Task> received = attr.get();
         Integer id=msg.getNetData();
-        Task task=tasks.get(id - 1);
+        Task task=received.get(id - 1);
         if (task.getAdOrderId()==0) {
             log.debug("该条目为空白帧");
         } else {
-            String imei=msg.getEquipmentName();
-            Completion completion=completionI.findByOidAndUid(task.getAdOrderId(), task.getUid());
-            if (completion==null) {
-                Completion com=Completion.builder()
-                        .adOrderId(task.getAdOrderId())
-                        .executedTimes(task.getRepeatNum())
-                        .isPaid(false)
-                        .uid(task.getUid())
-                        .build();
-                completionI.save(com);
-                log.info("完成了条目编号为{}的小任务，持久化完成",id);
-            } else {
-                completion.setExecutedTimes(completion.getExecutedTimes() + task.getRepeatNum());
-                completionI.save(completion);
-                log.debug("完成了条目编号为{}的小任务 更新执行次数",id+1);
+            try {
+                String imei=msg.getEquipmentName();
+                Completion completion=completionI.findByOidAndUid(task.getAdOrderId(), task.getUid());
+                if (completion==null) {
+                    Completion com=Completion.builder()
+                            .adOrderId(task.getAdOrderId())
+                            .executedTimes(task.getRepeatNum())
+                            .isPaid(false)
+                            .uid(task.getUid())
+                            .build();
+                    completionI.save(com);
+                    log.info("完成了条目编号为{}的小任务，持久化完成",id);
+                } else {
+
+                    completion.setExecutedTimes(completion.getExecutedTimes() + task.getRepeatNum());
+                    completionI.save(completion);
+                    log.debug("完成了条目编号为{}的小任务 更新执行次数",id+1);
+
+                }
+                //完成任务后删除该index的任务并更新attr属性
+                received.remove(id-1);
+                attr.set(received);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         }
     }
 }
