@@ -9,7 +9,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,10 @@ public class ScreenClient {
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup client=new NioEventLoopGroup();
-        String address="47.101.68.11";
-        int port=8188;
+//        String address="server.natappfree.cc";
+        String address ="127.0.0.1";
+//        int port=42910;
+        int port =8888;
         String equipName="11111111111111" + AdStringUtils.getNum(new Random().nextInt(10), 1);
         log.info("当前设备 IEMI： {}", equipName);
         try {
@@ -43,24 +45,23 @@ public class ScreenClient {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().channel().attr(REGISTERED_ID).set(equipName);
                             socketChannel.pipeline()
-                                    .addLast(new LineBasedFrameDecoder(100, true, true))
                                     .addLast(new ScreenProtocolCheckInboundHandler(27, 3, 4, true))
                                     .addLast(new ScreenProtocolOutEncoder())
-//                                    .addLast(new IdleStateHandler(120, 170, 180))
+                                    .addLast(new IdleStateHandler(70, 70, 80))
                                     .addLast(new ConfirmHandler())
                                     .addLast(new AdScreenHanlder());
-                            socketChannel.eventLoop().schedule(()->{
-                                socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
-                                GpsMsg msg=simulateGps(equipName);
-                                socketChannel.pipeline().writeAndFlush(msg);
-                            }, 0, TimeUnit.SECONDS);
                             socketChannel.eventLoop().scheduleAtFixedRate(()->{
+                                log.info("发送心跳帧");
                                 socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
 
                             }, 0, 1, TimeUnit.MINUTES);
                             socketChannel.eventLoop().scheduleAtFixedRate(()->{
-                                GpsMsg msg=simulateGps(equipName);
-                                socketChannel.pipeline().writeAndFlush(msg);
+                                Random r=new Random();
+                                DecimalFormat df=new DecimalFormat("0.00000");
+                                double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10000)*0.0001d));
+                                double y=Double.parseDouble(df.format(3013.16405 + r.nextInt(10000)*0.0001d));
+                                socketChannel.pipeline().writeAndFlush(new GpsMsg(new Point2D(x, y), equipName));
+                                log.info("发送GPS帧：{},{}", x, y);
                             }, 0, 2, TimeUnit.MINUTES);
                         }
                     });
@@ -70,13 +71,5 @@ public class ScreenClient {
             client.shutdownGracefully().sync();
         }
 
-    }
-
-    private static GpsMsg simulateGps(String equip) {
-        Random r=new Random();
-        DecimalFormat df=new DecimalFormat("0.00000");
-        double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10000)*0.0001d));
-        double y=Double.parseDouble(df.format(3013.16405 + r.nextInt(10000)*0.0001d));
-        return new GpsMsg(new Point2D(x, y), equip);
     }
 }

@@ -8,14 +8,22 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.apache.rocketmq.spring.support.RocketMQMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.converter.*;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author : wezhyn
@@ -31,6 +39,8 @@ public class BeanConfig {
     private ObjectMapper objectMapper;
 
 
+
+
     @Bean
     @ConditionalOnMissingBean(value={FileUploadService.class})
     @ConditionalOnProperty(prefix="custom.qn", name={"access-key", "secret-key"})
@@ -38,19 +48,10 @@ public class BeanConfig {
         return new QiNiuFileUploadServiceImpl(qiNiuProperties, genericUserService);
     }
 
-    @PostConstruct
-    public void init() {
-        this.initObjectMappper();
-    }
 
-    @Async
-    public void initObjectMappper() {
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        this.objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, true);
-        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        SimpleModule module=new SimpleModule("simpleModule");
-        this.objectMapper.registerModule(module);
-    }
+
+
+
 
 
 }

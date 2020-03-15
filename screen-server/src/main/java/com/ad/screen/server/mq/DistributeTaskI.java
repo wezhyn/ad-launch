@@ -16,13 +16,13 @@ import java.util.HashMap;
 public interface DistributeTaskI {
 
 
-    /**
-     * @param adOrder
-     * @return void
-     * @Description //发送任务信息到消息队列
-     * @Date 2020/3/8 0:59
-     **/
-    void sendTask(final AdOrder adOrder);
+//    /**
+//     * @param adOrder
+//     * @return void
+//     * @Description //发送任务信息到消息队列
+//     * @Date 2020/3/8 0:59
+//     **/
+//    void sendTask(final AdOrder adOrder);
 
 
     /**
