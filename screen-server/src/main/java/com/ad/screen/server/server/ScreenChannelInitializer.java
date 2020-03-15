@@ -15,6 +15,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,7 +82,8 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(confirmMsgHandler);
         ch.pipeline().addLast(completeMsgHandler);
 
-        ch.eventLoop().scheduleAtFixedRate(
+//dev
+         ch.eventLoop().schedule(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -102,6 +104,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                                         Task blankTask=Task.builder()
                                                 .adOrderId(0)
                                                 .entryId(i+1)
+                                                .view("")
                                                 .repeatNum(Integer.MAX_VALUE)
                                                 .verticalView(false)
                                                 .build();
@@ -119,16 +122,65 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                                             .imei(equipment.getKey())
                                             .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
                                             .build();
-                                    channel.writeAndFlush(adScreenResponse);
-                                    log.info("发送第{}条广告",i+1);
+                                    channel.write(adScreenResponse);
                                 }
+                                channel.flush();
+                                log.info("发送25条广告到设备上");
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
-                    }
-                }
-                , 20, 20, TimeUnit.SECONDS
-        );
+                        }                    }
+                }, 30, TimeUnit.SECONDS);
+
+//pro
+//        ch.eventLoop().scheduleAtFixedRate(
+//                new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Long id=ch.pipeline().channel().attr(REGISTERED_ID).get();
+//                            AdEquipment equipment = ch.pipeline().channel().attr(EQUIPMENT).get();
+//                            log.debug("开始检查池中id为:{}任务列表", id);
+//                            Channel channel = idChannelPool.getChannel(id);
+//                            List<Task> tasks = channel.attr(TASK_LIST).get();
+//                            //若任务表内的数据不为空则发送数据
+//                            if (tasks==null||tasks.size()==0) {
+//                                log.debug("id为:{}的设备还没收到任务", id);
+//                            } else {
+//                                //总任务数目小于25，填充空白帧
+//                                if (tasks.size() < 25) {
+//                                    int index=25 - tasks.size();
+//                                    for (int i=tasks.size(); i < 25; i++) {
+//                                        Task blankTask=Task.builder()
+//                                                .adOrderId(0)
+//                                                .entryId(i+1)
+//                                                .repeatNum(Integer.MAX_VALUE)
+//                                                .verticalView(false)
+//                                                .build();
+//                                        tasks.add(blankTask);
+//                                    }
+//                                }
+//
+//                                for (int i=0; i <tasks.size(); i++) {
+//                                    Task task=tasks.get(i);
+//                                    AdScreenResponse adScreenResponse=AdScreenResponse.builder()
+//                                            .entryId(task.getEntryId())
+//                                            .view(task.getView())
+//                                            .verticalView(task.getVerticalView())
+//                                            .repeatNum(task.getRepeatNum())
+//                                            .imei(equipment.getKey())
+//                                            .viewLength(task.getView()==null?(byte) 0 :(byte)task.getView().getBytes().length)
+//                                            .build();
+//                                    channel.writeAndFlush(adScreenResponse);
+//                                    log.info("发送第{}条广告",i+1);
+//                                }
+//                            }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//                , 20, 20, TimeUnit.SECONDS
+//        );
     }
 }

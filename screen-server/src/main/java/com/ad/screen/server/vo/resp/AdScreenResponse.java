@@ -27,17 +27,18 @@ public class AdScreenResponse extends AbstractScreenResponse {
      */
     private boolean verticalView;
 
-
+    private byte viewLength;
 
     private String view;
 
 
-    public AdScreenResponse(String imei, Integer entryId, Integer repeatNum, boolean verticalView, String view) {
+    public AdScreenResponse(String imei, Integer entryId, Integer repeatNum, boolean verticalView, String view,byte viewLength) {
         super(imei, FrameType.AD);
         this.entryId=entryId;
         this.repeatNum=repeatNum;
         this.verticalView=verticalView;
         this.view=view;
+        this.viewLength = viewLength;
     }
 
     public static AdScreenResponseBuilder builder() {
@@ -86,6 +87,7 @@ public class AdScreenResponse extends AbstractScreenResponse {
         private boolean verticalView;
         private String view;
         private String imei;
+        private byte viewLength;
         private AdScreenResponseBuilder() {
         }
 
@@ -120,8 +122,13 @@ public class AdScreenResponse extends AbstractScreenResponse {
             return this;
         }
 
+        public AdScreenResponseBuilder viewLength(byte viewLength){
+            this.viewLength = viewLength;
+            return this;
+        }
+
         public AdScreenResponse build() {
-            return new AdScreenResponse(imei, entryId, repeatNum, verticalView, view);
+            return new AdScreenResponse(imei, entryId, repeatNum, verticalView, view, viewLength);
         }
     }
 }

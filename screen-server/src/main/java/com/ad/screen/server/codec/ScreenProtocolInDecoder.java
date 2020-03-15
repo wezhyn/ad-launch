@@ -1,10 +1,8 @@
 package com.ad.screen.server.codec;
 
+import com.ad.screen.server.handler.CompleteMsgHandler;
 import com.ad.screen.server.vo.FrameType;
-import com.ad.screen.server.vo.req.BaseScreenRequest;
-import com.ad.screen.server.vo.req.ConfirmMsg;
-import com.ad.screen.server.vo.req.GpsMsg;
-import com.ad.screen.server.vo.req.HeartBeatMsg;
+import com.ad.screen.server.vo.req.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -129,6 +127,8 @@ public class ScreenProtocolInDecoder extends ByteToMessageDecoder {
                 GpsMsg gpsMsg=new GpsMsg();
                 BeanUtils.copyProperties(request, gpsMsg);
                 return gpsMsg;
+            }
+            case 4: {
             }
             default: {
                 throw new ScreenProtocolInDecoder.ParserException();

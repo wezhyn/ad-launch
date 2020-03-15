@@ -21,6 +21,7 @@ public class TypeMsgHandler extends BaseMsgHandler<BaseScreenRequest> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BaseScreenRequest msg) throws Exception {
         FrameType type=msg.getFrameType();
+
         switch (type) {
             case HEART_BEAT: {
                 HeartBeatMsg heartBeatMsg=new HeartBeatMsg();
@@ -41,8 +42,8 @@ public class TypeMsgHandler extends BaseMsgHandler<BaseScreenRequest> {
                 break;
             }
             case COMPLETE_NOTIFICATION: {
-                CompleteNotificationMsg completeNotificationMsg=new CompleteNotificationMsg();
-                BeanUtils.copyProperties(msg, completeNotificationMsg);
+               Integer entryId = Integer.valueOf((String) msg.getNetData());
+                CompleteNotificationMsg completeNotificationMsg=new CompleteNotificationMsg(msg.getEquipmentName(),entryId);
                 ctx.fireChannelRead(completeNotificationMsg);
                 break;
             }

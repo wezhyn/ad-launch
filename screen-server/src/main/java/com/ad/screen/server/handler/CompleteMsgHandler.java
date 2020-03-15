@@ -32,10 +32,10 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
+        log.warn("收到了imei号为{}的第{}项任务完成的消息",msg.getEquipmentName(),msg.getNetData());
         List<Task> tasks=ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
-
-        String id=msg.getNetData();
-        Task task=tasks.get(Integer.parseInt(id) - 1);
+        Integer id=msg.getNetData();
+        Task task=tasks.get(id - 1);
         if (task.getAdOrderId()==0) {
             log.debug("该条目为空白帧");
         } else {
@@ -49,10 +49,11 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                         .uid(task.getUid())
                         .build();
                 completionI.save(com);
-                log.debug("完成task:{}", id);
+                log.info("完成了条目编号为{}的小任务，持久化完成",id);
             } else {
                 completion.setExecutedTimes(completion.getExecutedTimes() + task.getRepeatNum());
                 completionI.save(completion);
+                log.debug("完成了条目编号为{}的小任务 更新执行次数",id+1);
             }
         }
     }

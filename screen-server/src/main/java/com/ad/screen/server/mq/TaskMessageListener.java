@@ -103,6 +103,7 @@ public class TaskMessageListener implements RocketMQListener<TaskMessage>,Distri
                                 .repeatNum(numPerTask)
                                 .pooledId(pooledIdAndEquipCache.getPooledId())
                                 .status(false)
+                                .uid(taskMessage.getUid())
                                 .view(sb.toString())
                                 .verticalView(taskMessage.getVertical())
                                 .build();
