@@ -1,12 +1,9 @@
 package com.ad.screen.server.entity;
 
-import com.ad.screen.server.mq.TaskKey;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * @ClassName FailTask
@@ -16,15 +13,17 @@ import javax.persistence.*;
  * @Version V1.0
  **/
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Table(name="fail_task")
-public class FailTask {
+public class FailTask  {
 
     @EmbeddedId
-    private TaskKey taskKey;
+    private TaskKey id;
 
     @Column(name="repeat_num")
     private Integer repeatNum;
@@ -35,5 +34,20 @@ public class FailTask {
     @Column(name = "verticalView")
     boolean verticalView;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FailTask failTask = (FailTask) o;
+        return verticalView == failTask.verticalView &&
+                id.equals(failTask.id) &&
+                repeatNum.equals(failTask.repeatNum) &&
+                view.equals(failTask.view);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, repeatNum, view, verticalView);
+    }
 }
 

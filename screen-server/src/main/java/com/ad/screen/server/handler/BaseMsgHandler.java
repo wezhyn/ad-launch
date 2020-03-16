@@ -4,11 +4,10 @@ import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.RemoteEquipmentServiceI;
 import com.ad.screen.server.FailTaskService;
 import com.ad.screen.server.IdChannelPool;
-import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
-import com.ad.screen.server.mq.TaskKey;
+import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.IScreenFrameServer;
 import io.netty.channel.Channel;
@@ -123,7 +122,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                 if (failTask==null) {
                     failTask = new FailTask();
                     TaskKey taskKey = new TaskKey(task.getOid(),task.getUid());
-                    failTask.setTaskKey(taskKey);
+                    failTask.setId(taskKey);
                     failTask.setRepeatNum(task.getRepeatNum());
                 } else {
                     //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
@@ -136,7 +135,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     hashMap.entrySet()) {
                 Integer key = entry.getKey();
                 FailTask tempTask =  entry.getValue();
-                FailTask failTask=failTaskService.findByKey(tempTask.getTaskKey());
+                FailTask failTask=failTaskService.findByKey(tempTask.getId());
                 if (failTask==null) {
                     failTaskService.save(entry.getValue());
                 } else {

@@ -1,7 +1,7 @@
 package com.ad.screen.server;
 
 import com.ad.screen.server.entity.FailTask;
-import com.ad.screen.server.mq.TaskKey;
+import com.ad.screen.server.entity.TaskKey;
 
 /**
  * @ClassName FailTaskService

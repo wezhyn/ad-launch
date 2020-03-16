@@ -19,7 +19,9 @@ public class ScreenApplication {
 
     public static void main(String[] args) {
 
-        SpringApplication application=new SpringApplication(ScreenApplication.class);
-        application.run(args);
+            SpringApplication application=new SpringApplication(ScreenApplication.class);
+            application.run(args);
+
+
     }
 }

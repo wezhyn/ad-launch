@@ -1,4 +1,4 @@
-package com.ad.screen.server.mq;
+package com.ad.screen.server.entity;
 
 import lombok.*;
 
@@ -20,6 +20,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Getter
 @Setter
+
 public class TaskKey implements Serializable {
 
 
@@ -37,20 +38,6 @@ public class TaskKey implements Serializable {
         return Objects.hash(oid, uid);
     }
 
-    @Override
-    public String toString() {
-        return "TaskKey{" +
-                "oid=" + oid +
-                ", uid=" + uid +
-                '}';
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TaskKey taskKey = (TaskKey) o;
-        return oid.equals(taskKey.oid) &&
-                uid.equals(taskKey.uid);
-    }
+
 }

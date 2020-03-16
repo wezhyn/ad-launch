@@ -1,7 +1,7 @@
 package com.ad.screen.server;
 
 import com.ad.screen.server.entity.FailTask;
-import com.ad.screen.server.mq.TaskKey;
+import com.ad.screen.server.entity.TaskKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -12,5 +12,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Version V1.0
  **/
 public interface FailTaskRepository extends JpaRepository<FailTask, TaskKey> {
-    FailTask findFailTaskByOidAndUid(Integer oid,Integer uid);
 }

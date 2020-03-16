@@ -1,7 +1,7 @@
 package com.ad.screen.server;
 
 import com.ad.screen.server.entity.FailTask;
-import com.ad.screen.server.mq.TaskKey;
+import com.ad.screen.server.entity.TaskKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +20,14 @@ public class FailTaskServiceImpl implements FailTaskService {
     @Override
     public FailTask save(FailTask failTask) {
         return failTaskRepository.save(failTask);
+    
     }
+    
 
     @Override
     public FailTask findByKey(TaskKey taskKey) {
         return failTaskRepository.findById(taskKey).orElse(null);
     }
 
-//    @Override
-//    public FailTask findByOidAndUid(Integer oid, Integer uid) {
-//        return failTaskRepository.findFailTaskByOidAndUid(oid,uid);
-//    }
+
 }
