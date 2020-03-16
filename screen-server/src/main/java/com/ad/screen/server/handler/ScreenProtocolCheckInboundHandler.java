@@ -50,6 +50,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
      * 帧开头: SOF
      */
     private final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
+    
     @Autowired
     private RemoteEquipmentServiceI equipmentService;
     /**
@@ -122,7 +123,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                     equipment.setStatus(true);
                     ctx.channel().attr(EQUIPMENT).set(equipment);
                     Long pooledId=ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
-                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment, false, 25);
+                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment, 25);
                     pooledIdAndEquipCacheService.getCache().put(imei, pooledIdAndEquipCache);
                 }
                 break;

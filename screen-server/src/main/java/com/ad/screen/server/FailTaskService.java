@@ -1,6 +1,7 @@
 package com.ad.screen.server;
 
 import com.ad.screen.server.entity.FailTask;
+import com.ad.screen.server.mq.TaskKey;
 
 /**
  * @ClassName FailTaskService
@@ -12,5 +13,6 @@ import com.ad.screen.server.entity.FailTask;
 public interface FailTaskService {
     FailTask save(FailTask failTask);
 
-    FailTask findById(Integer id);
+    FailTask findByKey(TaskKey taskKey);
+//    FailTask findByOidAndUid(Integer oid, Integer uid);
 }

@@ -39,15 +39,15 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
         List<Task> received = attr.get();
         Integer id=msg.getNetData();
         Task task=received.get(id - 1);
-        if (task.getAdOrderId()==0) {
+        if (task.getOid()==0) {
             log.debug("该条目为空白帧");
         } else {
             try {
                 String imei=msg.getEquipmentName();
-                Completion completion=completionI.findByOidAndUid(task.getAdOrderId(), task.getUid());
+                Completion completion=completionI.findByOidAndUid(task.getOid(), task.getUid());
                 if (completion==null) {
                     Completion com=Completion.builder()
-                            .adOrderId(task.getAdOrderId())
+                            .adOrderId(task.getOid())
                             .executedTimes(task.getRepeatNum())
                             .isPaid(false)
                             .uid(task.getUid())

@@ -1,14 +1,12 @@
 package com.ad.screen.server.entity;
 
+import com.ad.screen.server.mq.TaskKey;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @ClassName FailTask
@@ -25,15 +23,17 @@ import javax.persistence.Table;
 @Table(name="fail_task")
 public class FailTask {
 
-    @Id
-    @Column(name="order_id")
-    private Integer orderId;
-    @Column(name="num")
-    private Integer num;
+    @EmbeddedId
+    private TaskKey taskKey;
 
-    @Column(name="uid")
-    private Integer uid;
+    @Column(name="repeat_num")
+    private Integer repeatNum;
 
+    @Column(name = "view")
+    private String view;
+
+    @Column(name = "verticalView")
+    boolean verticalView;
 
 }
 

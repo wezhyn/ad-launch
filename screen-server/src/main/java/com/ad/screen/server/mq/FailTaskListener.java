@@ -15,14 +15,14 @@ import org.springframework.stereotype.Component;
  * @Date 2020/3/9 10:33
  * @Version V1.0
  **/
-@RocketMQMessageListener(consumerGroup="fail-task-group", topic="fail-task",
+@RocketMQMessageListener(
+        topic="fail_task_topic",
+        consumerGroup="fail_task_consumers",
         selectorExpression="*"
 )
 @Slf4j
 @Component
-public class FailTaskConsumer implements RocketMQListener<FailTask> {
-    @Autowired
-    RocketMQTemplate rocketMQTemplate;
+public class FailTaskListener implements RocketMQListener<FailTask> {
 
     @Override
     public void onMessage(FailTask message) {

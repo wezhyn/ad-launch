@@ -8,6 +8,7 @@ import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
+import com.ad.screen.server.mq.TaskKey;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.IScreenFrameServer;
 import io.netty.channel.Channel;
@@ -78,60 +79,17 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     @Override
     //规定时间内未收到心跳帧则断开连接并将该设备的状态设置为未在线的状态
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
-            //需要在这里判断是否有未处理的任务   直接在ctx里存放两个hashmap 一个存放每个条目编号的对应在消息队列中的
-            //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
-            List<Task> tasks=ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
-            if (tasks!=null){
-                HashMap<Integer, FailTask> hashMap=new HashMap<>();
-                for (Task task : tasks) {
-                    Integer id=task.getOid();
-                    if (id==0) {
-                        continue;
-                    } else {
-                        //整合一个FailTask持久化
-                        FailTask failTask=hashMap.get(id);
-                        if (failTask==null) {
-                            failTask = new FailTask();
-                            failTask.setOrderId(id);
-                            failTask.setNum(task.getRepeatNum());
-                            failTask.setUid(task.getUid());
-                            hashMap.put(id, failTask);
-                        } else {
-                            //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
-                            failTask.setNum(failTask.getNum() + task.getRepeatNum());
-                            hashMap.put(id, failTask);
-                        }
-                    }
-                }
-                //遍历失败任务的hashmap 并将其整合持久化到数据库
-                for (Map.Entry<Integer, FailTask> entry :
-                        hashMap.entrySet()) {
-                    FailTask failTask=failTaskService.findById(entry.getKey());
-                    if (failTask==null) {
-                        failTaskService.save(entry.getValue());
-                    } else {
-                        failTask.setNum(entry.getValue().getNum() + failTask.getNum());
-                        failTaskService.save(failTask);
-                    }
-                }
-            }
 
-            //从id-channel池中删除掉这个channel
-            idChannelPool.unregisterChannel(ctx.channel());
-            //更新设备的在线状态
-            AdEquipment equipment= ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
-            equipment.setStatus(false);
-            //保存设备的最终信息
-            preserveEquipInfo(equipment);
-            //在缓存中移除该信息
-            pooledIdAndEquipCacheService.remove(equipment.getKey());
+        //持久化未完成任务
+        compensate(ctx);
+        if (evt instanceof IdleStateEvent) {
             //项目只设置了全部超时时间
             IdleState state=((IdleStateEvent) evt).state();
             //关闭连接
             if (state==IdleState.ALL_IDLE) {
                 log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
             }
+
         } else {
             super.userEventTriggered(ctx, evt);
         }
@@ -152,4 +110,50 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
         equipmentService.mergeEquip(adEquipment);
     }
 
+    public void compensate(ChannelHandlerContext ctx){
+        //需要在这里判断是否有未处理的任务   直接在ctx里存放两个hashmap 一个存放每个条目编号的对应在消息队列中的
+        //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
+        List<Task> unFinishedTasks = ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
+        if (unFinishedTasks!=null && unFinishedTasks.size() != 0){
+            HashMap<Integer, FailTask> hashMap=new HashMap<>();
+            for (Task task : unFinishedTasks) {
+                Integer id=task.getOid();
+                //整合一个FailTask集成小的task的重复执行任务次数
+                FailTask failTask=hashMap.get(id);
+                if (failTask==null) {
+                    failTask = new FailTask();
+                    TaskKey taskKey = new TaskKey(task.getOid(),task.getUid());
+                    failTask.setTaskKey(taskKey);
+                    failTask.setRepeatNum(task.getRepeatNum());
+                } else {
+                    //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
+                    failTask.setRepeatNum(failTask.getRepeatNum() + task.getRepeatNum());
+                }
+                hashMap.put(id, failTask);
+            }
+            //遍历失败任务的hashmap,并将其整合持久化到数据库
+            for (Map.Entry<Integer, FailTask> entry :
+                    hashMap.entrySet()) {
+                Integer key = entry.getKey();
+                FailTask tempTask =  entry.getValue();
+                FailTask failTask=failTaskService.findByKey(tempTask.getTaskKey());
+                if (failTask==null) {
+                    failTaskService.save(entry.getValue());
+                } else {
+                    failTask.setRepeatNum(tempTask.getRepeatNum() + failTask.getRepeatNum());
+                    failTaskService.save(failTask);
+                }
+            }
+        }
+
+        //从id-channel池中删除掉这个channel
+        idChannelPool.unregisterChannel(ctx.channel());
+        //更新设备的在线状态
+        AdEquipment equipment= ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
+        equipment.setStatus(false);
+        //保存设备的最终信息
+        preserveEquipInfo(equipment);
+        //在缓存中移除该信息
+        pooledIdAndEquipCacheService.remove(equipment.getKey());
+    }
 }
