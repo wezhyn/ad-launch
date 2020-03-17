@@ -8,6 +8,7 @@ import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.entity.TaskKey;
+import com.ad.screen.server.mq.CommonSendCallback;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.IScreenFrameServer;
 import io.netty.channel.Channel;
@@ -144,6 +145,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     failTask.setRepeatNum(tempTask.getRepeatNum() + failTask.getRepeatNum());
                     failTaskService.save(failTask);
                 }
+                rocketMQTemplate.asyncSend("fail_task_topic",failTask,new CommonSendCallback<>(failTask));
             }
         }
 

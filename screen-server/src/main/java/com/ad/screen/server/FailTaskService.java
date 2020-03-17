@@ -3,6 +3,8 @@ package com.ad.screen.server;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.TaskKey;
 
+import java.util.List;
+
 /**
  * @ClassName FailTaskService
  * @Description
@@ -17,4 +19,6 @@ public interface FailTaskService {
 //    FailTask findByOidAndUid(Integer oid, Integer uid);
 
     void remove(TaskKey taskKey);
+
+    List<FailTask> findAll();
 }

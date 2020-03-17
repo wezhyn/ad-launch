@@ -5,6 +5,8 @@ import com.ad.screen.server.entity.TaskKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @ClassName FailTaskServiceImpl
  * @Description
@@ -32,6 +34,11 @@ public class FailTaskServiceImpl implements FailTaskService {
     @Override
     public void remove(TaskKey taskKey) {
         failTaskRepository.deleteById(taskKey);
+    }
+
+    @Override
+    public List<FailTask> findAll() {
+        return failTaskRepository.findAll();
     }
 
 
