@@ -1,7 +1,5 @@
 package com.ad.admain.test;
 
-import com.ad.admain.mq.order.CommonSendCallback;
-import com.ad.launch.order.AdOrder;
 import com.ad.launch.order.TaskMessage;
 import com.wezhyn.project.controller.ResponseResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -28,7 +26,7 @@ public class GenerateTasks {
     @ResponseBody
     public ResponseResult generateTasks(@RequestBody TaskMessage taskMessage){
         System.out.println(taskMessage.toString());
-        rocketMQTemplate.syncSend("task_topic",taskMessage);
+        rocketMQTemplate.syncSend("task_message_topic",taskMessage);
         return ResponseResult.forSuccessBuilder()
                 .withCode(200)
                 .withMessage("消息发送成功")

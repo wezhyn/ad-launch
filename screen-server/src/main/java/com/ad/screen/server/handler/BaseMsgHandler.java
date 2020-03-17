@@ -123,10 +123,12 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     failTask = new FailTask();
                     TaskKey taskKey = new TaskKey(task.getOid(),task.getUid());
                     failTask.setId(taskKey);
+                    failTask.setRate(1);
                     failTask.setRepeatNum(task.getRepeatNum());
                 } else {
                     //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
                     failTask.setRepeatNum(failTask.getRepeatNum() + task.getRepeatNum());
+                    failTask.setRate(1+failTask.getRate());
                 }
                 hashMap.put(id, failTask);
             }

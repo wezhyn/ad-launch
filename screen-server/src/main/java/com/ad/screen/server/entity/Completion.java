@@ -1,6 +1,5 @@
 package com.ad.screen.server.entity;
 
-import com.ad.launch.order.AdOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -15,4 +15,6 @@ public interface FailTaskService {
 
     FailTask findByKey(TaskKey taskKey);
 //    FailTask findByOidAndUid(Integer oid, Integer uid);
+
+    void remove(TaskKey taskKey);
 }

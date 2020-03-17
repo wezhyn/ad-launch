@@ -13,5 +13,6 @@
     <dubbo:reference interface="com.ad.launch.user.RemoteUserServiceI" id="remoteUserService" version="1.0.0"/>
     <dubbo:reference interface="com.ad.launch.order.RemoteEquipmentServiceI" id="remoteEquipmentService"
                      version="1.0.0"/>
-
+    <dubbo:reference interface="com.ad.launch.order.RemoteAdOrderServiceI" id="remoteAdOrderService"
+                     version="1.0.0"/>
 </beans>

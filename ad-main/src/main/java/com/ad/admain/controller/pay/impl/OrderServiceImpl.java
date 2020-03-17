@@ -122,6 +122,11 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
+    public AdOrder findById(Integer id) {
+        return adOrderRepository.findById(id).orElse(null);
+    }
+
+    @Override
     @Transactional(rollbackFor=Exception.class)
     public void delete(Integer integer) {
         AdOrder order=new AdOrder();

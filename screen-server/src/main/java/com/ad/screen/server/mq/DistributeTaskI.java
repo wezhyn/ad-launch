@@ -1,7 +1,6 @@
 package com.ad.screen.server.mq;
 
 
-import com.ad.launch.order.AdOrder;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 
 import java.util.HashMap;
@@ -37,5 +36,6 @@ public interface DistributeTaskI {
 //    HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope);
 
     HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate);
+
 
 }

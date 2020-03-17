@@ -29,5 +29,10 @@ public class FailTaskServiceImpl implements FailTaskService {
         return failTaskRepository.findById(taskKey).orElse(null);
     }
 
+    @Override
+    public void remove(TaskKey taskKey) {
+        failTaskRepository.deleteById(taskKey);
+    }
+
 
 }

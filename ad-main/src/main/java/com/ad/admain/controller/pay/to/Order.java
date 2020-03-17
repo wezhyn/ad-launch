@@ -3,6 +3,7 @@ package com.ad.admain.controller.pay.to;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
+import com.wezhyn.project.annotation.UpdateIgnore;
 import com.wezhyn.project.database.EnumType;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,16 +50,20 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
 
     @ManyToOne(cascade=CascadeType.MERGE)
     @JoinColumn(name="uid", insertable=false, updatable=false)
+    @UpdateIgnore
     private GenericUser orderUser;
 
     private Integer uid;
-
 
     private Double totalAmount;
 
     private Integer numPerEquip;
 
     private Long tradeOut;
+
+    private Double executed;
+
+    private Boolean isFinished;
 
     @Column(name="create_time", columnDefinition="timestamp  null  default current_timestamp")
     private LocalDateTime createTime;

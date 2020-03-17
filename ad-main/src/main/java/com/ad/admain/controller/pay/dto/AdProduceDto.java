@@ -67,5 +67,7 @@ public class AdProduceDto {
     private String endDate;
     private String startTime;
     private String endTime;
+    private Double executed;
+    private Boolean isFinished;
 
 }

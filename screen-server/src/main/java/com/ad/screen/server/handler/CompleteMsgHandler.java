@@ -1,5 +1,7 @@
 package com.ad.screen.server.handler;
 
+import com.ad.launch.order.AdRemoteOrder;
+import com.ad.launch.order.RemoteAdOrderServiceI;
 import com.ad.screen.server.CompletionI;
 import com.ad.screen.server.cache.EquipmentCacheService;
 import com.ad.screen.server.entity.Completion;
@@ -9,11 +11,11 @@ import com.ad.screen.server.vo.req.CompleteNotificationMsg;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.Attribute;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -31,6 +33,8 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
     CompletionI completionI;
     @Autowired
     EquipmentCacheService equipmentCacheService;
+    @Resource
+    RemoteAdOrderServiceI remoteAdOrderServiceI;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
@@ -60,10 +64,21 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                     completionI.save(completion);
                     log.debug("完成了条目编号为{}的小任务 更新执行次数",id+1);
 
+
                 }
                 //完成任务后删除该index的任务并更新attr属性
                 received.remove(id-1);
                 attr.set(received);
+                AdRemoteOrder adRemoteOrder = remoteAdOrderServiceI.findByOid(task.getOid());
+                Double executed = adRemoteOrder.getExecuted();
+                if (executed == null) {
+                    executed = Double.valueOf(task.getRepeatNum());
+                }else {
+                    executed+= Double.valueOf(task.getRepeatNum());
+                }
+
+                adRemoteOrder.setExecuted(executed);
+                remoteAdOrderServiceI.save(adRemoteOrder);
             } catch (Exception e) {
                 e.printStackTrace();
             }

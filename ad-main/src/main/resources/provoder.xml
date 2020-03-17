@@ -17,7 +17,8 @@
     <dubbo:service interface="com.ad.launch.user.RemoteUserServiceI" ref="remoteUserService" version="1.0.0"/>
     <dubbo:service interface="com.ad.launch.order.RemoteEquipmentServiceI" ref="remoteEquipmentService"
                    version="1.0.0"/>
-
+    <dubbo:service interface="com.ad.launch.order.RemoteAdOrderServiceI" ref="remoteAdOrderService"
+                   version="1.0.0"/>
     <!-- 和本地bean一样实现服务 -->
     <bean id="remoteUserService" class="com.ad.admain.remote.RemoteUserService">
         <constructor-arg type="com.ad.admain.remote.convert.RemoteUserMapper" ref="remoteUserMapperImpl"/>

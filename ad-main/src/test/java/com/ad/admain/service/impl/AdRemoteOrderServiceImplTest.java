@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class AdOrderServiceImplTest {
+public class AdRemoteOrderServiceImplTest {
     @Autowired
     AdOrderRepository orderReposity;
     @Autowired

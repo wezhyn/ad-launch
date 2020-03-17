@@ -52,4 +52,6 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
      */
     boolean rollbackRefundOrderStatus(Integer orderId, OrderStatus originStatus);
 
+    AdOrder findById(Integer id);
+
 }
