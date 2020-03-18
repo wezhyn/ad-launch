@@ -22,14 +22,8 @@ public class InitialController {
     FailTaskService failTaskService;
     @Autowired
     RocketMQTemplate rocketMQTemplate;
-    @PostConstruct
+
     public void SendFailTasks(){
-        List<FailTask> failTasks = failTaskService.findAll();
-        if (failTasks!=null && failTasks.size()!=0){
-            for (FailTask failTask : failTasks
-                 ) {
-                rocketMQTemplate.asyncSend("fail_task_topic",failTask,new CommonSendCallback<>(failTask));
-            }
-        }
+
     }
 }

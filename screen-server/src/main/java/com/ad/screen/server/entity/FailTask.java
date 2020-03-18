@@ -36,13 +36,15 @@ public class FailTask  {
 
     @Column(name = "rate")
     Integer rate;
+
     @Column(name = "longitude")
     Double longitude;
+
     @Column(name = "latitude")
     Double latitude;
+
     @Column(name = "scope")
     Double scope;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

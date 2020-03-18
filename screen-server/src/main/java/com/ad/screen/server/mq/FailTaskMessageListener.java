@@ -7,6 +7,7 @@ import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.entity.TaskKey;
+import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import io.netty.channel.Channel;
@@ -47,8 +48,11 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
     public void onMessage(FailTask message) {
         //收到的失败任务消息
        HashMap<Long, PooledIdAndEquipCache> cache =  distributeTaskI.scopeAvailableFreeEquips(message.getLongitude(),message.getLatitude(),message.getScope(),message.getRate());
-       assert cache!=null;
-       assert cache.size()>=1;
+        //目前没有这么多的在线车辆数,退出
+        if (cache==null||cache.size() < 1) {
+            throw new InsufficientException("目前没有这么多的在线车辆数");
+        }
+
         Integer rate = message.getRate();
         Iterator<Map.Entry<Long,PooledIdAndEquipCache>> iterator =  cache.entrySet().iterator();
         Map.Entry<Long, PooledIdAndEquipCache> map = iterator.next();

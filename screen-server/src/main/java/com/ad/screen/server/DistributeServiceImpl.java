@@ -5,6 +5,7 @@ import com.ad.launch.order.SquareUtils;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.Task;
+import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.mq.DistributeTaskI;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import io.netty.channel.Channel;
@@ -48,20 +49,28 @@ public class DistributeServiceImpl implements DistributeTaskI {
 
     @Override
     public HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate) {
-        HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeEquips(longitude,latitude,scope);
-        HashMap<Long, PooledIdAndEquipCache> availableEquips = new HashMap<>();
-        for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
-        ) {
 
-            PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
-            //比较目前车辆的剩余频率和订单的频率要求,若小于则跳过检查
-            if (pooledIdAndEquipCache.getRest() < rate) {
-                continue;
+            HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeEquips(longitude,latitude,scope);
+            if (freeEquips==null){
+                throw new InsufficientException("目前没有这么多的车辆");
             }
 
-            availableEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
-        }
-        return availableEquips;
+
+            HashMap<Long, PooledIdAndEquipCache> availableEquips = new HashMap<>();
+            for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
+            ) {
+
+                PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
+                //比较目前车辆的剩余频率和订单的频率要求,若小于则跳过检查
+                if (pooledIdAndEquipCache.getRest() < rate) {
+                    continue;
+                }
+
+                availableEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
+            }
+            return availableEquips;
+
+
     }
 
 

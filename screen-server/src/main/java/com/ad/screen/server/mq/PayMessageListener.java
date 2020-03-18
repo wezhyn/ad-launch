@@ -5,6 +5,7 @@ import com.ad.screen.server.IdChannelPool;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.Task;
+import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,7 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
 
         //目前没有这么多的在线车辆数,退出
         if (onlinenum < deliverNum) {
-            log.debug("目前没有这么多的在线车辆数");
-            return;
+            throw new InsufficientException("目前没有这么多的在线车辆数");
         } else {
             //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
             HashMap<Long, PooledIdAndEquipCache> available = distributeTaskI.scopeAvailableFreeEquips(taskMessage.getLongitude(), taskMessage.getLatitude(), taskMessage.getScope(), taskMessage.getRate());

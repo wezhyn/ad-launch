@@ -1,6 +1,8 @@
 package com.ad.screen.server.handler;
 
 import com.ad.launch.order.AdEquipment;
+import com.ad.launch.order.AdRemoteOrder;
+import com.ad.launch.order.RemoteAdOrderServiceI;
 import com.ad.launch.order.RemoteEquipmentServiceI;
 import com.ad.screen.server.FailTaskService;
 import com.ad.screen.server.IdChannelPool;
@@ -50,6 +52,8 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
     @Resource
     private RemoteEquipmentServiceI equipmentService;
+    @Resource
+    private RemoteAdOrderServiceI adOrderService;
 
     /**
      * 递增获取流水号
@@ -126,6 +130,8 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     TaskKey taskKey = new TaskKey(task.getOid(),task.getUid());
                     failTask.setId(taskKey);
                     failTask.setRate(1);
+                    failTask.setView(task.getView());
+                    failTask.setVerticalView(task.getVerticalView());
                     failTask.setRepeatNum(task.getRepeatNum());
                 } else {
                     //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数,并增加1点频率
@@ -140,8 +146,21 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                 Integer key = entry.getKey();
                 FailTask tempTask =  entry.getValue();
                 FailTask failTask=failTaskService.findByKey(tempTask.getId());
+
                 if (failTask==null) {
-                    failTaskService.save(entry.getValue());
+                    AdRemoteOrder adRemoteOrder = adOrderService.findByOid(tempTask.getId().getOid());
+
+                    failTask = FailTask.builder()
+                            .id(tempTask.getId())
+                            .latitude(adRemoteOrder.getLatitude())
+                            .longitude(adRemoteOrder.getLongitude())
+                            .rate(adRemoteOrder.getRate())
+                            .repeatNum(tempTask.getRepeatNum())
+                            .scope(adRemoteOrder.getScope())
+                            .view(tempTask.getView())
+                            .verticalView(tempTask.isVerticalView())
+                            .build();
+                    failTaskService.save(failTask);
                 } else {
                     failTask.setRepeatNum(tempTask.getRepeatNum() + failTask.getRepeatNum());
                     failTaskService.save(failTask);
