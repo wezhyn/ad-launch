@@ -35,5 +35,10 @@ public class RemoteAdOrderService implements RemoteAdOrderServiceI {
             return remoteOrderMapper.toDto(adOrder);
     }
 
+    @Override
+    public Integer updateExecuted(AdRemoteOrder adRemoteOrder) {
+        return adOrderService.updateExecuted(adRemoteOrder.getId(),adRemoteOrder.getExecuted());
+    }
+
 
 }

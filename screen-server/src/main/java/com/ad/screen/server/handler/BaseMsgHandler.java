@@ -113,11 +113,12 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
     public void compensate(ChannelHandlerContext ctx){
         //需要在这里判断是否有未处理的任务   直接在ctx里存放两个hashmap 一个存放每个条目编号的对应在消息队列中的
         //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
-        List<Task> unFinishedTasks = ctx.channel().attr(ScreenChannelInitializer.TASK_LIST).get();
+        HashMap<Integer,Task> unFinishedTasks = ctx.channel().attr(ScreenChannelInitializer.TASK_MAP).get();
         if (unFinishedTasks!=null && unFinishedTasks.size() != 0){
             HashMap<Integer, FailTask> hashMap=new HashMap<>();
-            for (Task task : unFinishedTasks) {
-                Integer id=task.getOid();
+            for (Map.Entry<Integer,Task> entry: unFinishedTasks.entrySet()) {
+                Integer id=entry.getKey();
+                Task task = entry.getValue();
                 //整合一个FailTask集成小的task的重复执行任务次数
                 FailTask failTask=hashMap.get(id);
                 if (failTask==null) {
@@ -127,7 +128,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     failTask.setRate(1);
                     failTask.setRepeatNum(task.getRepeatNum());
                 } else {
-                    //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数
+                    //如果改订单id已经在该hashmap中存在，则在该基础上增加未完成的执行次数,并增加1点频率
                     failTask.setRepeatNum(failTask.getRepeatNum() + task.getRepeatNum());
                     failTask.setRate(1+failTask.getRate());
                 }

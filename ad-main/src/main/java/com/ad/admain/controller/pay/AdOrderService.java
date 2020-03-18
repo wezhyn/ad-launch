@@ -54,4 +54,6 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
 
     AdOrder findById(Integer id);
 
+    Integer updateExecuted(Integer oid,Double executed);
+
 }

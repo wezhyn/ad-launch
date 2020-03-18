@@ -127,6 +127,11 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
+    public Integer updateExecuted(Integer oid, Double executed) {
+        return adOrderRepository.updateExecuted(oid,executed);
+    }
+
+    @Override
     @Transactional(rollbackFor=Exception.class)
     public void delete(Integer integer) {
         AdOrder order=new AdOrder();

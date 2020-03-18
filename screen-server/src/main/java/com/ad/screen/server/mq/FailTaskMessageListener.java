@@ -16,10 +16,8 @@ import org.apache.tomcat.jni.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -51,29 +49,35 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
        HashMap<Long, PooledIdAndEquipCache> cache =  distributeTaskI.scopeAvailableFreeEquips(message.getLongitude(),message.getLatitude(),message.getScope(),message.getRate());
        assert cache!=null;
        assert cache.size()>=1;
-
+        Integer rate = message.getRate();
         Iterator<Map.Entry<Long,PooledIdAndEquipCache>> iterator =  cache.entrySet().iterator();
         Map.Entry<Long, PooledIdAndEquipCache> map = iterator.next();
         Long pooledId = map.getKey();
-        PooledIdAndEquipCache equip = map.getValue();
+        PooledIdAndEquipCache pooledIdAndEquipCache = map.getValue();
         Channel channel = idChannelPool.getChannel(pooledId);
-        List<Task> received = channel.attr(ScreenChannelInitializer.TASK_LIST).get();
-        int entryId = received.size();
-        for (int i =entryId;i<entryId+message.getRate();i++){
+        HashMap<Integer, Task> received = channel.attr(ScreenChannelInitializer.TASK_MAP).get();
+        Set<Integer> keySet = received.keySet();
+//        int entryId = received.size();
+        int addNum = rate.intValue();
+        for (int j = 1;addNum>0&&j<=25;j++){
+            if (!keySet.contains(j)){
            Task task = Task.builder()
-                    .uid(equip.getEquipment().getUid())
+                    .uid(pooledIdAndEquipCache.getEquipment().getUid())
                     .view(message.getView())
                     .repeatNum(message.getRepeatNum()/message.getRate())
-                    .entryId(i)
+                    .entryId(j)
                     .sendIf(false)
                     .oid(message.getId().getOid())
                     .verticalView(message.isVerticalView())
                     .build();
-            received.add(task);
-            //同步数据库
-            failTaskService.remove(message.getId());
+            received.put(j,task);
+            addNum--;
+            }
         }
-        channel.attr(ScreenChannelInitializer.TASK_LIST).set(received);
-        pooledIdAndEquipCacheService.setValue(channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get().getKey(),equip);
+        //同步数据库并更新缓存
+        failTaskService.remove(message.getId());
+        channel.attr(ScreenChannelInitializer.TASK_MAP).set(received);
+        pooledIdAndEquipCache.setRest(pooledIdAndEquipCache.getRest()-rate);
+        pooledIdAndEquipCacheService.setValue(channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get().getKey(),pooledIdAndEquipCache);
     }
 }

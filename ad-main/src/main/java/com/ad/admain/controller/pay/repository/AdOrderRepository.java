@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+
 /**
  * @author : wezhyn
  * @date : 2020/2/24
@@ -58,4 +60,10 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      * @return page
      */
     Page<AdOrder> findAdOrdersByUidAndIsDeleteIsFalse(Integer uId, Pageable pageable);
+
+
+    @Modifying(clearAutomatically = true,flushAutomatically = true)
+    @Query("update ad_order o set o.executed =:executed where o.id=:oid")
+    @Transactional
+    Integer updateExecuted(Integer oid, Double executed);
 }

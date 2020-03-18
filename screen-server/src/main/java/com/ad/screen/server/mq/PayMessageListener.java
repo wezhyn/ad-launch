@@ -67,46 +67,63 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
 //                Cache<String, PooledIdAndEquipCache> cache=pooledIdAndEquipCacheService.getCache();
                 PooledIdAndEquipCache pooledIdAndEquipCache = entry.getValue();
                 Long pooledId = entry.getKey();
+
+                //组合广告内容
+                List<String> views = taskMessage.getProduceContext();
+                StringBuilder sb = new StringBuilder();
+                for (String str : views) {
+                    sb.append(str);
+                }
+
                 try {
                     Integer entryId = null;
                     Channel channel = idChannelPool.getChannel(entry.getKey());
                     //取出channel已经收到的任务列表
-                    List<Task> received = channel.attr(ScreenChannelInitializer.TASK_LIST).get();
+                    HashMap<Integer,Task> received = channel.attr(ScreenChannelInitializer.TASK_MAP).get();
                     if (received == null) {
                         entryId = 1;
-                        received = new ArrayList<>();
-                    } else {
-                        entryId = received.size();
+                        received = new HashMap<>();
+                        //单个设备内添加rate个数个task
+                        for (int i = 1; i <= rate; i++) {
+                            //将任务加入对应channel的received列表中
+                            Task task = Task.builder()
+                                    .oid(taskMessage.getOid())
+                                    .entryId(entryId++)
+                                    .repeatNum(numPerTask)
+                                    .sendIf(false)
+                                    .uid(taskMessage.getUid())
+                                    .view(sb.toString())
+                                    .verticalView(taskMessage.getVertical())
+                                    .build();
+                            received.put(i,task);
+                        }
+                    }else {
+                        Set<Integer> keySet  = received.keySet();
+                        int addNum = rate.intValue();
+                        for (int j = 1;addNum>0&&j<=25;j++){
+                            if (!keySet.contains(j)){
+                                //将任务加入对应channel的received列表中
+                                Task task = Task.builder()
+                                        .oid(taskMessage.getOid())
+                                        .entryId(j)
+                                        .repeatNum(numPerTask)
+                                        .sendIf(false)
+                                        .uid(taskMessage.getUid())
+                                        .view(sb.toString())
+                                        .verticalView(taskMessage.getVertical())
+                                        .build();
+                                received.put(j,task);
+                                addNum--;
+                            }
+                        }
                     }
 
-                    //组合广告内容
-                    List<String> views = taskMessage.getProduceContext();
-                    StringBuilder sb = new StringBuilder();
-                    for (String str : views) {
-                        sb.append(str);
-                    }
-
-
-                    //单个设备内添加rate个数个task
-                    for (int i = 1; i <= rate; i++) {
-                        //将任务加入对应channel的received列表中
-                        Task task = Task.builder()
-                                .oid(taskMessage.getOid())
-                                .entryId(entryId++)
-                                .repeatNum(numPerTask)
-                                .sendIf(false)
-                                .uid(taskMessage.getUid())
-                                .view(sb.toString())
-                                .verticalView(taskMessage.getVertical())
-                                .build();
-                        received.add(task);
-                    }
                     log.info("已经往pooledId为:{}的channel中安排了{}个task", pooledId, rate);
 
                     //设置新的频率余量后更新缓存信息
                     String imei = entry.getValue().getEquipment().getKey();
                     pooledIdAndEquipCache.setRest(pooledIdAndEquipCache.getRest() - rate);
-                    channel.attr(ScreenChannelInitializer.TASK_LIST).set(received);
+                    channel.attr(ScreenChannelInitializer.TASK_MAP).set(received);
                     pooledIdAndEquipCacheService.setValue(imei, pooledIdAndEquipCache);
                 } catch (Exception e) {
                     e.printStackTrace();

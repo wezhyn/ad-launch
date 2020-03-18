@@ -9,5 +9,8 @@ package com.ad.launch.order;
  **/
 public interface RemoteAdOrderServiceI {
     void save(AdRemoteOrder adRemoteOrder);
+
     AdRemoteOrder findByOid(Integer id);
+
+    Integer updateExecuted(AdRemoteOrder adRemoteOrder);
 }

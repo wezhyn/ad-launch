@@ -4,6 +4,8 @@ import com.ad.launch.order.AdRemoteOrder;
 import com.ad.launch.order.RemoteAdOrderServiceI;
 import com.ad.screen.server.CompletionI;
 import com.ad.screen.server.cache.EquipmentCacheService;
+import com.ad.screen.server.cache.PooledIdAndEquipCache;
+import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.Completion;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.server.ScreenChannelInitializer;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,18 +34,17 @@ import java.util.List;
 public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> {
     @Autowired
     CompletionI completionI;
-    @Autowired
-    EquipmentCacheService equipmentCacheService;
     @Resource
     RemoteAdOrderServiceI remoteAdOrderServiceI;
-
+    @Autowired
+    PooledIdAndEquipCacheService cacheService;
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
-        log.warn("收到了imei号为{}的第{}项任务完成的消息",msg.getEquipmentName(),msg.getNetData());
-        Attribute<List<Task>> attr = ctx.channel().attr(ScreenChannelInitializer.TASK_LIST);
-        List<Task> received = attr.get();
+        log.warn("收到了imei号为{}的第{}个条目编号的完成消息",msg.getEquipmentName(),msg.getNetData());
+        Attribute<HashMap<Integer,Task>> attr = ctx.channel().attr(ScreenChannelInitializer.TASK_MAP);
+        HashMap<Integer,Task> received = attr.get();
         Integer id=msg.getNetData();
-        Task task=received.get(id - 1);
+        Task task=received.get(id);
         if (task.getOid()==0) {
             log.debug("该条目为空白帧");
         } else {
@@ -62,12 +64,12 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
 
                     completion.setExecutedTimes(completion.getExecutedTimes() + task.getRepeatNum());
                     completionI.save(completion);
-                    log.debug("完成了条目编号为{}的小任务 更新执行次数",id+1);
+                    log.debug("完成了条目编号为{}的小任务 更新执行次数",id);
 
 
                 }
                 //完成任务后删除该index的任务并更新attr属性
-                received.remove(id-1);
+                received.remove(id);
                 attr.set(received);
                 AdRemoteOrder adRemoteOrder = remoteAdOrderServiceI.findByOid(task.getOid());
                 Double executed = adRemoteOrder.getExecuted();
@@ -76,9 +78,20 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                 }else {
                     executed+= Double.valueOf(task.getRepeatNum());
                 }
-
+                //更新缓存
+                PooledIdAndEquipCache cache = cacheService.getValue(imei);
+                Integer rest = cache.getRest();
+                if (rest==null){
+                    cache.setRest(1);
+                }
+                else
+                {
+                    cache.setRest(cache.getRest()+1);
+                }
+                cacheService.setValue(imei,cache);
+                //更新订单的已执行属性
                 adRemoteOrder.setExecuted(executed);
-                remoteAdOrderServiceI.save(adRemoteOrder);
+                remoteAdOrderServiceI.updateExecuted(adRemoteOrder);
             } catch (Exception e) {
                 e.printStackTrace();
             }
