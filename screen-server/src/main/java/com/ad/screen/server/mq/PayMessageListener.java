@@ -118,7 +118,7 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
                         }
                     }
 
-                    log.info("已经往pooledId为:{}的channel中安排了{}个task", pooledId, rate);
+                    log.info("已经往IMEI为:{}的channel中安排了{}个task",pooledIdAndEquipCache.getEquipment().getKey() , rate);
 
                     //设置新的频率余量后更新缓存信息
                     String imei = entry.getValue().getEquipment().getKey();

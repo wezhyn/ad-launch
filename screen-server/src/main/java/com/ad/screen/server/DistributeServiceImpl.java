@@ -12,6 +12,7 @@ import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +40,9 @@ public class DistributeServiceImpl implements DistributeTaskI {
         for (Map.Entry<String, PooledIdAndEquipCache> entry:cache.entrySet()){
             PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
             AdEquipment equipment=entry.getValue().getEquipment();
-            Double lgt=equipment.getLongitude();
-            Double lat=equipment.getLatitude();
-            if (lgt >= info[0] && lgt <= info[1] && lat >= info[2] && lat <= info[3]) {
+            double lgt= SquareUtils.format(equipment.getLongitude());
+            double lat= SquareUtils.format(equipment.getLatitude());
+            if (lgt>info[0] && lgt<info[1] && lat>info[2]&& lat<info[3]) {
                 scopeEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
             }
         }

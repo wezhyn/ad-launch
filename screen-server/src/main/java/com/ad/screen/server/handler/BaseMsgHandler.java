@@ -121,10 +121,9 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
         if (unFinishedTasks!=null && unFinishedTasks.size() != 0){
             HashMap<Integer, FailTask> hashMap=new HashMap<>();
             for (Map.Entry<Integer,Task> entry: unFinishedTasks.entrySet()) {
-                Integer id=entry.getKey();
                 Task task = entry.getValue();
                 //整合一个FailTask集成小的task的重复执行任务次数
-                FailTask failTask=hashMap.get(id);
+                FailTask failTask=hashMap.get(task.getOid());
                 if (failTask==null) {
                     failTask = new FailTask();
                     TaskKey taskKey = new TaskKey(task.getOid(),task.getUid());
@@ -138,7 +137,7 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
                     failTask.setRepeatNum(failTask.getRepeatNum() + task.getRepeatNum());
                     failTask.setRate(1+failTask.getRate());
                 }
-                hashMap.put(id, failTask);
+                hashMap.put(task.getOid(), failTask);
             }
             //遍历失败任务的hashmap,并将其整合持久化到数据库
             for (Map.Entry<Integer, FailTask> entry :

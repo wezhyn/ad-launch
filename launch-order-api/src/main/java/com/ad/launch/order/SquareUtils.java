@@ -1,5 +1,8 @@
 package com.ad.launch.order;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 /**
  * @ClassName SquartUtils
  * @Description TODO
@@ -10,6 +13,7 @@ package com.ad.launch.order;
  */
 public class SquareUtils {
     public static Double[] getSquareInfo(Double longitude, Double latitude, Double square) {
+        DecimalFormat df4  = new DecimalFormat("##.0000");
         double r=6371.393;    // 地球半径千米
         double lng=longitude.doubleValue();
         double lat=latitude.doubleValue();
@@ -18,11 +22,17 @@ public class SquareUtils {
         double dlat=square/r;
         dlat=dlat*180/Math.PI;
 
-        double minlng=lng - dlng;
-        double maxlng=lng + dlng;
-        double minlat=lat - dlat;
-        double maxlat=lat + dlat;
+        double minlng= format(lng - dlng);
+        double maxlng=format(lng + dlng);
+        double minlat=format(lat - dlat);
+        double maxlat=format(lat + dlat);
         Double[] info=new Double[]{minlng, maxlng, minlat, maxlat};
         return info;
+    }
+
+
+    public static double format(double val){
+        double format = new BigDecimal(val).setScale(4,BigDecimal.ROUND_HALF_UP).doubleValue();
+        return format;
     }
 }

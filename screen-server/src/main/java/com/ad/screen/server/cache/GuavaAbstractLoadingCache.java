@@ -78,10 +78,7 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
                 return fetchData(key);
             }
         });
-        if (cache.size() > highestSize) {
-            highestSize=getCache().size();
-            highestTime=new Date();
-        }
+
         return result;
     }
 
@@ -94,10 +91,8 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
      **/
     public V setValue(K key, V value) {
         if (cache!=null) {
-            synchronized (cache) {
                 cache.put(key, value);
             }
-        }
         return value;
     }
 
@@ -108,16 +103,11 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
      * @Date 2020/3/9 20:45
      **/
     public Integer count() {
-        synchronized (cache) {
             return cache.asMap().size();
-        }
-
     }
 
     public void remove(K key){
-        synchronized (cache){
             cache.asMap().remove(key);
-        }
     }
 
 
