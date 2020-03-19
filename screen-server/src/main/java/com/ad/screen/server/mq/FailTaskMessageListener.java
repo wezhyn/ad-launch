@@ -39,7 +39,6 @@ import java.util.concurrent.ExecutionException;
 @Component
 @Slf4j
 public class FailTaskMessageListener implements RocketMQListener<FailTask> {
-
     @Autowired
     IdChannelPool idChannelPool;
     @Autowired
@@ -69,22 +68,39 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
         PooledIdAndEquipCache pooledIdAndEquipCache = map.getValue();
         Channel channel = idChannelPool.getChannel(pooledId);
         HashMap<Integer, Task> received = channel.attr(ScreenChannelInitializer.TASK_MAP).get();
-        Set<Integer> keySet = received.keySet();
-//        int entryId = received.size();
-        int addNum = rate.intValue();
-        for (int j = 1;addNum>0&&j<=25;j++){
-            if (!keySet.contains(j)){
-           Task task = Task.builder()
-                    .uid(pooledIdAndEquipCache.getEquipment().getUid())
-                    .view(message.getView())
-                    .repeatNum(message.getRepeatNum()/message.getRate())
-                    .entryId(j)
-                    .sendIf(false)
-                    .oid(message.getId().getOid())
-                    .verticalView(message.isVerticalView())
-                    .build();
-            received.put(j,task);
-            addNum--;
+        if (received==null){
+            Integer numPerEquip = message.getRepeatNum()/rate;
+            for (int i =1;i<=rate;i++) {
+                received = new HashMap<Integer, Task>();
+                Task task = Task.builder()
+                        .uid(pooledIdAndEquipCache.getEquipment().getUid())
+                        .view(message.getView())
+                        .repeatNum(message.getRepeatNum() / message.getRate())
+                        .entryId(i)
+                        .sendIf(false)
+                        .oid(message.getId().getOid())
+                        .verticalView(message.isVerticalView())
+                        .build();
+                received.put(i, task);
+            }
+        }
+        else {
+            Set<Integer> keySet = received.keySet();
+            int addNum = rate.intValue();
+            for (int j = 1; addNum > 0 && j <= 25; j++) {
+                if (!keySet.contains(j)) {
+                    Task task = Task.builder()
+                            .uid(pooledIdAndEquipCache.getEquipment().getUid())
+                            .view(message.getView())
+                            .repeatNum(message.getRepeatNum() / message.getRate())
+                            .entryId(j)
+                            .sendIf(false)
+                            .oid(message.getId().getOid())
+                            .verticalView(message.isVerticalView())
+                            .build();
+                    received.put(j, task);
+                    addNum--;
+                }
             }
         }
         //同步数据库并更新缓存

@@ -208,7 +208,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         }
                     }
                 }
-                , 30, 300, TimeUnit.SECONDS
+                , 20, 30, TimeUnit.SECONDS
         );
 
     }
