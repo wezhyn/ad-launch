@@ -108,7 +108,6 @@ public abstract class GuavaAbstractLoadingCache<K, V> {
      * @Date 2020/3/9 20:45
      **/
     public Integer count() {
-
         synchronized (cache) {
             return cache.asMap().size();
         }

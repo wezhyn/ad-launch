@@ -57,20 +57,18 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                 String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
                 AdEntry entry=null;
                 while (entry==null) {
-                    entry=cache.peek();
-                    currentEntry++;
+                    entry=cache.poll();
                 }
                 Integer repeatNum=entry.getRepeatNum();
                 repeatNum--;
                 entry.setRepeatNum(repeatNum);
                 log.error("consumer 第 {} 次： {} at {} ", currentEntry, entry, LocalDateTime.now());
                 if (repeatNum==0) {
-                    cache.poll();
-                    currentEntry=0;
                     context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                } else {
+                    cache.put(entry);
                 }
-                TimeUnit.SECONDS.sleep(12);
-
+                TimeUnit.SECONDS.sleep(1);
             }
         }
     }
