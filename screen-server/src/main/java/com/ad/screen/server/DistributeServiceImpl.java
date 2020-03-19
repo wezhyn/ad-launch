@@ -48,9 +48,9 @@ public class DistributeServiceImpl implements DistributeTaskI {
         return scopeEquips;    }
 
     @Override
-    public HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate) {
+    public HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(HashMap<Long,PooledIdAndEquipCache> scopeMaps, int rate) {
 
-            HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeEquips(longitude,latitude,scope);
+            HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeMaps;
             if (freeEquips==null){
                 throw new InsufficientException("目前没有这么多的车辆");
             }

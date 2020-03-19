@@ -11,10 +11,12 @@ import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import io.netty.channel.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.apache.tomcat.jni.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.*;
@@ -34,6 +36,8 @@ import java.util.concurrent.ExecutionException;
         consumerGroup="fail_task_consumers",
         selectorExpression="*"
 )
+@Component
+@Slf4j
 public class FailTaskMessageListener implements RocketMQListener<FailTask> {
 
     @Autowired
@@ -46,8 +50,13 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
     FailTaskService failTaskService;
     @Override
     public void onMessage(FailTask message) {
+        int onlinenum = pooledIdAndEquipCacheService.count();
+        if (onlinenum<1){
+            throw new InsufficientException("当前在线车辆数目小于1");
+        }
         //收到的失败任务消息
-       HashMap<Long, PooledIdAndEquipCache> cache =  distributeTaskI.scopeAvailableFreeEquips(message.getLongitude(),message.getLatitude(),message.getScope(),message.getRate());
+        HashMap<Long, PooledIdAndEquipCache> scopeMap = distributeTaskI.scopeEquips(message.getLongitude(),message.getLatitude(),message.getScope());
+        HashMap<Long, PooledIdAndEquipCache> cache =  distributeTaskI.scopeAvailableFreeEquips(scopeMap,message.getRate());
         //目前没有这么多的在线车辆数,退出
         if (cache==null||cache.size() < 1) {
             throw new InsufficientException("目前没有这么多的在线车辆数");

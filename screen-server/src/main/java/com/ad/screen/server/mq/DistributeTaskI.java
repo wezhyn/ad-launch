@@ -35,7 +35,7 @@ public interface DistributeTaskI {
 
 //    HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope);
 
-    HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(Double longitude, Double latitude, Double scope, int rate);
+    HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(HashMap<Long,PooledIdAndEquipCache> scopeMaps, int rate);
 
 
 }

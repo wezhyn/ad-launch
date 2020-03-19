@@ -48,11 +48,11 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
         if (onlinenum < deliverNum) {
             throw new InsufficientException("目前没有这么多的在线车辆数");
         } else {
+            HashMap<Long,PooledIdAndEquipCache> scopeMap = distributeTaskI.scopeEquips(taskMessage.getLongitude(),taskMessage.getLatitude(),taskMessage.getScope());
             //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
-            HashMap<Long, PooledIdAndEquipCache> available = distributeTaskI.scopeAvailableFreeEquips(taskMessage.getLongitude(), taskMessage.getLatitude(), taskMessage.getScope(), taskMessage.getRate());
+            HashMap<Long, PooledIdAndEquipCache> available = distributeTaskI.scopeAvailableFreeEquips(scopeMap, taskMessage.getRate());
             if (available.size() < deliverNum) {
-                log.info("当前区域内可用车辆数目为{}小于{}", available.size(), deliverNum);
-                return;
+                throw new InsufficientException("区域内可用车辆数目小于订单要求");
             }
 
 
