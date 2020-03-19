@@ -1,6 +1,9 @@
 package com.ad.launch.order;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.StringWriter;
 import java.util.List;
@@ -13,9 +16,10 @@ import java.util.List;
  * @Version V1.0
  **/
 @Getter
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskMessage {
-    public static final String TOPIC_TAG="task_topic";
 
     private Integer oid;
 
@@ -25,7 +29,7 @@ public class TaskMessage {
 
     private Boolean vertical;
 
-    private Double totalAmount;
+    private Integer totalNum;
 
     private Integer numPerEquip;
 

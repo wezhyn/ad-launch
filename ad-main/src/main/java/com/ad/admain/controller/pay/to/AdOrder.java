@@ -119,5 +119,13 @@ public class AdOrder extends Order implements IProduce {
         return produce.getEndTime();
     }
 
+    @Override
+    public Integer getExecuted() {
+        return super.getExecuted();
+    }
 
+    @Override
+    public Order setExecuted(Integer executed) {
+        return super.setExecuted(executed);
+    }
 }

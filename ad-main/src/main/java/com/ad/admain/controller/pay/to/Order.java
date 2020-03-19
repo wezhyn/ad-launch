@@ -61,9 +61,8 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
 
     private Long tradeOut;
 
-    private Double executed;
+    private Integer executed;
 
-    private Boolean isFinished;
 
     @Column(name="create_time", columnDefinition="timestamp  null  default current_timestamp")
     private LocalDateTime createTime;

@@ -6,6 +6,7 @@ import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -54,6 +55,7 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
 
     AdOrder findById(Integer id);
 
-    Integer updateExecuted(Integer oid,Double executed);
+    Integer updateExecuted(Integer oid,Integer executed);
 
+    List<AdOrder> findByEnum (Integer type);
 }
