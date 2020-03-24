@@ -6,28 +6,20 @@ import com.ad.screen.server.handler.GpsMsgMsgHandler;
 import com.ad.screen.server.handler.HeartBeatMsgMsgHandler;
 import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.server.handler.TypeMsgHandler;
-import com.ad.screen.server.vo.FrameType;
 import com.ad.screen.server.vo.req.BaseScreenRequest;
 import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mapstruct.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.nio.charset.StandardCharsets;
-
-import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
 @SpringBootTest(classes = ScreenApplication.class)

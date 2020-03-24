@@ -2,8 +2,8 @@ package com.ad.screen.server.vo;
 
 import com.ad.screen.server.codec.ScreenProtocolInDecoder;
 import com.ad.screen.server.vo.req.BaseScreenRequest;
+import com.ad.screen.server.vo.req.Point2D;
 import io.netty.buffer.ByteBuf;
-import javafx.geometry.Point2D;
 import lombok.Getter;
 
 import java.nio.charset.StandardCharsets;

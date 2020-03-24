@@ -1,6 +1,5 @@
 package com.ad.screen.server.vo.req;
 
-import javafx.geometry.Point2D;
 import lombok.Data;
 
 /**

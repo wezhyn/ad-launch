@@ -18,12 +18,12 @@ public class ScreenApplication {
 
 
     public static void main(String[] args) {
-try {
-    SpringApplication application=new SpringApplication(ScreenApplication.class);
-    application.run(args);
-} catch (Exception e) {
-    e.printStackTrace();
-}
+        try {
+            SpringApplication application=new SpringApplication(ScreenApplication.class);
+            application.run(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }

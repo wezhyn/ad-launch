@@ -31,7 +31,7 @@ public class ScreenClient {
         EventLoopGroup client=new NioEventLoopGroup();
         String address="47.111.185.61";
 //        String address = "127.0.0.1";
-        int port=31994;
+        int port=31975;
         String equipName="11111111111111" + AdStringUtils.getNum(new Random().nextInt(10), 1);
         log.info("当前设备 IEMI： {}", equipName);
         try {
