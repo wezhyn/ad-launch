@@ -74,24 +74,49 @@ spec:
         app: ad-main-server
         remote: java
     spec:
+      volumes:
+        - name: dumps
+          emptyDir: {}
       containers:
         - name: ad-main-server
           image: registry.cn-hangzhou.aliyuncs.com/wezhyn/ad-main:lastest
           command: ["java"]
           args:
             #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - "-XX:+HeapDumpOnOutOfMemoryError"
+            - "-XX:HeapDumpPath=/dumps/oom.bin"
+            - "-XX:MaxRAMPercentage=80.0"
             - "-jar"
             - "ad-main.jar"
-            - "--spring.profiles.avtive=zhaoo"
+            - "--spring.profiles.avtive=tmp"
           imagePullPolicy: "Always"
           tty: true
           ports:
             - containerPort: 12345
-            - containerPort: 28080
+            - name: webHttp
+              containerPort: 28080
             - containerPort: 5005
           env:
             - name: TZ
               value: Asia/Shanghai
+          livenessProbe:
+            httpGet:
+              path: /api
+              port: webHttp
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 60
+          resources:
+            requests:
+              cpu: 0.3
+              memory: 200M
+            limits:
+              cpu: 1.5
+              memory: 1024M
+          volumeMounts:
+            - name: dumps
+              mountPath: /dumps
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -115,15 +140,21 @@ spec:
         app: screen-server
         remote: java
     spec:
+      volumes:
+        - name: dumps
+          emptyDir: {}
       containers:
         - name: ad-screen-server
           image: registry.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
           command: ["java"]
           args:
             #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - "-XX:MaxRAMPercentage=80.0"
+            - "-XX:+HeapDumpOnOutOfMemoryError"
+            - "-XX:HeapDumpPath=/dumps/oom.bin"
             - "-jar"
             - "screen-server.jar"
-            - "--spring.profiles.avtive=zhaoo"
+            - "--spring.profiles.avtive=tmp"
           imagePullPolicy: "Always"
           ports:
             - containerPort: 8888
@@ -131,3 +162,6 @@ spec:
           env:
             - name: TZ
               value: Asia/Shanghai
+          volumeMounts:
+            - name: dumps
+              mountPath: /dumps

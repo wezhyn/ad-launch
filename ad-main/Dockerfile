@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-alpine
 
 WORKDIR /ad-main
 COPY target/*.jar   ad-main.jar

@@ -1,13 +1,13 @@
 spring:
   profiles:
-    active: zhaoo
+    active: tmp
   application:
     name: ad-comsumer
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://ecs.izhaoo.com:3306/fkz?autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
-    username: fkz
-    password: fkz
+    url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
+    username: ${custom.mysql.username}
+    password: ${custom.mysql.password}
   jpa:
     show-sql: true
     hibernate:

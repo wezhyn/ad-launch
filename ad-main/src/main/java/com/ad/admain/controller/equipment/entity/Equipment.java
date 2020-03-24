@@ -55,10 +55,10 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("0")
     private Double longitude;
 
-    @Column(name="key")
+    @Column(name="`key`")
     private String key;
 
-    @Column(insertable=false, updatable=false)
+    //    @Column(insertable=false, updatable=false)
     @ColumnDefault("current_timestamp")
     private LocalDateTime createTime;
 
