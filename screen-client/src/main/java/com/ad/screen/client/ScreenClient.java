@@ -29,9 +29,9 @@ public class ScreenClient {
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup client=new NioEventLoopGroup();
-        String address="server.zhaoo.icu";
+        String address="47.111.185.61";
 //        String address = "127.0.0.1";
-        int port=30315;
+        int port=31994;
         String equipName="11111111111111" + AdStringUtils.getNum(new Random().nextInt(10), 1);
         log.info("当前设备 IEMI： {}", equipName);
         try {

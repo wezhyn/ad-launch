@@ -62,7 +62,6 @@ public class NettyTcpServer {
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
         ChannelFuture channelFuture=serverBootstrap.bind(address,port).sync();
         if (channelFuture.isSuccess()) {
-
             log.info("TCP服务启动完毕,port={}", this.port);
         }
     }

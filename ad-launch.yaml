@@ -20,11 +20,11 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - protocol: tcp
-      port: 8188
+    - port: 8888
       targetPort: 8888
   selector:
     app: screen-server
+
 ---
 apiVersion: v1
 kind: Service
@@ -78,7 +78,11 @@ spec:
         - name: ad-main-server
           image: registry.cn-hangzhou.aliyuncs.com/wezhyn/ad-main:lastest
           command: ["java"]
-          args: ["-jar", "ad-main.jar","--spring.profiles.avtive=zhaoo"]
+          args:
+            #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - "-jar"
+            - "ad-main.jar"
+            - "--spring.profiles.avtive=zhaoo"
           imagePullPolicy: "Always"
           tty: true
           ports:
@@ -97,7 +101,7 @@ spec:
   selector:
     matchLabels:
       app: screen-server
-  replicas: 2
+  replicas: 1
   minReadySeconds: 5
   strategy:
     # indicate which strategy we want for rolling update
@@ -115,7 +119,11 @@ spec:
         - name: ad-screen-server
           image: registry.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
           command: ["java"]
-          args: ["-jar", "screen-server.jar","--spring.profiles.avtive=zhaoo"]
+          args:
+            #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - "-jar"
+            - "screen-server.jar"
+            - "--spring.profiles.avtive=zhaoo"
           imagePullPolicy: "Always"
           ports:
             - containerPort: 8888

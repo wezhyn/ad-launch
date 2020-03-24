@@ -1,5 +1,7 @@
 package com.ad.screen.server;
 
+import org.apache.rocketmq.remoting.common.RemotingUtil;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,18 +16,24 @@ public class FlakeIdGenerator implements IdGenerator {
     /**
      * 每一部分占用的位数,分别为序列号，线程数，ip，0
      */
-    private final static long SEQUENCE_BIT=16;
-    private final static long THREAD_BIT=7;
+    private final static long SEQUENCE_BIT=17;
+    private final static long THREAD_BIT=4;
     private final static long IP_BIT=40;
     private static final AtomicInteger INDEX=new AtomicInteger(0);
-    private long ip=10123255255L;
-    private long ipOffset=ip << (SEQUENCE_BIT + THREAD_BIT);
+    private long ip;
+    private long ipOffset;
     private ExecutorService idGenerateExecutor;
 
 
     public FlakeIdGenerator() {
-        this.idGenerateExecutor=new ThreadPoolExecutor((int) THREAD_BIT, (int) THREAD_BIT, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(10000), IdTaskThread::new, new ThreadPoolExecutor.CallerRunsPolicy());
+        this.idGenerateExecutor=new ThreadPoolExecutor(1, (int) THREAD_BIT, 1, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(1000), IdTaskThread::new, new ThreadPoolExecutor.CallerRunsPolicy());
+        String ipAddress=RemotingUtil.getLocalAddress();
+//        ipAddress=ipAddress.replace(".", "");
+//        255 267654534533218304
+        ipAddress="255.255.255.255".replace(".", "");
+        ip=Long.parseLong(ipAddress);
+        ipOffset=ip << (SEQUENCE_BIT + THREAD_BIT);
 
     }
 
