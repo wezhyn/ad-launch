@@ -28,8 +28,11 @@ dubbo:
     username: nacos
     password: nacos
     address: nacos://47.111.185.61
+    port: 8848
   consumer:
     group: ${spring.profiles.active}
+    version: 1.0.0
+    timeout: 5000
 rocketmq:
   name-server: 47.111.185.61:9876
 #  name-server: 127.0.0.1:9876

@@ -1,16 +1,56 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-ad-dubbo-producer
+  name: svc-ad-main
   labels:
     run: ad-main-producer
 spec:
+  ports:
+    - port: 80
+      targetPort: 28080
+  selector:
+    app: ad-main-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ad-screen
+  labels:
+    run: ad-screen
+spec:
   type: NodePort
   ports:
-    - port: 12345
-      targetPort: 12345
+    - protocol: tcp
+      port: 8188
+      targetPort: 8888
   selector:
-    dobbo: producer
+    app: screen-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ad-debug
+spec:
+  type: NodePort
+  ports:
+    - port: 5005
+      targetPort: 5005
+  selector:
+    remote: java
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-ad-server
+spec:
+  rules:
+    - host: server.zhaoo.icu
+      http:
+        paths:
+          - path: /api
+            backend:
+              serviceName: svc-ad-main
+              servicePort: 80
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -32,10 +72,11 @@ spec:
     metadata:
       labels:
         app: ad-main-server
+        remote: java
     spec:
       containers:
         - name: ad-main-server
-          image: registry-vpc.cn-hangzhou.aliyuncs.com/wezhyn/ad-main:lastest
+          image: registry.cn-hangzhou.aliyuncs.com/wezhyn/ad-main:lastest
           command: ["java"]
           args: ["-jar", "ad-main.jar","--spring.profiles.avtive=zhaoo"]
           imagePullPolicy: "Always"
@@ -43,7 +84,10 @@ spec:
           ports:
             - containerPort: 12345
             - containerPort: 28080
-
+            - containerPort: 5005
+          env:
+            - name: TZ
+              value: Asia/Shanghai
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -65,12 +109,17 @@ spec:
     metadata:
       labels:
         app: screen-server
+        remote: java
     spec:
       containers:
-        - name:
-          image: registry-vpc.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
+        - name: ad-screen-server
+          image: registry.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
           command: ["java"]
           args: ["-jar", "screen-server.jar","--spring.profiles.avtive=zhaoo"]
           imagePullPolicy: "Always"
           ports:
             - containerPort: 8888
+            - containerPort: 5005
+          env:
+            - name: TZ
+              value: Asia/Shanghai
