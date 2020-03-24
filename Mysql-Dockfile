@@ -1,8 +1,0 @@
-FROM mysql:5.7
-
-MAINTAINER wezhyn (wezhyn@163.com)
-
-COPY ./init.sql /docker-entrypoint-initdb.d
-
-
-

@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-ad-dubbo-producer
+  labels:
+    run: ad-main-producer
+spec:
+  type: NodePort
+  ports:
+    - port: 12345
+      targetPort: 12345
+  selector:
+    dobbo: producer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-ad-main-server
+spec:
+  selector:
+    matchLabels:
+      app: ad-main-server
+  replicas: 2
+  minReadySeconds: 5
+  strategy:
+    # indicate which strategy we want for rolling update
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: ad-main-server
+    spec:
+      containers:
+        - name: ad-main-server
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/wezhyn/ad-main:lastest
+          command: ["java"]
+          args: ["-jar", "ad-main.jar","--spring.profiles.avtive=zhaoo"]
+          imagePullPolicy: "Always"
+          tty: true
+          ports:
+            - containerPort: 12345
+            - containerPort: 28080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-screen-server
+spec:
+  selector:
+    matchLabels:
+      app: screen-server
+  replicas: 2
+  minReadySeconds: 5
+  strategy:
+    # indicate which strategy we want for rolling update
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: screen-server
+    spec:
+      containers:
+        - name:
+          image: registry-vpc.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
+          command: ["java"]
+          args: ["-jar", "screen-server.jar","--spring.profiles.avtive=zhaoo"]
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8888

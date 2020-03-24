@@ -1,5 +1,6 @@
-
 spring:
+  profiles:
+    active: zhaoo
   application:
     name: ad-comsumer
   datasource:
@@ -27,9 +28,8 @@ dubbo:
     username: nacos
     password: nacos
     address: nacos://47.111.185.61
-  protocol:
-    name: dubbo
-    port: 12345
+  consumer:
+    group: ${spring.profiles.active}
 rocketmq:
   name-server: 47.111.185.61:9876
 #  name-server: 127.0.0.1:9876

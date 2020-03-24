@@ -8,3 +8,4 @@ custom:
     username: fkz
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&useAffectedRows=true
 
+
