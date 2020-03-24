@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * @author : wezhyn
@@ -65,5 +66,8 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
     @Modifying(clearAutomatically = true,flushAutomatically = true)
     @Query("update ad_order o set o.executed =:executed where o.id=:oid")
     @Transactional
-    Integer updateExecuted(Integer oid, Double executed);
+    Integer updateExecuted(Integer oid, Integer executed);
+
+
+    List<AdOrder> findAdOrdersByOrderStatusEquals(OrderStatus orderStatus);
 }

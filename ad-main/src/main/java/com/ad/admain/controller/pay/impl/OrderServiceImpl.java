@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -127,9 +128,26 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
-    public Integer updateExecuted(Integer oid, Double executed) {
+    public Integer updateExecuted(Integer oid, Integer executed) {
         return adOrderRepository.updateExecuted(oid,executed);
     }
+
+    @Override
+    public List<AdOrder> findByEnum(Integer type) {
+        OrderStatus orderStatus = null;
+        switch (type){
+            case 3:{
+                orderStatus = OrderStatus.EXECUTING;
+                break;
+            }
+        }
+        List<AdOrder> adOrders = adOrderRepository.findAdOrdersByOrderStatusEquals(orderStatus);
+        if (adOrders!=null&&adOrders.size()!=0){
+            return adOrders;
+        }
+        return null;
+    }
+
 
     @Override
     @Transactional(rollbackFor=Exception.class)

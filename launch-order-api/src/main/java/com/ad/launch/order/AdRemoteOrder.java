@@ -48,9 +48,8 @@ public class AdRemoteOrder implements Serializable {
 
     private OrderStatus orderStatus;
 
-    private Double executed;
+    private Integer executed;
 
-    private Boolean isFinished;
 
     public List<String> getProduceContext() {
         return produce.getProduceContext();
@@ -188,19 +187,13 @@ public class AdRemoteOrder implements Serializable {
         this.orderStatus = orderStatus;
     }
 
-    public Double getExecuted() {
+    public Integer getExecuted() {
         return executed;
     }
 
-    public void setExecuted(Double executed) {
+    public void setExecuted(Integer executed) {
         this.executed = executed;
     }
 
-    public Boolean getFinished() {
-        return isFinished;
-    }
 
-    public void setFinished(Boolean finished) {
-        isFinished = finished;
-    }
 }

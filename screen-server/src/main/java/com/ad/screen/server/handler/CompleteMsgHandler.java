@@ -72,11 +72,11 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                 received.remove(id);
                 attr.set(received);
                 AdRemoteOrder adRemoteOrder = remoteAdOrderServiceI.findByOid(task.getOid());
-                Double executed = adRemoteOrder.getExecuted();
+                Integer executed = adRemoteOrder.getExecuted();
                 if (executed == null) {
-                    executed = Double.valueOf(task.getRepeatNum());
+                    executed = task.getRepeatNum();
                 }else {
-                    executed+= Double.valueOf(task.getRepeatNum());
+                    executed+= task.getRepeatNum();
                 }
                 //更新缓存
                 PooledIdAndEquipCache cache = cacheService.getValue(imei);

@@ -1,5 +1,7 @@
 package com.ad.launch.order;
 
+import java.util.List;
+
 /**
  * @ClassName RemoteAdOrderServiceI
  * @Description
@@ -13,4 +15,8 @@ public interface RemoteAdOrderServiceI {
     AdRemoteOrder findByOid(Integer id);
 
     Integer updateExecuted(AdRemoteOrder adRemoteOrder);
+
+    List<AdRemoteOrder> findByEnum(Integer type);
+
+
 }

@@ -1,11 +1,15 @@
 package com.ad.admain.remote;
 
 import com.ad.admain.controller.pay.AdOrderService;
+import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.remote.convert.RemoteOrderMapper;
 import com.ad.launch.order.AdRemoteOrder;
+import com.ad.launch.order.OrderStatus;
 import com.ad.launch.order.RemoteAdOrderServiceI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @ClassName RemoteAdOrderService
@@ -38,6 +42,16 @@ public class RemoteAdOrderService implements RemoteAdOrderServiceI {
     @Override
     public Integer updateExecuted(AdRemoteOrder adRemoteOrder) {
         return adOrderService.updateExecuted(adRemoteOrder.getId(),adRemoteOrder.getExecuted());
+    }
+
+    @Override
+    public List<AdRemoteOrder> findByEnum(Integer type) {
+        List<AdOrder> adOrders = adOrderService.findByEnum(type);
+        if (adOrders == null||adOrders.size()==0) {
+            return null;
+        }else {
+            return remoteOrderMapper.toDtoList(adOrders);
+        }
     }
 
 

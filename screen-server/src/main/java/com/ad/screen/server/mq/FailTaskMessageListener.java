@@ -1,5 +1,6 @@
 package com.ad.screen.server.mq;
 
+import com.ad.launch.order.AdEquipment;
 import com.ad.screen.server.FailTaskService;
 import com.ad.screen.server.IdChannelPool;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
@@ -103,6 +104,8 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
                 }
             }
         }
+        AdEquipment equipment = channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
+        log.info("已经为IMEI号为:{}的车辆安排了{}个任务",equipment.getKey(),rate);
         //同步数据库并更新缓存
         failTaskService.remove(message.getId());
         channel.attr(ScreenChannelInitializer.TASK_MAP).set(received);
