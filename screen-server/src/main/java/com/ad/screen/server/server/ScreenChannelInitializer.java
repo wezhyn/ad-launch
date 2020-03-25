@@ -7,21 +7,21 @@ import com.ad.screen.server.cache.EquipmentCacheService;
 import com.ad.screen.server.codec.ScreenProtocolOutEncoder;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.handler.*;
-import com.ad.screen.server.vo.IScreenFrame;
-import com.ad.screen.server.vo.req.BaseScreenRequest;
 import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler.EQUIPMENT;
@@ -37,8 +37,8 @@ import static com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler.EQU
 @Component
 @Slf4j
 public class ScreenChannelInitializer extends io.netty.channel.ChannelInitializer<SocketChannel> {
-    public static final AttributeKey<Long> REGISTERED_ID = AttributeKey.valueOf("REGISTERED_ID");
-    public static final AttributeKey<HashMap<Integer,Task>> TASK_MAP = AttributeKey.valueOf("TASK_MAP");
+    public static final AttributeKey<Long> REGISTERED_ID=AttributeKey.valueOf("REGISTERED_ID");
+    public static final AttributeKey<HashMap<Integer, Task>> TASK_MAP=AttributeKey.valueOf("TASK_MAP");
 //    public static final AttributeKey<boolean[]> TASK_STATUS = AttributeKey.valueOf("TASK_STATUS");
 
     @Value("${netty.server.allTimeout}")
@@ -70,7 +70,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         //将channel注册到id池中
-        final Long longId = idChannelPool.registerChannel(ch);
+        final Long longId=idChannelPool.registerChannel(ch);
         ch.pipeline().channel().attr(REGISTERED_ID).setIfAbsent(longId);
 
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
@@ -139,34 +139,35 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                     @Override
                     public void run() {
                         try {
-                            Long id = ch.pipeline().channel().attr(REGISTERED_ID).get();
-                            AdEquipment equipment = ch.pipeline().channel().attr(EQUIPMENT).get();
+                            Long id=ch.pipeline().channel().attr(REGISTERED_ID).get();
+                            AdEquipment equipment=ch.pipeline().channel().attr(EQUIPMENT).get();
                             log.debug("开始检查池中id为:{}任务列表", id);
-                            Channel channel = idChannelPool.getChannel(id);
-                            HashMap<Integer,Task> received = channel.attr(TASK_MAP).get();
+                            Channel channel=idChannelPool.getChannel(id);
+                            final Attribute<HashMap<Integer, Task>> receivedAttribute=channel.attr(TASK_MAP);
                             //若任务表内的数据不为空则发送数据
-                            if (received == null || received.size() == 0) {
+                            if (receivedAttribute==null || receivedAttribute.get().size()==0) {
                                 log.debug("id为:{}的设备还没收到任务", id);
                             } else {
+                                HashMap<Integer, Task> received=channel.attr(TASK_MAP).get();
                                 //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
-                                for (Map.Entry<Integer,Task> entry:
+                                for (Map.Entry<Integer, Task> entry :
                                         received.entrySet()) {
-                                    Task task = entry.getValue();
-                                    if (task.getSendIf()==false){
-                                        AdScreenResponse adScreenResponse = AdScreenResponse.builder()
+                                    Task task=entry.getValue();
+                                    if (!task.getSendIf()) {
+                                        AdScreenResponse adScreenResponse=AdScreenResponse.builder()
                                                 .entryId(task.getEntryId())
                                                 .view(task.getView())
                                                 .verticalView(task.getVerticalView())
                                                 .repeatNum(task.getRepeatNum())
                                                 .imei(equipment.getKey())
-                                                .viewLength(task.getView() == null ? (byte) 0 : (byte) task.getView().getBytes().length)
+                                                .viewLength(task.getView()==null ? (byte) 0 : (byte) task.getView().getBytes().length)
                                                 .build();
                                         //先将未发送的数据放入缓冲区
                                         channel.write(adScreenResponse);
                                         task.setSendIf(true);
 //                                        newReceived.add(task);
-                                        received.put(task.getEntryId(),task);
-                                    }else{
+                                        received.put(task.getEntryId(), task);
+                                    } else {
 //                                        newReceived.add(task);
                                         continue;
                                     }
@@ -185,10 +186,10 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 //                                    channel.write(blankResponse);
 //                                }
                                 //获取keySet在如果keySet不包含i则用空白帧填充，以维持设备的频率
-                                Set<Integer> keys = received.keySet();
-                                for (int i =1;i<=25;i++){
-                                    if (!keys.contains(i)){
-                                        AdScreenResponse blankResponse = AdScreenResponse.builder()
+                                Set<Integer> keys=received.keySet();
+                                for (int i=1; i <= 25; i++) {
+                                    if (!keys.contains(i)) {
+                                        AdScreenResponse blankResponse=AdScreenResponse.builder()
                                                 .entryId(i)
                                                 .view("")
                                                 .verticalView(false)
