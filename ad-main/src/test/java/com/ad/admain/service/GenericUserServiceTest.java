@@ -3,6 +3,7 @@ package com.ad.admain.service;
 import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.launch.user.AuthenticationEnum;
+import com.wezhyn.project.account.SexEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,18 @@ public class GenericUserServiceTest {
 
     @Test
     public void saveGenericUser() {
-        GenericUser genericUser=GenericUser.builder()
-                .username("zhaoo111")
-                .password(passwordEncoder.encode("zhaoo"))
-                .roles(AuthenticationEnum.CUSTOMER)
-                .enable(GenericUser.UserEnable.FORBID)
-                .email("zhaoo@zhaoo.com")
-                .build();
-        genericUserService.save(genericUser);
+        for (int i=0; i < 100; i++) {
+            GenericUser genericUser=GenericUser.builder()
+                    .username("wezhyn" + i)
+                    .password(passwordEncoder.encode("wezhyn"))
+                    .roles(AuthenticationEnum.CUSTOMER)
+                    .enable(GenericUser.UserEnable.NORMAL)
+                    .email("wezhyn" + i + "@test.com")
+                    .sex(SexEnum.MALE)
+                    .intro("test")
+                    .build();
+            genericUserService.save(genericUser);
+        }
     }
 
     @Test

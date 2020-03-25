@@ -93,7 +93,7 @@ spec:
           tty: true
           ports:
             - containerPort: 12345
-            - name: webHttp
+            - name: web-http
               containerPort: 28080
             - containerPort: 5005
           env:
@@ -102,7 +102,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /api
-              port: webHttp
+              port: web-http
               scheme: HTTP
             initialDelaySeconds: 20
             periodSeconds: 60
