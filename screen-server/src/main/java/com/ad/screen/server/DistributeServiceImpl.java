@@ -4,19 +4,12 @@ import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.SquareUtils;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
-import com.ad.screen.server.entity.Task;
-import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.mq.DistributeTaskI;
-import com.ad.screen.server.server.ScreenChannelInitializer;
-import io.netty.channel.Channel;
+import com.ad.screen.server.mq.PrepareTaskMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
 /**
@@ -31,48 +24,42 @@ public class DistributeServiceImpl implements DistributeTaskI {
     @Autowired
     PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
 
-    @Override
-    public HashMap<Long, PooledIdAndEquipCache> scopeEquips(Double longitude, Double latitude, Double scope) {
-        HashMap<Long,PooledIdAndEquipCache> scopeEquips = new HashMap<>();
 
-        Double[] info = SquareUtils.getSquareInfo(longitude, latitude, scope);
-        ConcurrentMap<String, PooledIdAndEquipCache> cache = pooledIdAndEquipCacheService.getCache().asMap();
-        for (Map.Entry<String, PooledIdAndEquipCache> entry:cache.entrySet()){
+    @Override
+    public List<PooledIdAndEquipCache> availableEquips(PrepareTaskMessage taskMessage) {
+        List<PooledIdAndEquipCache> scopeEquips=new ArrayList<>(8);
+        double rate=taskMessage.getRate();
+        int driverNum=taskMessage.getDeliverNum();
+        Double[] info=SquareUtils.getSquareInfo(taskMessage.getLongitude(), taskMessage.getLatitude(), rate);
+        ConcurrentMap<String, PooledIdAndEquipCache> cache=pooledIdAndEquipCacheService.getCache().asMap();
+        final Iterator<Map.Entry<String, PooledIdAndEquipCache>> cacheEntry=cache.entrySet().iterator();
+        while (driverNum > 0) {
+            if (!cacheEntry.hasNext()) {
+//                把分配到的设备回放
+                for (PooledIdAndEquipCache allocatedEquip : scopeEquips) {
+                    allocatedEquip.setRest((int) (allocatedEquip.getRest() + rate));
+                    allocatedEquip.releaseAllocate();
+                }
+                break;
+            }
+            final Map.Entry<String, PooledIdAndEquipCache> entry=cacheEntry.next();
             PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
             AdEquipment equipment=entry.getValue().getEquipment();
-            double lgt= SquareUtils.format(equipment.getLongitude());
-            double lat= SquareUtils.format(equipment.getLatitude());
-            if (lgt>info[0] && lgt<info[1] && lat>info[2]&& lat<info[3]) {
-                scopeEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
+            double lgt=SquareUtils.format(equipment.getLongitude());
+            double lat=SquareUtils.format(equipment.getLatitude());
+//            检查范围信息是否合理
+            if (lgt > info[0] && lgt < info[1] && lat > info[2] && lat < info[3]) {
+//                尝试获取当前设备独占
+                if (pooledIdAndEquipCache.tryAllocate()) {
+                    if (pooledIdAndEquipCache.getRest() > rate) {
+                        pooledIdAndEquipCache.setRest((int) (rate - pooledIdAndEquipCache.getRest()));
+                        scopeEquips.add(pooledIdAndEquipCache);
+                        driverNum--;
+                    }
+                }
             }
         }
-        return scopeEquips;    }
-
-    @Override
-    public HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(HashMap<Long,PooledIdAndEquipCache> scopeMaps, int rate) {
-
-            HashMap<Long, PooledIdAndEquipCache> freeEquips=scopeMaps;
-            if (freeEquips==null){
-                throw new InsufficientException("目前没有这么多的车辆");
-            }
-
-
-            HashMap<Long, PooledIdAndEquipCache> availableEquips = new HashMap<>();
-            for (Map.Entry<Long, PooledIdAndEquipCache> entry : freeEquips.entrySet()
-            ) {
-
-                PooledIdAndEquipCache pooledIdAndEquipCache=entry.getValue();
-                //比较目前车辆的剩余频率和订单的频率要求,若小于则跳过检查
-                if (pooledIdAndEquipCache.getRest() < rate) {
-                    continue;
-                }
-
-                availableEquips.put(pooledIdAndEquipCache.getPooledId(), pooledIdAndEquipCache);
-            }
-            return availableEquips;
-
-
+        return Collections.unmodifiableList(scopeEquips);
     }
-
 
 }

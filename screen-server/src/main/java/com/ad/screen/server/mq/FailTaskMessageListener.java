@@ -7,7 +7,6 @@ import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FailTask;
 import com.ad.screen.server.entity.Task;
-import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.server.server.ScreenChannelInitializer;
@@ -15,14 +14,11 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
-import org.apache.tomcat.jni.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @ClassName TaskMessageListener
@@ -48,68 +44,57 @@ public class FailTaskMessageListener implements RocketMQListener<FailTask> {
     DistributeTaskI distributeTaskI;
     @Autowired
     FailTaskService failTaskService;
+
     @Override
     public void onMessage(FailTask message) {
-        int onlinenum = pooledIdAndEquipCacheService.count();
-        if (onlinenum<1){
+        int onlinenum=pooledIdAndEquipCacheService.count();
+        if (onlinenum < 1) {
             throw new InsufficientException("当前在线车辆数目小于1");
         }
         //收到的失败任务消息
-        HashMap<Long, PooledIdAndEquipCache> scopeMap = distributeTaskI.scopeEquips(message.getLongitude(),message.getLatitude(),message.getScope());
-        HashMap<Long, PooledIdAndEquipCache> cache =  distributeTaskI.scopeAvailableFreeEquips(scopeMap,message.getRate());
+        final List<PooledIdAndEquipCache> cache=distributeTaskI.availableEquips(message);
         //目前没有这么多的在线车辆数,退出
-        if (cache==null||cache.size() < 1) {
+        if (cache==null || cache.size() < 1) {
             throw new InsufficientException("目前没有这么多的在线车辆数");
         }
-
-        Integer rate = message.getRate();
-        Iterator<Map.Entry<Long,PooledIdAndEquipCache>> iterator =  cache.entrySet().iterator();
-        Map.Entry<Long, PooledIdAndEquipCache> map = iterator.next();
-        Long pooledId = map.getKey();
-        PooledIdAndEquipCache pooledIdAndEquipCache = map.getValue();
-        Channel channel = idChannelPool.getChannel(pooledId);
-        HashMap<Integer, Task> received = channel.attr(ScreenChannelInitializer.TASK_MAP).get();
-        if (received==null){
-            Integer numPerEquip = message.getRepeatNum()/rate;
-            for (int i =1;i<=rate;i++) {
-                received = new HashMap<Integer, Task>();
-                Task task = Task.builder()
-                        .uid(pooledIdAndEquipCache.getEquipment().getUid())
-                        .view(message.getView())
-                        .repeatNum(message.getRepeatNum() / message.getRate())
-                        .entryId(i)
-                        .sendIf(false)
-                        .oid(message.getId().getOid())
-                        .verticalView(message.isVerticalView())
-                        .build();
-                received.put(i, task);
+        PooledIdAndEquipCache availableEquip=cache.get(0);
+        try {
+            Integer rate=message.getRate();
+            Long pooledId=availableEquip.getPooledId();
+            Channel channel=idChannelPool.getChannel(pooledId);
+            HashMap<Integer, Task> received=channel.attr(ScreenChannelInitializer.TASK_MAP).get();
+            if (received==null) {
+                received=new HashMap<>(16);
+                channel.attr(ScreenChannelInitializer.TASK_MAP).set(received);
             }
-        }
-        else {
-            Set<Integer> keySet = received.keySet();
-            int addNum = rate.intValue();
-            for (int j = 1; addNum > 0 && j <= 25; j++) {
-                if (!keySet.contains(j)) {
-                    Task task = Task.builder()
-                            .uid(pooledIdAndEquipCache.getEquipment().getUid())
-                            .view(message.getView())
-                            .repeatNum(message.getRepeatNum() / message.getRate())
-                            .entryId(j)
-                            .sendIf(false)
-                            .oid(message.getId().getOid())
-                            .verticalView(message.isVerticalView())
-                            .build();
-                    received.put(j, task);
+            int addNum=rate;
+            for (int j=1; addNum > 0 && j <= 25; j++) {
+                // 将任务加入对应 channel 的 received 列表中
+                Task task=createTask(message, availableEquip, j);
+                if (null==received.putIfAbsent(j, task)) {
                     addNum--;
                 }
             }
+            AdEquipment equipment=channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
+            log.info("已经为IMEI号为:{}的车辆安排了{}个任务", equipment.getKey(), rate);
+            // 同步数据库并更新缓存
+            failTaskService.remove(message.getId());
+        } finally {
+            if (availableEquip!=null) {
+                availableEquip.releaseAllocate();
+            }
         }
-        AdEquipment equipment = channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
-        log.info("已经为IMEI号为:{}的车辆安排了{}个任务",equipment.getKey(),rate);
-        //同步数据库并更新缓存
-        failTaskService.remove(message.getId());
-        channel.attr(ScreenChannelInitializer.TASK_MAP).set(received);
-        pooledIdAndEquipCache.setRest(pooledIdAndEquipCache.getRest()-rate);
-        pooledIdAndEquipCacheService.setValue(channel.attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get().getKey(),pooledIdAndEquipCache);
+    }
+
+    public Task createTask(FailTask message, PooledIdAndEquipCache availableEquip, int entryId) {
+        return Task.builder()
+                .uid(availableEquip.getEquipment().getUid())
+                .view(message.getView())
+                .repeatNum(message.getRepeatNum()/message.getRate())
+                .entryId(entryId)
+                .sendIf(false)
+                .oid(message.getId().getOid())
+                .verticalView(message.isVerticalView())
+                .build();
     }
 }

@@ -3,7 +3,7 @@ package com.ad.screen.server.mq;
 
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * @ClassName DistributeTaskI
@@ -15,27 +15,13 @@ import java.util.HashMap;
 public interface DistributeTaskI {
 
 
-//    /**
-//     * @param adOrder
-//     * @return void
-//     * @Description //发送任务信息到消息队列
-//     * @Date 2020/3/8 0:59
-//     **/
-//    void sendTask(final AdOrder adOrder);
-
-
     /**
-     * @param
-     * @return java.util.HashMap<java.lang.Long, com.ad.admain.controller.equipment.entity.Equipment>
-     * @Description //返回空闲车辆的hashmap
-     * @Date 2020/3/8 16:47
-     **/
-//    HashMap<Long, PooledIdAndEquipCache> freeEquips();
-    HashMap<Long, PooledIdAndEquipCache> scopeEquips(Double longitude, Double latitude, Double scope);
-
-//    HashMap<Long, PooledIdAndEquipCache> scopeFreeEquips(Double longitude, Double latitude, Double scope);
-
-    HashMap<Long, PooledIdAndEquipCache> scopeAvailableFreeEquips(HashMap<Long,PooledIdAndEquipCache> scopeMaps, int rate);
+     * 获取可用数量车，检查： 范围，剩余可用数量
+     *
+     * @param taskMessage 订单信息
+     * @return 分配的设备
+     */
+    List<PooledIdAndEquipCache> availableEquips(PrepareTaskMessage taskMessage);
 
 
 }

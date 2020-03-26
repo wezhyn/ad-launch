@@ -12,7 +12,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 import org.springframework.util.Assert;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -43,6 +46,7 @@ public class AdOrder extends Order implements IProduce {
     private OrderStatus orderStatus;
 
 
+    private Integer executed;
     /**
      * 创建订单时使用
      *
@@ -119,13 +123,11 @@ public class AdOrder extends Order implements IProduce {
         return produce.getEndTime();
     }
 
-    @Override
     public Integer getExecuted() {
-        return super.getExecuted();
+        return executed;
     }
 
-    @Override
-    public Order setExecuted(Integer executed) {
-        return super.setExecuted(executed);
+    public void setExecuted(Integer executed) {
+        this.executed=executed;
     }
 }

@@ -29,9 +29,10 @@ public class ScreenClient {
 
     public static void main(String[] args) throws InterruptedException {
         EventLoopGroup client=new NioEventLoopGroup();
-        String address="47.111.185.61";
-//        String address = "127.0.0.1";
-        int port=31975;
+//        String address="47.111.185.61";
+        String address="127.0.0.1";
+//        int port=31975;
+        int port=8888;
         String equipName="1111111111111" + AdStringUtils.getNum(new Random().nextInt(99), 2);
         log.info("当前设备 IEMI： {}", equipName);
         try {
@@ -74,8 +75,8 @@ public class ScreenClient {
     private static GpsMsg simulateGps(String equip) {
         Random r=new Random();
         DecimalFormat df=new DecimalFormat("0.00000");
-        double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10000)*0.0001d));
-        double y=Double.parseDouble(df.format(3013.16405 + r.nextInt(10000)*0.0001d));
+        double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10)*0.0001d));
+        double y=Double.parseDouble(df.format(3022.36405 + r.nextInt(10)*0.0001d));
         return new GpsMsg(new Point2D(x, y), equip);
     }
 }

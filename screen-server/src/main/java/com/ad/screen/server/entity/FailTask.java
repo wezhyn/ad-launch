@@ -1,8 +1,12 @@
 package com.ad.screen.server.entity;
 
+import com.ad.screen.server.mq.PrepareTaskMessage;
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Objects;
 
 /**
@@ -20,7 +24,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Table(name="fail_task")
-public class FailTask  {
+public class FailTask implements PrepareTaskMessage {
 
     @EmbeddedId
     private TaskKey id;
@@ -28,29 +32,25 @@ public class FailTask  {
     @Column(name="repeat_num")
     private Integer repeatNum;
 
-    @Column(name = "view")
+    @Column(name="verticalView")
+    boolean verticalView;
+    @Column(name="rate")
+    Integer rate;
+    @Column(name="longitude")
+    Double longitude;
+    @Column(name="latitude")
+    Double latitude;
+    @Column(name="scope")
+    Double scope;
+    @Column(name="view")
     private String view;
 
-    @Column(name = "verticalView")
-    boolean verticalView;
-
-    @Column(name = "rate")
-    Integer rate;
-
-    @Column(name = "longitude")
-    Double longitude;
-
-    @Column(name = "latitude")
-    Double latitude;
-
-    @Column(name = "scope")
-    Double scope;
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FailTask failTask = (FailTask) o;
-        return verticalView == failTask.verticalView &&
+        if (this==o) return true;
+        if (o==null || getClass()!=o.getClass()) return false;
+        FailTask failTask=(FailTask) o;
+        return verticalView==failTask.verticalView &&
                 id.equals(failTask.id) &&
                 repeatNum.equals(failTask.repeatNum) &&
                 view.equals(failTask.view);
@@ -59,6 +59,11 @@ public class FailTask  {
     @Override
     public int hashCode() {
         return Objects.hash(id, repeatNum, view, verticalView);
+    }
+
+    @Override
+    public Integer getDeliverNum() {
+        return 1;
     }
 }
 
