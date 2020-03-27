@@ -10,7 +10,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenResponse> {
 
-    private final ArrayBlockingQueue<AdEntry> cache=new ArrayBlockingQueue<>(1000);
+    private final HashMap<Integer, AdEntry> cache=new HashMap<>(32);
     private final AtomicBoolean isStart=new AtomicBoolean(false);
 
 
@@ -34,17 +34,17 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                 new Thread(new ConsumerClass(cache, channelHandlerContext)).start();
             }
         }
-        cache.put(adScreenResponse.getNetData());
+        final AdEntry entry=adScreenResponse.getNetData();
+        cache.put(entry.getEntryId(), entry);
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
 
     private static class ConsumerClass implements Runnable {
-        private final ArrayBlockingQueue<AdEntry> cache;
+        private final HashMap<Integer, AdEntry> cache;
         private ChannelHandlerContext context;
-        private int currentEntry=0;
 
-        public ConsumerClass(ArrayBlockingQueue<AdEntry> cache, ChannelHandlerContext context) {
+        public ConsumerClass(HashMap<Integer, AdEntry> cache, ChannelHandlerContext context) {
             this.cache=cache;
             this.context=context;
         }
@@ -53,23 +53,23 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         @SneakyThrows
         @Override
         public void run() {
+            int count=1;
             while (true) {
                 String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
-                AdEntry entry=null;
-                while (entry==null) {
-                    entry=cache.poll();
-                }
+                final AdEntry entry=cache.get(getIndex(count++));
                 Integer repeatNum=entry.getRepeatNum();
-                repeatNum--;
-                entry.setRepeatNum(repeatNum);
-                log.error("consumer 第 {} 次： {} at {} ", currentEntry, entry, LocalDateTime.now());
+                entry.setRepeatNum(--repeatNum);
+                log.error("consumer  ： {} at {} ", entry, LocalDateTime.now());
                 if (repeatNum==0) {
                     context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
-                } else {
-                    cache.put(entry);
                 }
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(2);
             }
+        }
+
+        public int getIndex(int count) {
+            int mod=count%25;
+            return mod==0 ? 25 : mod;
         }
     }
 }

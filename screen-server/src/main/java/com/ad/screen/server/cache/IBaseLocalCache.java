@@ -1,7 +1,5 @@
 package com.ad.screen.server.cache;
 
-import com.ad.launch.order.exception.NotEquipmentException;
-
 /**
  * @ClassName IlocalCache
  * @Description
@@ -10,5 +8,11 @@ import com.ad.launch.order.exception.NotEquipmentException;
  * @Version V1.0
  **/
 public interface IBaseLocalCache<K, V> {
-    public V get(K key) throws NotEquipmentException;
+    /**
+     * 根据 Key 获取对应 Valuel
+     *
+     * @param key Key
+     * @return V or Null
+     */
+    V get(K key);
 }

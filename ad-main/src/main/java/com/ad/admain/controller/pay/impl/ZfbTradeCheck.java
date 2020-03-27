@@ -4,7 +4,6 @@ import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoService;
 import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.controller.pay.to.OrderStatus;
-import com.ad.admain.mq.order.PaymentOrderMessage;
 import com.ad.admain.mq.order.PaymentOrderProduceI;
 import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
 import com.ad.admain.pay.TradeStatus;
@@ -57,7 +56,6 @@ public class ZfbTradeCheck implements ZfbTradeI {
 //        修改订单状态并附加账单信息
         orderService.modifyOrderStatus(tradeId, OrderStatus.SUCCESS_PAYMENT);
         Optional<AdBillInfo> savedOrderInfo=orderInfoService.getByOrderId(tradeId);
-        paymentOrderProduce.paymentOrder(new PaymentOrderMessage(tradeId));
         if (savedOrderInfo.isPresent()) {
             AdBillInfo oInfo=savedOrderInfo.get();
             oInfo.setTradeStatus(TradeStatus.TRADE_SUCCESS);

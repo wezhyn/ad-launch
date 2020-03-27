@@ -1,10 +1,7 @@
 package com.ad.screen.server.handler;
 
 import com.ad.launch.order.AdEquipment;
-import com.ad.launch.order.RemoteEquipmentServiceI;
-import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
-import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.vo.req.GpsMsg;
 import com.ad.screen.server.vo.req.Point2D;
 import io.netty.channel.ChannelHandler;
@@ -13,7 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
+import java.text.DecimalFormat;
+
+import static com.ad.screen.server.server.ScreenChannelInitializer.EQUIPMENT;
 
 /**
  * @ClassName GpsMsgHandler
@@ -27,35 +26,23 @@ import javax.annotation.Resource;
 @Component
 @ChannelHandler.Sharable
 public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
-    @Resource
-    private RemoteEquipmentServiceI equipmentService;
     @Autowired
     PooledIdAndEquipCacheService cacheService;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GpsMsg msg) throws Exception {
-        String imei = msg.getEquipmentName();
-        log.debug("收到IMEI号为{}的GPS帧",imei);
-        //获取channel的pooled id
-        Long pooledId = ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
-        AdEquipment equip = ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).get();
-        if (pooledId!=null&&imei!=null&&imei!=""){
+        String imei=msg.getEquipmentName();
+        log.debug("收到IMEI号为{}的GPS帧", imei);
+        AdEquipment equip=ctx.channel().attr(EQUIPMENT).get();
+        if (imei!=null && !"".equals(imei)) {
             //获取设备的经纬度信息
             Point2D net=msg.getNetData();
-            double x=net.getX();
-            double y=net.getY();
-//            AdEquipment equipment=equipmentService.loadEquipByIemi(msg.getEquipmentName());
-//            equipment.setLongitude(x);
-//            equipment.setLatitude(y);
-
-            //获取缓存内该设备对应的信息
-            PooledIdAndEquipCache cache = cacheService.getValue(imei);
+            DecimalFormat df=new DecimalFormat("0.00000");
+            double x=Double.parseDouble(df.format(net.getX()/100.0));
+            double y=Double.parseDouble(df.format(net.getY()/100.0));
             //更新channel内部和缓存当中的设备信息
-            equip.setLongitude(x/100.0);
-            equip.setLatitude(y/100.0);
-            cache.setEquipment(equip);
-            ctx.channel().attr(ScreenProtocolCheckInboundHandler.EQUIPMENT).set(equip);
-            cacheService.setValue(imei,cache);
+            equip.setLongitude(x);
+            equip.setLatitude(y);
             log.info("{}的地理位置已更新", msg.getEquipmentName());
         }
     }

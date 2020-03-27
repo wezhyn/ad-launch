@@ -4,6 +4,7 @@ package com.ad.screen.server.mq;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @ClassName DistributeTaskI
@@ -22,6 +23,8 @@ public interface DistributeTaskI {
      * @return 分配的设备
      */
     List<PooledIdAndEquipCache> availableEquips(PrepareTaskMessage taskMessage);
+
+    Optional<PooledIdAndEquipCache> availableSingleEquip(PrepareTaskMessage taskMessage);
 
 
 }

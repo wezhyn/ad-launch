@@ -37,8 +37,8 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
     Optional<AdOrder> findUserOrder(Integer orderId, Integer userId);
 
 
-    Boolean cancelOvertimeOrder(Integer orderId, Integer uid);
 
+    Optional<AdOrder> trySuccessOrder(Integer orderId, Integer uid);
 
     Page<AdOrder> listUserOrders(Integer userId, Pageable pageable);
 
@@ -55,7 +55,7 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
 
     AdOrder findById(Integer id);
 
-    Integer updateExecuted(Integer oid,Integer executed);
+    Integer updateExecuted(Integer oid, Integer executed);
 
-    List<AdOrder> findByEnum (Integer type);
+    List<AdOrder> findByEnum(Integer type);
 }

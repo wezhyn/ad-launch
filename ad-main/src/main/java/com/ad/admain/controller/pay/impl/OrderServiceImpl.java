@@ -51,10 +51,29 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         return getRepository().findOne(Example.of(order));
     }
 
+
     @Override
     @Transactional(rollbackFor=Exception.class)
-    public Boolean cancelOvertimeOrder(Integer orderId, Integer uid) {
-        return getRepository().updateOrderStatus(orderId, uid, OrderStatus.WAITING_PAYMENT, OrderStatus.CANCEL) > 0;
+    public Optional<AdOrder> trySuccessOrder(Integer orderId, Integer uid) {
+        final Optional<AdOrder> userOrder=findUserOrder(orderId, uid);
+        if (userOrder.isPresent()) {
+            AdOrder o=userOrder.get();
+            switch (o.getOrderStatus()) {
+                case WAITING_PAYMENT: {
+                    getRepository().updateOrderStatus(orderId, uid, OrderStatus.WAITING_PAYMENT, OrderStatus.CANCEL);
+                    return Optional.empty();
+                }
+                case SUCCESS_PAYMENT: {
+                    getRepository().updateOrderStatus(orderId, uid, OrderStatus.SUCCESS_PAYMENT, OrderStatus.EXECUTING);
+                    return userOrder;
+                }
+                default: {
+                    return Optional.empty();
+                }
+            }
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -129,20 +148,20 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
 
     @Override
     public Integer updateExecuted(Integer oid, Integer executed) {
-        return adOrderRepository.updateExecuted(oid,executed);
+        return adOrderRepository.updateExecuted(oid, executed);
     }
 
     @Override
     public List<AdOrder> findByEnum(Integer type) {
-        OrderStatus orderStatus = null;
-        switch (type){
-            case 3:{
-                orderStatus = OrderStatus.EXECUTING;
+        OrderStatus orderStatus=null;
+        switch (type) {
+            case 3: {
+                orderStatus=OrderStatus.EXECUTING;
                 break;
             }
         }
-        List<AdOrder> adOrders = adOrderRepository.findAdOrdersByOrderStatusEquals(orderStatus);
-        if (adOrders!=null&&adOrders.size()!=0){
+        List<AdOrder> adOrders=adOrderRepository.findAdOrdersByOrderStatusEquals(orderStatus);
+        if (adOrders!=null && adOrders.size()!=0) {
             return adOrders;
         }
         return null;

@@ -1,8 +1,6 @@
 package com.ad.screen.server.handler;
 
-import com.ad.launch.order.AdEquipment;
-import com.ad.launch.order.RemoteEquipmentServiceI;
-import com.ad.screen.server.cache.EquipmentCacheService;
+import com.ad.screen.server.ChannelFirstReadEvent;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.server.ScreenChannelInitializer;
@@ -14,7 +12,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,16 +28,9 @@ import java.util.Objects;
 @Component
 public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdapter {
 
-    /**
-     * 设备attr的key
-     */
-    public final static AttributeKey<AdEquipment> EQUIPMENT=AttributeKey.valueOf("EQUIPMENT");
-
     @Autowired
-    EquipmentCacheService equipmentCacheService;
+    private PooledIdAndEquipCacheService equipCacheService;
 
-    @Autowired
-    PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
     /**
      * 帧末尾：EOF
      */
@@ -50,9 +40,8 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
      * 帧开头: SOF
      */
     private final static ByteBuf BEGIN_FIELD=Unpooled.copiedBuffer("SOF".getBytes());
-    
-    @Autowired
-    private RemoteEquipmentServiceI equipmentService;
+
+
     /**
      * ,
      */
@@ -116,15 +105,11 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 //            解析数据
             try {
                 request=readRequest(inboundMsg, sof, frameLength);
-                String imei=request.getEquipmentName();
-                AdEquipment equipment=equipmentCacheService.get(imei);
-                //如果设备存在，则在缓存中中保存当前设备信息
-                if (equipment!=null) {
-                    equipment.setStatus(true);
-                    ctx.channel().attr(EQUIPMENT).set(equipment);
-                    Long pooledId=ctx.channel().attr(ScreenChannelInitializer.REGISTERED_ID).get();
-                    PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache(pooledId, equipment, 25);
-                    pooledIdAndEquipCacheService.getCache().put(imei, pooledIdAndEquipCache);
+                if (!ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get().get()) {
+//                    第一次初始化
+                    final PooledIdAndEquipCache cache=equipCacheService.getOrInit(request.getEquipmentName(), ctx.channel());
+                    ctx.channel().attr(ScreenChannelInitializer.EQUIPMENT).setIfAbsent(cache.getEquipment());
+                    ctx.fireUserEventTriggered(ChannelFirstReadEvent.INSTANCE);
                 }
                 break;
 

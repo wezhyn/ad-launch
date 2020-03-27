@@ -75,8 +75,8 @@ public class ScreenClient {
     private static GpsMsg simulateGps(String equip) {
         Random r=new Random();
         DecimalFormat df=new DecimalFormat("0.00000");
-        double x=Double.parseDouble(df.format(12000.85115 + r.nextInt(10)*0.0001d));
-        double y=Double.parseDouble(df.format(3022.36405 + r.nextInt(10)*0.0001d));
+        double x=Double.parseDouble(df.format(12000.00000 + r.nextInt(10)*0.0001d));
+        double y=Double.parseDouble(df.format(3020.00000 + r.nextInt(10)*0.0001d));
         return new GpsMsg(new Point2D(x, y), equip);
     }
 }

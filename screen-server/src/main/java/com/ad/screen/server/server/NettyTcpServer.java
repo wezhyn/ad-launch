@@ -1,6 +1,5 @@
 package com.ad.screen.server.server;
 
-import com.ad.screen.server.IdChannelPool;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -37,9 +36,6 @@ public class NettyTcpServer {
     @Autowired
     ScreenChannelInitializer screenChannelInitializer;
 
-    @Autowired
-    IdChannelPool idChannelPool;
-
 
     EventLoopGroup bossGroup=new NioEventLoopGroup();
     EventLoopGroup workerGroup=new NioEventLoopGroup();
@@ -60,7 +56,7 @@ public class NettyTcpServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true)//长连接
                 .attr(AttributeKey.valueOf("TASK_MAP"), null);//接收的任务列表
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
-        ChannelFuture channelFuture=serverBootstrap.bind(address,port).sync();
+        ChannelFuture channelFuture=serverBootstrap.bind(address, port).sync();
         if (channelFuture.isSuccess()) {
             log.info("TCP服务启动完毕,port={}", this.port);
         }

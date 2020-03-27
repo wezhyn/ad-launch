@@ -1,6 +1,6 @@
 package com.ad.screen.server.mq;
 
-import com.ad.launch.order.TaskMessage;
+import com.ad.screen.server.entity.EquipTask;
 
 /**
  * @author wezhyn
@@ -8,18 +8,15 @@ import com.ad.launch.order.TaskMessage;
  */
 public class TaskMessageAdapter implements PrepareTaskMessage {
 
-    private TaskMessage taskMessage;
+    private EquipTask taskMessage;
 
-    public TaskMessageAdapter(TaskMessage taskMessage) {
+    public TaskMessageAdapter(EquipTask taskMessage) {
         this.taskMessage=taskMessage;
     }
 
-    public Integer getTotalNum() {
+    @Override
+    public Integer getAvailableAllocateNum() {
         return taskMessage.getTotalNum();
-    }
-
-    public Integer getNumPerEquip() {
-        return taskMessage.getNumPerEquip();
     }
 
     @Override

@@ -1,9 +1,14 @@
 package com.ad.screen.server.cache;
 
 import com.ad.launch.order.AdEquipment;
+import com.ad.screen.server.entity.Task;
+import com.ad.screen.server.server.ScreenChannelInitializer;
+import io.netty.channel.Channel;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @ClassName EquipmentCache
@@ -14,28 +19,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
  **/
 @Data
 public class PooledIdAndEquipCache {
-    /**
-     * id-channel池中的唯一id号
-     */
-    Long pooledId;
     /*
     设备信息
     */
     AdEquipment equipment;
-//    /**
-//     * 设备的工作状态  若为true则表示正在执行任务  若为false为表示设备空闲
-//     */
-//    Boolean status;
+
+    private final Object taskMapLock=new Object();
+    private Channel channel;
+    private HashMap<Integer, Task> taskMap;
+
 
     /**
-     * 频率余量
+     * 频率余量, 变动时，先调用 {@link this#tryAllocate()} 获取当前设备独占
      */
-    Integer rest;
+    private AtomicInteger rest;
 
-    public PooledIdAndEquipCache(Long pooledId, AdEquipment equipment, Integer rest) {
-        this.pooledId=pooledId;
+    public PooledIdAndEquipCache(Channel channel, AdEquipment equipment) {
+        this.channel=channel;
         this.equipment=equipment;
-        this.rest=rest;
+        this.rest=new AtomicInteger(ScreenChannelInitializer.SCHEDULE_NUM);
+        this.taskMap=new HashMap<>(16);
     }
 
     /**
@@ -43,6 +46,15 @@ public class PooledIdAndEquipCache {
      */
     private AtomicBoolean isAllocating=new AtomicBoolean(false);
 
+    public void restIncr(int incr) {
+        while (true) {
+            int old=rest.get();
+            int expect=old + incr;
+            if (rest.compareAndSet(old, expect)) {
+                break;
+            }
+        }
+    }
 
     public boolean tryAllocate() {
         return isAllocating.compareAndSet(false, true);
@@ -57,43 +69,4 @@ public class PooledIdAndEquipCache {
         return isAllocating.compareAndSet(true, false);
     }
 
-
-    public static final class PooledIdAndEquipCacheBuilder {
-        Long pooledId;
-        /**
-         * 设备信息
-         */
-        AdEquipment equipment;
-        Integer rest;
-
-        private PooledIdAndEquipCacheBuilder() {
-        }
-
-        public static PooledIdAndEquipCacheBuilder aPooledIdAndEquipCache() {
-            return new PooledIdAndEquipCacheBuilder();
-        }
-
-        public PooledIdAndEquipCacheBuilder withPooledId(Long pooledId) {
-            this.pooledId=pooledId;
-            return this;
-        }
-
-        public PooledIdAndEquipCacheBuilder withEquipment(AdEquipment equipment) {
-            this.equipment=equipment;
-            return this;
-        }
-
-        public PooledIdAndEquipCacheBuilder withRest(Integer rest) {
-            this.rest=rest;
-            return this;
-        }
-
-        public PooledIdAndEquipCache build() {
-            PooledIdAndEquipCache pooledIdAndEquipCache=new PooledIdAndEquipCache();
-            pooledIdAndEquipCache.setPooledId(pooledId);
-            pooledIdAndEquipCache.setEquipment(equipment);
-            pooledIdAndEquipCache.setRest(rest);
-            return pooledIdAndEquipCache;
-        }
-    }
 }

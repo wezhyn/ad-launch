@@ -37,8 +37,13 @@ public class DistributeServiceImpl implements DistributeTaskI {
             if (!cacheEntry.hasNext()) {
 //                把分配到的设备回放
                 for (PooledIdAndEquipCache allocatedEquip : scopeEquips) {
-                    allocatedEquip.setRest((int) (allocatedEquip.getRest() + rate));
-                    allocatedEquip.releaseAllocate();
+                    try {
+                        while (!allocatedEquip.tryAllocate()) {
+                        }
+                        allocatedEquip.getRest().getAndAdd((int) rate);
+                    } finally {
+                        allocatedEquip.releaseAllocate();
+                    }
                 }
                 break;
             }
@@ -50,16 +55,27 @@ public class DistributeServiceImpl implements DistributeTaskI {
 //            检查范围信息是否合理
             if (lgt > info[0] && lgt < info[1] && lat > info[2] && lat < info[3]) {
 //                尝试获取当前设备独占
-                if (pooledIdAndEquipCache.tryAllocate()) {
-                    if (pooledIdAndEquipCache.getRest() > rate) {
-                        pooledIdAndEquipCache.setRest((int) (rate - pooledIdAndEquipCache.getRest()));
-                        scopeEquips.add(pooledIdAndEquipCache);
-                        driverNum--;
+                try {
+                    if (pooledIdAndEquipCache.tryAllocate()) {
+                        int rest=pooledIdAndEquipCache.getRest().get();
+                        if (rest > rate) {
+                            pooledIdAndEquipCache.getRest().compareAndSet(rest, (int) (rest - rate));
+                            scopeEquips.add(pooledIdAndEquipCache);
+                            driverNum--;
+                        }
                     }
+                } finally {
+                    pooledIdAndEquipCache.releaseAllocate();
                 }
             }
         }
         return Collections.unmodifiableList(scopeEquips);
     }
 
+
+    @Override
+    public Optional<PooledIdAndEquipCache> availableSingleEquip(PrepareTaskMessage taskMessage) {
+        final List<PooledIdAndEquipCache> equipCaches=availableEquips(taskMessage);
+        return equipCaches.size()==1 ? Optional.of(equipCaches.get(0)) : Optional.empty();
+    }
 }

@@ -6,6 +6,9 @@ package com.ad.screen.server.mq;
  */
 public interface PrepareTaskMessage {
 
+
+    Integer getAvailableAllocateNum();
+
     Integer getDeliverNum();
 
     Integer getRate();

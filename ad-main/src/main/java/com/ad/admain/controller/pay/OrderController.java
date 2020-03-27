@@ -7,8 +7,8 @@ import com.ad.admain.controller.pay.dto.AdProduceDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.AdProduce;
-import com.ad.admain.mq.order.CancelOrderMessage;
-import com.ad.admain.mq.order.CancelOrderProduceI;
+import com.ad.admain.mq.order.CheckOrderMessage;
+import com.ad.admain.mq.order.CheckOrderStatueProduceI;
 import com.ad.admain.security.AdAuthentication;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     private final BillInfoService orderInfoService;
     private final ProduceMapper produceMapper;
     @Autowired
-    private CancelOrderProduceI cancelOrderProduce;
+    private CheckOrderStatueProduceI cancelOrderProduce;
 
 
     public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper, ProduceMapper produceMapper) {
@@ -64,7 +64,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         }
         AdOrder order=new AdOrder(authentication.getId(), produce);
         AdOrder savedOrder=orderService.save(order);
-        cancelOrderProduce.cancelOrder(new CancelOrderMessage(savedOrder.getId(), savedOrder.getUid()));
+        cancelOrderProduce.checkOrder(new CheckOrderMessage(savedOrder.getId(), savedOrder.getUid()));
         if (savedOrder.getId()!=null) {
             return ResponseResult.forSuccessBuilder()
                     .withData("id", savedOrder.getId())

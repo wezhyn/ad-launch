@@ -1,17 +1,8 @@
 package screen;
 
-import com.ad.launch.order.AdEquipment;
-import com.ad.launch.order.RemoteEquipmentServiceI;
-import com.ad.screen.server.cache.EquipmentCacheService;
-import com.google.common.cache.Cache;
-import org.apache.dubbo.config.annotation.Reference;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * @ClassName EquipmentCacheServiceTest

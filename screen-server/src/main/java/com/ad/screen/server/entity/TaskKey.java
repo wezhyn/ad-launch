@@ -5,7 +5,6 @@ import lombok.*;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * @ClassName TaskKey
@@ -18,26 +17,23 @@ import java.util.Objects;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Getter
 @Setter
-
 public class TaskKey implements Serializable {
 
 
-    @Column(name = "oid")
+    /**
+     * 订单id
+     */
+    @Column(name="oid")
     private Integer oid;
 
-
-    @Column(name = "uid")
+    /**
+     * 发布订单的用户id
+     */
+    @Column(name="uid")
     private Integer uid;
-
-
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(oid, uid);
-    }
-
 
 
 }

@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  * @since 02.27.2020
  */
 @Getter
-public class CancelOrderMessage {
+public class CheckOrderMessage {
 
     public static final String MESSAGE_TOPIC="order-topic:cancel-order";
 
@@ -20,8 +20,8 @@ public class CancelOrderMessage {
 
 
     @JsonCreator
-    public CancelOrderMessage(@JsonProperty("orderId") Integer orderId,
-                              @JsonProperty("uid") Integer uid) {
+    public CheckOrderMessage(@JsonProperty("orderId") Integer orderId,
+                             @JsonProperty("uid") Integer uid) {
         Assert.notNull(orderId, "取消订单id不能为空");
         Assert.notNull(uid, "取消订单用户id不能为空");
         this.orderId=orderId;
