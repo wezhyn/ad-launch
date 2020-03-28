@@ -1,5 +1,6 @@
 package com.ad.screen.server.event;
 
+import com.ad.screen.server.cache.ChannelCloseException;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
@@ -73,15 +74,18 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                         if (list==null || list.size() < task.getDeliverNum()) {
                             try {
                                 TimeUnit.SECONDS.sleep(10);
-                            } catch (InterruptedException e) {
-//                                    忽略中断异常
+                            } catch (InterruptedException ignore) {
                             }
                         } else {
                             break;
                         }
                     }
-                    log.info("恢复{}", task.getId());
-                    applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, list));
+                    try {
+                        applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, list));
+                        log.info("恢复{}", task.getId());
+                    } catch (ChannelCloseException e) {
+                        tasks.add(task);
+                    }
                 }
             }
         });

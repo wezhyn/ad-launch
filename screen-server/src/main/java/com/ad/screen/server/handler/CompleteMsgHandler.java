@@ -1,5 +1,6 @@
 package com.ad.screen.server.handler;
 
+import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.FixedTask;
 import com.ad.screen.server.entity.MemoryCompletion;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 /**
  * @ClassName CompleteMsgHandler
@@ -36,14 +36,15 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
         log.warn("收到了imei号为{}的第{}个条目编号的完成消息", msg.getEquipmentName(), msg.getNetData());
-        HashMap<Integer, Task> received=ctx.channel().attr(ScreenChannelInitializer.TASK_MAP).get();
+        final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
 //        条目编号
         Integer entryId=msg.getNetData();
-        Task task=received.get(entryId);
+        int taskEntryId=entryId%ScreenChannelInitializer.SCHEDULE_NUM;
+        Task task=equipCache.getTask(taskEntryId);
         String iemi=msg.getEquipmentName();
         final FixedTask preTask=task.getPreTask();
-        if (preTask==null) {
-            log.error("重复通知：{} at {}", msg, LocalDateTime.now());
+        if (preTask==null || entryId!=preTask.getEquipEntryId()) {
+            log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
             return;
         }
         try {
@@ -54,20 +55,12 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                     .build();
             memoryCompletionService.completeIncrMemory(com);
             if (task.getRepeatNum()==0) {
-                received.remove(task.getEntryId());
-                boolean equipTaskComplete=true;
-                for (Task remainTask : received.values()) {
-                    if (remainTask.getOrderId().equals(task.getOrderId())) {
-                        equipTaskComplete=false;
-                        break;
-                    }
-                }
-                if (equipTaskComplete) {
-//                        当前Task 帧完成, 删除 redis 中的当前帧数据，保存到数据库中
-                    memoryCompletionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
-                    cacheService.get(iemi).restIncr(1);
-                }
+//              当前Task 帧完成, 删除 redis 中的当前帧数据，保存到数据库中
+                equipCache.completeTask(taskEntryId);
+                memoryCompletionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
+                cacheService.get(iemi).restIncr(task.getRate());
             } else {
+//                允许定时任务下一次调度发送帧
                 task.setPreTask(null);
             }
         } catch (Exception e) {

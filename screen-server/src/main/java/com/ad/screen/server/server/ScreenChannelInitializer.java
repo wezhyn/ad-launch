@@ -2,6 +2,7 @@ package com.ad.screen.server.server;
 
 
 import com.ad.launch.order.AdEquipment;
+import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.codec.ScreenProtocolOutEncoder;
 import com.ad.screen.server.entity.FixedTask;
 import com.ad.screen.server.entity.Task;
@@ -14,11 +15,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,34 +35,33 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     public static final AttributeKey<AtomicBoolean> FIRST_READ_CHANNEL=AttributeKey.valueOf("channel_first_read");
 
     public static final AttributeKey<ScheduledFuture<?>> SCHEDULED_SEND=AttributeKey.valueOf("SCHEDULED_SEND_EVENT");
-
-
-    public static final AttributeKey<HashMap<Integer, Task>> TASK_MAP=AttributeKey.valueOf("TASK_MAP");
+    public static final AttributeKey<Map<Integer, FixedTask>> FIXED_TASK_COPY=AttributeKey.valueOf("FIXED_TASK_COPY");
     /**
      * 设备attr的key,{@link ScreenChannelInitializer#channelRead} 处设置
      */
-    public final static AttributeKey<AdEquipment> EQUIPMENT=AttributeKey.valueOf("EQUIPMENT");
-
+    public static final AttributeKey<String> IEMI=AttributeKey.valueOf("EQUIP_IEMI");
+    public static final AttributeKey<PooledIdAndEquipCache> POOLED_EQUIP_CACHE=AttributeKey.valueOf("EQUIP_POOLED_CACHE");
     /**
      * 5分钟内调度频率
      */
     public static final Integer SCHEDULE_NUM=25;
-    @Value("${netty.server.allTimeout}")
-    private int allTimeOut;
-    @Autowired
-    HeartBeatMsgMsgHandler heartBeatMsgHandler;
-    @Autowired
-    GpsMsgMsgHandler gpsMsgHandler;
-    @Autowired
-    TypeMsgHandler typeHandler;
-    @Autowired
-    ConfirmMsgHandler confirmMsgHandler;
-    @Autowired
-    ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler;
-    @Autowired
-    CompleteMsgHandler completeMsgHandler;
-    @Autowired
-    private CompensateHandler compensateHandler;
+    private final HeartBeatMsgMsgHandler heartBeatMsgHandler;
+    private final GpsMsgMsgHandler gpsMsgHandler;
+    private final TypeMsgHandler typeHandler;
+    private final ConfirmMsgHandler confirmMsgHandler;
+    private final ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler;
+    private final CompleteMsgHandler completeMsgHandler;
+    private final CompensateHandler compensateHandler;
+
+    public ScreenChannelInitializer(HeartBeatMsgMsgHandler heartBeatMsgHandler, GpsMsgMsgHandler gpsMsgHandler, TypeMsgHandler typeHandler, ConfirmMsgHandler confirmMsgHandler, ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler, CompleteMsgHandler completeMsgHandler, CompensateHandler compensateHandler) {
+        this.heartBeatMsgHandler=heartBeatMsgHandler;
+        this.gpsMsgHandler=gpsMsgHandler;
+        this.typeHandler=typeHandler;
+        this.confirmMsgHandler=confirmMsgHandler;
+        this.screenProtocolCheckInboundHandler=screenProtocolCheckInboundHandler;
+        this.completeMsgHandler=completeMsgHandler;
+        this.compensateHandler=compensateHandler;
+    }
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
@@ -88,23 +85,22 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 //                            客户端被关闭，定时任务取消
                             return;
                         }
-                        AdEquipment equipment=chChannel.attr(EQUIPMENT).get();
-                        HashMap<Integer, Task> received=chChannel.attr(TASK_MAP).get();
+                        final PooledIdAndEquipCache equipCache=chChannel.attr(POOLED_EQUIP_CACHE).get();
+                        AdEquipment equipment=equipCache.getEquipment();
                         //若任务表内的数据不为空则发送数据
-                        if (received==null || received.size()==0) {
+                        Map<Integer, Task> received=equipCache.getAllTask();
+                        if (received.size()==0) {
                             log.debug("id为:{}的设备还没收到任务", equipment.getKey());
-                        } else {
-                            //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
-                            for (Map.Entry<Integer, Task> entry : received.entrySet()) {
-                                Task task=entry.getValue();
-                                if (task.getPreTask()==null) {
-                                    FixedTask fixedTask=new FixedTask(task);
-                                    task.setPreTask(fixedTask);
-                                    //先将未发送的数据放入缓冲区
-                                    chChannel.write(createResponse(task, fixedTask.getRepeatNum(), equipment.getKey()));
-                                }
+                            return;
+                        }
+                        //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
+                        for (Map.Entry<Integer, Task> entry : received.entrySet()) {
+                            Task task=entry.getValue();
+                            if (task.getPreTask()==null) {
+                                FixedTask fixedTask=new FixedTask(task);
+                                task.setPreTask(fixedTask);
                                 //将消息推送到设备上
-                                chChannel.flush();
+                                chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));
                             }
                         }
                     } catch (Exception e) {
@@ -118,14 +114,14 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     }
 
 
-    private AdScreenResponse createResponse(Task task, int repeatNum, String iemi) {
+    private AdScreenResponse createResponse(FixedTask task, String iemi) {
         return AdScreenResponse.builder()
-                .entryId(task.getEntryId())
-                .view(task.getView())
-                .verticalView(task.getVerticalView())
-                .repeatNum(repeatNum)
+                .entryId(task.getEquipEntryId())
+                .view(task.getTask().getView())
+                .verticalView(task.getTask().getVerticalView())
+                .repeatNum(task.getRepeatNum())
                 .imei(iemi)
-                .viewLength(task.getView()==null ? (byte) 0 : (byte) task.getView().getBytes().length)
+                .viewLength((byte) task.getTask().getView().length())
                 .build();
     }
 

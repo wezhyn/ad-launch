@@ -83,7 +83,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf inboundMsg=(ByteBuf) msg;
-        BaseScreenRequest<?> request=null;
+        BaseScreenRequest<?> request;
         for (; ; ) {
             inboundMsg.markReaderIndex();
             final int sof=findBeginOfLine(inboundMsg);
@@ -107,8 +107,8 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                 request=readRequest(inboundMsg, sof, frameLength);
                 if (!ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get().get()) {
 //                    第一次初始化
-                    final PooledIdAndEquipCache cache=equipCacheService.getOrInit(request.getEquipmentName(), ctx.channel());
-                    ctx.channel().attr(ScreenChannelInitializer.EQUIPMENT).setIfAbsent(cache.getEquipment());
+                    final PooledIdAndEquipCache equipCache=equipCacheService.getOrInit(request.getEquipmentName(), ctx.channel());
+                    ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).set(equipCache);
                     ctx.fireUserEventTriggered(ChannelFirstReadEvent.INSTANCE);
                 }
                 break;

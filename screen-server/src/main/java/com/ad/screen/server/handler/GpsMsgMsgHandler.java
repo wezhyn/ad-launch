@@ -1,6 +1,7 @@
 package com.ad.screen.server.handler;
 
 import com.ad.launch.order.AdEquipment;
+import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.vo.req.GpsMsg;
 import com.ad.screen.server.vo.req.Point2D;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
 
-import static com.ad.screen.server.server.ScreenChannelInitializer.EQUIPMENT;
+import static com.ad.screen.server.server.ScreenChannelInitializer.POOLED_EQUIP_CACHE;
 
 /**
  * @ClassName GpsMsgHandler
@@ -33,7 +34,8 @@ public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
     protected void channelRead0(ChannelHandlerContext ctx, GpsMsg msg) throws Exception {
         String imei=msg.getEquipmentName();
         log.debug("收到IMEI号为{}的GPS帧", imei);
-        AdEquipment equip=ctx.channel().attr(EQUIPMENT).get();
+        final PooledIdAndEquipCache equipCache=ctx.channel().attr(POOLED_EQUIP_CACHE).get();
+        final AdEquipment equip=equipCache.getEquipment();
         if (imei!=null && !"".equals(imei)) {
             //获取设备的经纬度信息
             Point2D net=msg.getNetData();

@@ -35,7 +35,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
             }
         }
         final AdEntry entry=adScreenResponse.getNetData();
-        cache.put(entry.getEntryId(), entry);
+        cache.put(entry.getEntryId()%25, entry);
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
@@ -55,15 +55,19 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         public void run() {
             int count=1;
             while (true) {
-                String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
-                final AdEntry entry=cache.get(getIndex(count++));
-                Integer repeatNum=entry.getRepeatNum();
-                entry.setRepeatNum(--repeatNum);
-                log.error("consumer  ： {} at {} ", entry, LocalDateTime.now());
-                if (repeatNum==0) {
-                    context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                try {
+                    String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
+                    final AdEntry entry=cache.get(getIndex(count++));
+                    Integer repeatNum=entry.getRepeatNum();
+                    entry.setRepeatNum(--repeatNum);
+                    log.error("consumer  ： {} at {} ", entry, LocalDateTime.now());
+                    if (repeatNum==0) {
+                        context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                    }
+                } catch (Exception ignore) {
+                    log.info("consumer  ： {} 无 ", count);
                 }
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(1);
             }
         }
 

@@ -110,8 +110,8 @@ public class EquipTask implements IBaseTo<Integer>, PrepareTaskMessage {
             return this;
         }
 
-        public EquipTaskBuilder rateInc(int inc) {
-            this.rate+=inc;
+        public EquipTaskBuilder driverNumInc(int inc) {
+            this.deliverNum+=inc;
             return this;
         }
 

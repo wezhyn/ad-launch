@@ -2,12 +2,12 @@ package com.ad.screen.server.entity;
 
 
 import com.ad.screen.server.mq.PrepareTaskMessage;
+import com.ad.screen.server.server.ScreenChannelInitializer;
 import lombok.Data;
 
 /**
- * 具体分配给每个设备的任务, 即服务器内的任务, 但Task 是帧总任务，继续划分成 n FixedTask
- * 一个Task 对应设备内的一个 1 个频率帧的总信息
- * 规定： 一个一个25 个频率帧，即最大 一个设备有 25 个 Task
+ * 具体分配给每个设备的任务, 即服务器内的任务, 但Task 是对应某个分配设备帧总任务，继续划分成 n FixedTask
+ * 规定： 每个设备 Channel 中的Task 列表中rate 之和小于 25
  * 1 EquipTask : n Task
  * 1 Task : n FixedTask
  * n Task: repeatNum 相加 = equipTask.totalNum
@@ -22,8 +22,8 @@ public class Task implements PrepareTaskMessage {
      * 对于 repeatNum 的保护
      */
     private final Object repeatLock=new Object();
-    //条目编号,相对对于每个设备而言的内部任务编号
-    Integer entryId;
+    //    不可达
+    public static final int MAX_ROUTE=FixedTask.EQUIP_MAX_ENTRY_ID/ScreenChannelInitializer.SCHEDULE_NUM;
     /**
      * 与 EquipTask 相同: 订单id，发布设备的用户
      */
@@ -33,6 +33,16 @@ public class Task implements PrepareTaskMessage {
      * 发布 Fixed 时修改  {@code com.ad.screen.server.server.ScreenChannelInitializer#initChannel}
      */
     private int repeatNum;
+    /**
+     * 条目编号,相对对于每个设备而言的内部任务编号
+     * 插入后回调设置
+     */
+    private Integer entryId;
+    /**
+     * 第几次发布当前帧信息
+     * 发布 Fixed 时修改  {@code com.ad.screen.server.server.ScreenChannelInitializer#initChannel}
+     */
+    private volatile int repeatRoute;
 
 
     /**
@@ -46,6 +56,7 @@ public class Task implements PrepareTaskMessage {
     private Double longitude;
     private Double latitude;
     private Double scope;
+    private Integer rate;
 
 
     /**
@@ -67,9 +78,9 @@ public class Task implements PrepareTaskMessage {
      */
     private volatile FixedTask preTask=null;
 
-    public Task(TaskKey taskKey, Integer entryId, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
+    public Task(TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
         this.taskKey=taskKey;
-        this.entryId=entryId;
+        this.rate=rate;
         this.initRepeatNum=repeatNum;
         this.repeatNum=repeatNum;
         this.deliverUserId=deliverUserId;
@@ -78,6 +89,7 @@ public class Task implements PrepareTaskMessage {
         this.scope=scope;
         this.verticalView=verticalView;
         this.view=view;
+        this.repeatRoute=0;
         this.preTask=null;
     }
 
@@ -93,7 +105,7 @@ public class Task implements PrepareTaskMessage {
 
     @Override
     public Integer getRate() {
-        return 1;
+        return rate;
     }
 
     @Override
@@ -113,6 +125,7 @@ public class Task implements PrepareTaskMessage {
 
     public int repeatReduce(int reduce) {
         synchronized (repeatLock) {
+            repeatRoute=(++repeatRoute)%MAX_ROUTE;
             if (repeatNum - reduce > 0) {
                 repeatNum-=reduce;
                 return reduce;
@@ -137,8 +150,6 @@ public class Task implements PrepareTaskMessage {
     }
 
     public static final class TaskBuilder {
-        //条目编号,相对对于每个设备而言的内部任务编号
-        Integer entryId;
         private TaskKey taskKey;
         private int repeatNum;
         private volatile Integer deliverUserId;
@@ -147,6 +158,7 @@ public class Task implements PrepareTaskMessage {
         private Double scope;
         private Boolean verticalView;
         private String view;
+        private Integer rate;
 
         private TaskBuilder() {
         }
@@ -160,13 +172,14 @@ public class Task implements PrepareTaskMessage {
             return this;
         }
 
-        public TaskBuilder entryId(Integer entryId) {
-            this.entryId=entryId;
-            return this;
-        }
 
         public TaskBuilder repeatNum(int repeatNum) {
             this.repeatNum=repeatNum;
+            return this;
+        }
+
+        public TaskBuilder rate(int rate) {
+            this.rate=rate;
             return this;
         }
 
@@ -201,7 +214,7 @@ public class Task implements PrepareTaskMessage {
         }
 
         public Task build() {
-            return new Task(taskKey, entryId, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
+            return new Task(taskKey, rate, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
         }
     }
 }

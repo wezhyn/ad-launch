@@ -37,13 +37,7 @@ public class DistributeServiceImpl implements DistributeTaskI {
             if (!cacheEntry.hasNext()) {
 //                把分配到的设备回放
                 for (PooledIdAndEquipCache allocatedEquip : scopeEquips) {
-                    try {
-                        while (!allocatedEquip.tryAllocate()) {
-                        }
-                        allocatedEquip.getRest().getAndAdd((int) rate);
-                    } finally {
-                        allocatedEquip.releaseAllocate();
-                    }
+                    allocatedEquip.restIncr(taskMessage.getRate());
                 }
                 break;
             }
@@ -54,18 +48,9 @@ public class DistributeServiceImpl implements DistributeTaskI {
             double lat=SquareUtils.format(equipment.getLatitude());
 //            检查范围信息是否合理
             if (lgt > info[0] && lgt < info[1] && lat > info[2] && lat < info[3]) {
-//                尝试获取当前设备独占
-                try {
-                    if (pooledIdAndEquipCache.tryAllocate()) {
-                        int rest=pooledIdAndEquipCache.getRest().get();
-                        if (rest > rate) {
-                            pooledIdAndEquipCache.getRest().compareAndSet(rest, (int) (rest - rate));
-                            scopeEquips.add(pooledIdAndEquipCache);
-                            driverNum--;
-                        }
-                    }
-                } finally {
-                    pooledIdAndEquipCache.releaseAllocate();
+                if (pooledIdAndEquipCache.tryRestOccupy(taskMessage.getRate())) {
+                    scopeEquips.add(pooledIdAndEquipCache);
+                    driverNum--;
                 }
             }
         }

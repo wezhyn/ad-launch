@@ -3,6 +3,7 @@ package com.ad.screen.server.handler;
 import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.RemoteEquipmentServiceI;
 import com.ad.screen.server.ChannelFirstReadEvent;
+import com.ad.screen.server.cache.ChannelCloseException;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.EquipTask;
@@ -12,8 +13,6 @@ import com.ad.screen.server.event.AllocateEvent;
 import com.ad.screen.server.mq.DistributeTaskI;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.service.CompletionService;
-import com.ad.screen.server.vo.resp.AdScreenResponse;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,19 +21,17 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.ad.screen.server.server.ScreenChannelInitializer.EQUIPMENT;
 
 /**
  * @author wezhyn
@@ -46,22 +43,22 @@ import static com.ad.screen.server.server.ScreenChannelInitializer.EQUIPMENT;
 public class CompensateHandler extends ChannelInboundHandlerAdapter {
 
 
-    @Autowired
+    final
     PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
     @Resource
     private RemoteEquipmentServiceI equipmentService;
+    private final DistributeTaskI distributeTask;
+    private final CompletionService completionService;
+    private final ThreadPoolTaskExecutor taskExecutor;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
-    private DistributeTaskI distributeTask;
-
-    @Autowired
-    private CompletionService completionService;
-
-    @Autowired
-    private ThreadPoolTaskExecutor taskExecutor;
-
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher) {
+        this.pooledIdAndEquipCacheService=pooledIdAndEquipCacheService;
+        this.distributeTask=distributeTask;
+        this.completionService=completionService;
+        this.taskExecutor=taskExecutor;
+        this.applicationEventPublisher=applicationEventPublisher;
+    }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -90,20 +87,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 //          填充25个空白帧
             final AtomicBoolean firstRead=ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get();
             if (firstRead.compareAndSet(false, true)) {
-                final Channel channel=ctx.channel();
-                for (int i=1; i <= ScreenChannelInitializer.SCHEDULE_NUM; i++) {
-                    final AdEquipment equipment=ctx.channel().attr(EQUIPMENT).get();
-                    AdScreenResponse blankResponse=AdScreenResponse.builder()
-                            .entryId(i)
-                            .view("")
-                            .verticalView(false)
-                            .repeatNum(9999)
-                            .imei(equipment.getKey())
-                            .viewLength((byte) 0)
-                            .build();
-                    channel.write(blankResponse);
-                }
-                channel.flush();
             }
         } else {
 //            远程主机强制关闭
@@ -117,21 +100,25 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 
     public void compensate(ChannelHandlerContext ctx) {
         //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
-        HashMap<Integer, Task> unFinishedTasks=ctx.channel().attr(ScreenChannelInitializer.TASK_MAP).get();
+        final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
+        equipCache.setChannelClose(true);
+        Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
         if (unFinishedTasks==null || unFinishedTasks.size()==0) {
             return;
         }
 //        order,equipTask
         HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask=new HashMap<>(8);
         for (Task task : unFinishedTasks.values()) {
+//              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
+            completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
             if (!constructEquipTask.containsKey(task.getTaskKey())) {
                 constructEquipTask.putIfAbsent(task.getTaskKey(), fromTask(task));
             } else {
-//              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
-                completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
-                final EquipTask.EquipTaskBuilder equipTask=constructEquipTask.get(task.getTaskKey());
-                equipTask.totalNumInc(getTaskNum(task))
-                        .rateInc(1);
+//                异常调度导致同 EquipTask 里的不同车到一辆车上
+                constructEquipTask.get(task.getTaskKey())
+//                        添加剩余数量
+                        .totalNumInc(getTaskNum(task))
+                        .driverNumInc(1);
             }
         }
 //        当前服务器转移任务, 自此，旧数据已经被持久化
@@ -139,7 +126,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             taskExecutor.submit(new TransferRunner(builder.build(), distributeTask, taskExecutor, applicationEventPublisher));
         }
         //更新设备的在线状态
-        AdEquipment channelEquip=ctx.channel().attr(EQUIPMENT).get();
+        AdEquipment channelEquip=equipCache.getEquipment();
         taskExecutor.submit(()->{
             channelEquip.setStatus(false);
             //保存设备的最终信息
@@ -182,7 +169,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                 .latitude(task.getLatitude())
                 .deliverNum(task.getDeliverNum())
                 .executedNum(0);
-
     }
 
     private static class TransferRunner implements Runnable {
@@ -207,18 +193,20 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void run() {
-            final Optional<PooledIdAndEquipCache> availableSingleEquip=distributeTask.availableSingleEquip(task);
-            if (!availableSingleEquip.isPresent()) {
+            List<PooledIdAndEquipCache> availableEquips=distributeTask.availableEquips(task);
+            if (availableEquips.size() < task.getDeliverNum()) {
                 if (this.retry.getAndIncrement() > MAX_RETRY) {
 //                  丢弃当前任务
-                    return;
                 } else {
                     threadPoolTaskExecutor.submit(this);
-                    return;
                 }
+                return;
             }
-            final PooledIdAndEquipCache equipChannel=availableSingleEquip.get();
-            applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, Collections.singletonList(equipChannel)));
+            try {
+                applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, availableEquips));
+            } catch (ChannelCloseException e) {
+                threadPoolTaskExecutor.submit(this);
+            }
         }
     }
 }
