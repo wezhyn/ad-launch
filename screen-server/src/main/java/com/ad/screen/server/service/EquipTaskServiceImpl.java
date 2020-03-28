@@ -34,7 +34,20 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
 
     @Override
     public List<EquipTask> nextPreparedResume(int id, int limit) {
-        return getRepository().findEquipTasksByIdGreaterThan(id, PageRequest.of(0, limit));
+        return getRepository().findEquipTasksByIdGreaterThanAndWorkIdentityAndExecutedIsFalse(id,
+                globalIdentify.getId(), PageRequest.of(0, limit));
+    }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public int transferCrashServer(String crashServer, int crashRecord) {
+        return getRepository().updateCrashWorkIdentify(crashServer, crashRecord, globalIdentify.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public int checkTaskExecuted(int id) {
+        return getRepository().updateEquipStatus(globalIdentify.getId(), id);
     }
 
     @Override

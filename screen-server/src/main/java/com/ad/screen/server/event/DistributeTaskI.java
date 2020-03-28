@@ -1,7 +1,8 @@
-package com.ad.screen.server.mq;
+package com.ad.screen.server.event;
 
 
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
+import com.ad.screen.server.mq.PrepareTaskMessage;
 
 import java.util.List;
 import java.util.Optional;

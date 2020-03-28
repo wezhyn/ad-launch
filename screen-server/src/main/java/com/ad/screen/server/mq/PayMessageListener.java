@@ -7,6 +7,7 @@ import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
+import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.service.EquipTaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +63,7 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
                 return;
             }
             //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
-            List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(new TaskMessageAdapter(equipTask));
+            List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(equipTask);
             if (available.size() < deliverNum) {
                 throw new InsufficientException("区域内可用车辆数目小于订单要求");
             }

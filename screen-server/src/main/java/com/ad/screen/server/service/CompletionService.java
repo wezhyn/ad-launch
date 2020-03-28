@@ -17,7 +17,7 @@ public interface CompletionService {
     Integer forOrderTotal(Integer orderId);
 
     /**
-     * 获取并删除统计信息
+     * 获取并删除统计信息,并检查订单是否已经完成
      *
      * @param orderId  订单id
      * @param driverId 设备所有者id

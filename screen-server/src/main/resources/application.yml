@@ -35,6 +35,9 @@ dubbo:
     timeout: 5000
 rocketmq:
   name-server: 47.111.185.61:9876
-#  name-server: 127.0.0.1:9876
+  #  name-server: 127.0.0.1:9876
   producer:
     group: order-group
+heart:
+  producer:
+    destination: screen_server_heart

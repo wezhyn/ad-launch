@@ -4,7 +4,7 @@ import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.SquareUtils;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
-import com.ad.screen.server.mq.DistributeTaskI;
+import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.mq.PrepareTaskMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

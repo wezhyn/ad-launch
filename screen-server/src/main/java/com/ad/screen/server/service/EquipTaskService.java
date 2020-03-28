@@ -29,4 +29,21 @@ public interface EquipTaskService extends BaseService<EquipTask, Integer> {
      */
     List<EquipTask> nextPreparedResume(int id, int limit);
 
+    /**
+     * 转移故障机器的任务到本结点
+     *
+     * @param crashServer crashServer:ip
+     * @param crashRecord crashServer:恢复记录
+     * @return update
+     */
+    int transferCrashServer(String crashServer, int crashRecord);
+
+    /**
+     * 检查某个订单的是否已经完成
+     *
+     * @param id id
+     * @return 1 ： succeed
+     */
+    int checkTaskExecuted(int id);
+
 }

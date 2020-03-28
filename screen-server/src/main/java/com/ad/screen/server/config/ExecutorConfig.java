@@ -19,14 +19,14 @@ public class ExecutorConfig {
      *
      * @return executor
      */
-    @Bean(name="taskExecutor")
+    @Bean(name="self_taskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor=new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(20);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(1000);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setThreadNamePrefix("spring_async_task");
+        executor.setThreadNamePrefix("self_async_task");
         executor.initialize();
         return executor;
     }

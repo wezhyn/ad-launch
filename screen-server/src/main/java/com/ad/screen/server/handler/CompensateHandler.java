@@ -10,7 +10,7 @@ import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
-import com.ad.screen.server.mq.DistributeTaskI;
+import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.service.CompletionService;
 import io.netty.channel.ChannelHandler;

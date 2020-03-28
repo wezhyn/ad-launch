@@ -66,6 +66,7 @@ public class CompletionImpl implements CompletionService {
             boundHashOps.delete(driverId);
             equipTaskRepository.executeNumInc(globalIdentify.getId(), orderId, exec);
             diskCompletionRepository.save(new DiskCompletion(exec, orderId, driverId));
+            equipTaskRepository.updateEquipStatus(globalIdentify.getId(), orderId);
         }
         return exec;
     }

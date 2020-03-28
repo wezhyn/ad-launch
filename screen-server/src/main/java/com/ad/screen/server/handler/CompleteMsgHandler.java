@@ -48,11 +48,7 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
             return;
         }
         try {
-            MemoryCompletion com=MemoryCompletion.builder()
-                    .adOrderId(task.getOrderId())
-                    .executedNum(preTask.getRepeatNum())
-                    .driverId(task.getDeliverUserId())
-                    .build();
+            MemoryCompletion com=createMemoryRecord(preTask);
             memoryCompletionService.completeIncrMemory(com);
             if (task.getRepeatNum()==0) {
 //              当前Task 帧完成, 删除 redis 中的当前帧数据，保存到数据库中
@@ -66,5 +62,13 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private MemoryCompletion createMemoryRecord(FixedTask preTask) {
+        return MemoryCompletion.builder()
+                .adOrderId(preTask.getTask().getOrderId())
+                .executedNum(preTask.getRepeatNum())
+                .driverId(preTask.getTask().getDeliverUserId())
+                .build();
     }
 }

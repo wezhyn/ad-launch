@@ -23,6 +23,11 @@ public class EquipTaskServiceTest {
     private EquipTaskService equipTaskService;
 
     @Test
+    public void check() {
+        equipTaskService.checkTaskExecuted(1);
+    }
+
+    @Test
     public void mergeTaskExecStatistics() throws InterruptedException {
 
         final ExecutorService exe=Executors.newCachedThreadPool();

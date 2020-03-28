@@ -1,5 +1,6 @@
 package com.ad.screen.server.entity;
 
+import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.mq.PrepareTaskMessage;
 import com.wezhyn.project.IBaseTo;
 import lombok.Getter;
@@ -23,7 +24,7 @@ import javax.persistence.*;
 @Getter
 @Table(
         indexes={
-                @Index(name="work_order", columnList="work_identity,oid"),
+                @Index(name="work_exe_order", columnList="work_identity,executed,oid"),
                 @Index(name="equip_unique_id", columnList="oid,uid", unique=true)
         }
 )
@@ -53,7 +54,13 @@ public class EquipTask implements IBaseTo<Integer>, PrepareTaskMessage {
     @Setter
     private Integer executedNum;
     @Column(name="work_identity")
-    private String workIdentity;
+    private String workIdentity=GlobalIdentify.IDENTIFY.getId();
+
+    /**
+     * 当前任务是否结束
+     */
+    @Column(name="executed", columnDefinition="bit(1) default b'0'")
+    private Boolean executed;
 
     public EquipTask() {
     }
