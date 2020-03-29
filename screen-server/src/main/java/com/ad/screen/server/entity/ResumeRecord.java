@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class ResumeRecord implements IBaseTo<String> {
 
     @Id
+    @Column(name="word_identity", columnDefinition="varchar(20) not null")
     private String wordIdentity;
 
     /**
