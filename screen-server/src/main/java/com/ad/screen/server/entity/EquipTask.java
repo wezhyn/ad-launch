@@ -53,7 +53,7 @@ public class EquipTask implements IBaseTo<Integer>, PrepareTaskMessage {
      */
     @Setter
     private Integer executedNum;
-    @Column(name="work_identity")
+    @Column(name="work_identity", columnDefinition="varchar(20) not null")
     private String workIdentity=GlobalIdentify.IDENTIFY.getId();
 
     /**
