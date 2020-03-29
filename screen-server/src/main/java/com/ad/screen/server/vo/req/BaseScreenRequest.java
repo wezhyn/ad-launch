@@ -2,17 +2,13 @@ package com.ad.screen.server.vo.req;
 
 import com.ad.screen.server.vo.FrameType;
 import com.ad.screen.server.vo.IScreenFrame;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * @author wezhyn
  * @since 02.19.2020
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Data
 public class BaseScreenRequest<T> implements IScreenFrame {
@@ -33,6 +29,12 @@ public class BaseScreenRequest<T> implements IScreenFrame {
      * 后一个数表示维度：+
      */
     private T netData;
+
+    public BaseScreenRequest(String equipmentName, FrameType frameType, T netData) {
+        this.equipmentName=equipmentName;
+        this.frameType=frameType;
+        this.netData=netData;
+    }
 
     @Override
     public int type() {

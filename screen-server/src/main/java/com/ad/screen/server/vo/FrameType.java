@@ -1,7 +1,6 @@
 package com.ad.screen.server.vo;
 
-import com.ad.screen.server.codec.ScreenProtocolInDecoder;
-import com.ad.screen.server.vo.req.BaseScreenRequest;
+import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
 import com.ad.screen.server.vo.req.Point2D;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static com.ad.screen.server.codec.ScreenProtocolInDecoder.END_FIELD;
+import static com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler.END_FIELD;
 
 /**
  * @author wezhyn
@@ -23,13 +22,12 @@ public enum FrameType {
      */
     HEART_BEAT(2), CONFIRM(1), GPS(3) {
         @Override
-        @SuppressWarnings("unchecked")
-        public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
+        public Object netData(ByteBuf msg) throws Exception {
             final int readableLength=msg.readableBytes() - END_FIELD.readableBytes();
             String gpsString=msg.readCharSequence(readableLength - 1, StandardCharsets.US_ASCII).toString();
             final String[] gpsSplit=gpsString.split(",");
             if (gpsSplit.length!=4) {
-                throw new ScreenProtocolInDecoder.ParserException();
+                throw new ScreenProtocolCheckInboundHandler.ParserException();
             }
             final double[] gpsDouble=new double[gpsSplit.length];
             for (int i=0; i < gpsSplit.length; i++) {
@@ -49,15 +47,12 @@ public enum FrameType {
                     }
                 }
             }
-            U data=(U) new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]);
-            request.setNetData(data);
+            return new Point2D(gpsDouble[0]*gpsDouble[1], gpsDouble[2]*gpsDouble[3]);
         }
     }, COMPLETE_NOTIFICATION(4) {
         @Override
-        @SuppressWarnings("unchecked")
-        public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
-            U data=(U) msg.readCharSequence(4, StandardCharsets.US_ASCII).toString();
-            request.setNetData(data);
+        public Object netData(ByteBuf msg) throws Exception {
+            return msg.readCharSequence(4, StandardCharsets.US_ASCII).toString();
         }
     }, IP(2), AD(3);
 
@@ -77,7 +72,8 @@ public enum FrameType {
                 .orElseThrow(()->new RuntimeException("无法解析的数据类型"));
     }
 
-    public <U, T extends BaseScreenRequest<U>> void netData(ByteBuf msg, T request) throws Exception {
+    public Object netData(ByteBuf msgt) throws Exception {
+        return null;
     }
 
 

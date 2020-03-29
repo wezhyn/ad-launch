@@ -1,11 +1,10 @@
 package screen;
 
 import com.ad.screen.server.ScreenApplication;
-import com.ad.screen.server.codec.ScreenProtocolOutEncoder;
 import com.ad.screen.server.handler.GpsMsgMsgHandler;
 import com.ad.screen.server.handler.HeartBeatMsgMsgHandler;
 import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
-import com.ad.screen.server.handler.TypeMsgHandler;
+import com.ad.screen.server.handler.ScreenProtocolOutEncoder;
 import com.ad.screen.server.vo.req.BaseScreenRequest;
 import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.buffer.ByteBuf;
@@ -28,8 +27,7 @@ public class ScreenChannelInitializerTest {
     private final byte[] str1="SOF0058,863987031739406,3,12000.84339,E,3013.18313,N,EOF\r\n".getBytes();
     @Autowired
     GpsMsgMsgHandler gpsMsgHandler;
-    @Autowired
-    TypeMsgHandler typeHandler;
+
     @Autowired
     HeartBeatMsgMsgHandler heartBeatMsgHandler;
 
@@ -39,7 +37,6 @@ public class ScreenChannelInitializerTest {
                 new LineBasedFrameDecoder(60, true, true),
                 new ScreenProtocolOutEncoder(),
                 new ScreenProtocolCheckInboundHandler(27, 3, 4),
-                typeHandler,
                 heartBeatMsgHandler,
                 gpsMsgHandler
         );

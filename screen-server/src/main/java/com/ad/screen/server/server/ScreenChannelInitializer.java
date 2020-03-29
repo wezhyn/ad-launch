@@ -3,7 +3,6 @@ package com.ad.screen.server.server;
 
 import com.ad.launch.order.AdEquipment;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
-import com.ad.screen.server.codec.ScreenProtocolOutEncoder;
 import com.ad.screen.server.entity.FixedTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.handler.*;
@@ -47,16 +46,14 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     public static final Integer SCHEDULE_NUM=25;
     private final HeartBeatMsgMsgHandler heartBeatMsgHandler;
     private final GpsMsgMsgHandler gpsMsgHandler;
-    private final TypeMsgHandler typeHandler;
     private final ConfirmMsgHandler confirmMsgHandler;
     private final ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler;
     private final CompleteMsgHandler completeMsgHandler;
     private final CompensateHandler compensateHandler;
 
-    public ScreenChannelInitializer(HeartBeatMsgMsgHandler heartBeatMsgHandler, GpsMsgMsgHandler gpsMsgHandler, TypeMsgHandler typeHandler, ConfirmMsgHandler confirmMsgHandler, ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler, CompleteMsgHandler completeMsgHandler, CompensateHandler compensateHandler) {
+    public ScreenChannelInitializer(HeartBeatMsgMsgHandler heartBeatMsgHandler, GpsMsgMsgHandler gpsMsgHandler, ConfirmMsgHandler confirmMsgHandler, ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler, CompleteMsgHandler completeMsgHandler, CompensateHandler compensateHandler) {
         this.heartBeatMsgHandler=heartBeatMsgHandler;
         this.gpsMsgHandler=gpsMsgHandler;
-        this.typeHandler=typeHandler;
         this.confirmMsgHandler=confirmMsgHandler;
         this.screenProtocolCheckInboundHandler=screenProtocolCheckInboundHandler;
         this.completeMsgHandler=completeMsgHandler;
@@ -71,7 +68,6 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
         ch.pipeline().addLast(new IdleStateHandler(0, 0, 60));
-        ch.pipeline().addLast(typeHandler);
         ch.pipeline().addLast(heartBeatMsgHandler);
         ch.pipeline().addLast(gpsMsgHandler);
         ch.pipeline().addLast(confirmMsgHandler);

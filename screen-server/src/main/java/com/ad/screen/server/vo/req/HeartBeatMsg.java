@@ -1,6 +1,8 @@
 package com.ad.screen.server.vo.req;
 
-import lombok.Data;
+import com.ad.screen.server.vo.FrameType;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * @ClassName HeartBeatMsg
@@ -10,6 +12,10 @@ import lombok.Data;
  * @Date 2020/2/21 19:31
  * @Version 1.0
  */
-@Data
+@Getter
+@EqualsAndHashCode(callSuper=false)
 public class HeartBeatMsg extends BaseScreenRequest<Void> {
+    public HeartBeatMsg(String equipmentName) {
+        super(equipmentName, FrameType.HEART_BEAT, null);
+    }
 }

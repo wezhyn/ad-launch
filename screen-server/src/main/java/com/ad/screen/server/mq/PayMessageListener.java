@@ -49,26 +49,25 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
 
     @Override
     public void onMessage(TaskMessage taskMessage) {
+        final EquipTask equipTask=createEquipTask(taskMessage);
+        try {
+            equipTaskService.save(equipTask);
+        } catch (Exception ignore) {
+//            判断是否是重复主键，完成成功订单的消费
+            return;
+        }
         Integer deliverNum=taskMessage.getDeliverNum();
         int onlineNum=pooledIdAndEquipCacheService.count();
         //目前没有这么多的在线车辆数,退出
         if (onlineNum < deliverNum) {
             throw new InsufficientException("目前没有这么多的在线车辆数");
-        } else {
-            final EquipTask equipTask=createEquipTask(taskMessage);
-            try {
-                equipTaskService.save(equipTask);
-            } catch (Exception ignore) {
-//            判断是否是重复主键，完成成功订单的消费
-                return;
-            }
-            //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
-            List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(equipTask);
-            if (available.size() < deliverNum) {
-                throw new InsufficientException("区域内可用车辆数目小于订单要求");
-            }
-            applicationEventPublisher.publishEvent(new AllocateEvent(this, false, equipTask, available));
         }
+        //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
+        List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(equipTask);
+        if (available.size() < deliverNum) {
+            throw new InsufficientException("区域内可用车辆数目小于订单要求");
+        }
+        applicationEventPublisher.publishEvent(new AllocateEvent(this, false, equipTask, available));
     }
 
 
