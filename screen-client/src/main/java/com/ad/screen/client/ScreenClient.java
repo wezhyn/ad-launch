@@ -141,7 +141,7 @@ public class ScreenClient {
             ChannelFuture f=b.connect().sync();
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            client.shutdownGracefully();
         } finally {
             try {
                 client.shutdownGracefully().sync();

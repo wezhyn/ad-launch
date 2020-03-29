@@ -104,45 +104,47 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 
     public void compensate(ChannelHandlerContext ctx) {
         final AtomicBoolean channelInitCompleted=ctx.channel().attr(FIRST_READ_CHANNEL).get();
-        if (channelInitCompleted==null || !channelInitCompleted.get()) {
-//            还未完成初始化，客户端就被关闭
-            return;
-        }
         //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
         final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
         equipCache.setChannelClose(true);
-        Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
-        if (unFinishedTasks==null || unFinishedTasks.size()==0) {
-            return;
-        }
-//        order,equipTask
-        HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask=new HashMap<>(8);
-        for (Task task : unFinishedTasks.values()) {
-//              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
-            completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
-            if (!constructEquipTask.containsKey(task.getTaskKey())) {
-                constructEquipTask.putIfAbsent(task.getTaskKey(), fromTask(task));
-            } else {
-//                异常调度导致同 EquipTask 里的不同车到一辆车上
-                constructEquipTask.get(task.getTaskKey())
-//                        添加剩余数量
-                        .totalNumInc(getTaskNum(task))
-                        .driverNumInc(1);
+        try {
+            if (channelInitCompleted==null || !channelInitCompleted.get()) {
+//            还未完成初始化，客户端就被关闭
+                return;
             }
-        }
+            Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
+            if (unFinishedTasks==null || unFinishedTasks.size()==0) {
+                return;
+            }
+            HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask=new HashMap<>(8);
+            for (Task task : unFinishedTasks.values()) {
+//              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
+                completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
+                if (!constructEquipTask.containsKey(task.getTaskKey())) {
+                    constructEquipTask.putIfAbsent(task.getTaskKey(), fromTask(task));
+                } else {
+//                异常调度导致同 EquipTask 里的不同车到一辆车上
+                    constructEquipTask.get(task.getTaskKey())
+//                        添加剩余数量
+                            .totalNumInc(getTaskNum(task))
+                            .driverNumInc(1);
+                }
+            }
 //        当前服务器转移任务, 自此，旧数据已经被持久化
-        for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
-            taskExecutor.submit(new TransferRunner(builder.build(), distributeTask, taskExecutor, applicationEventPublisher));
+            for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
+                taskExecutor.submit(new TransferRunner(builder.build(), distributeTask, taskExecutor, applicationEventPublisher));
+            }
+            //更新设备的在线状态
+            AdEquipment channelEquip=equipCache.getEquipment();
+            taskExecutor.submit(()->{
+                channelEquip.setStatus(false);
+                //保存设备的最终信息
+                preserveEquipInfo(channelEquip);
+            });
+        } finally {
+            //在缓存中移除该信息
+            pooledIdAndEquipCacheService.remove(equipCache.getEquipment().getKey());
         }
-        //更新设备的在线状态
-        AdEquipment channelEquip=equipCache.getEquipment();
-        taskExecutor.submit(()->{
-            channelEquip.setStatus(false);
-            //保存设备的最终信息
-            preserveEquipInfo(channelEquip);
-        });
-        //在缓存中移除该信息
-        pooledIdAndEquipCacheService.remove(channelEquip.getKey());
     }
 
     /**
