@@ -1,4 +1,4 @@
-FROM openjdk:8-alpine
+FROM openjdk:8
 WORKDIR /screen-server
 COPY target/*.jar   screen-server.jar
 # tcp
