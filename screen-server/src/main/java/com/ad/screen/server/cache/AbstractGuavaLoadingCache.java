@@ -25,30 +25,17 @@ public abstract class AbstractGuavaLoadingCache<K, V> {
     private Date resetTime;     //Cache初始化或被重置的时间
     private long highestSize=0; //历史最高记录数
     private Date highestTime;   //创造历史记录的时间
-    private volatile Cache<K, V> cache;
+    private final Cache<K, V> cache;
 
-    /**
-     * @return cache实例 {@link com.google.common.cache.LoadingCache<K,V>}
-     * @Description //通过cache.get(key)的方式来获取值
-     * @Date 2020/3/7 15:47
-     **/
-    public Cache<K, V> getCache() {
-        if (cache==null) {
-            synchronized (this) {
-                if (cache==null) {
-                    cache=CacheBuilder.newBuilder().maximumSize(maximumSize)//设置缓存最大数量
-                            .expireAfterWrite(expireAfterWriteDuration, timeUnit)//设置缓存国企时间
-                            .recordStats()//启用统计
-                            .build();
-                    this.resetTime=new Date();
-                    this.highestTime=new Date();
-                    log.info("本地缓存{}初始化成功", cache.getClass().getSimpleName());
-                }
-            }
-        }
-        return cache;
+
+    public AbstractGuavaLoadingCache() {
+        this.cache=CacheBuilder.newBuilder().maximumSize(maximumSize)//设置缓存最大数量
+                .expireAfterWrite(expireAfterWriteDuration, timeUnit)//设置缓存国企时间
+                .recordStats()//启用统计
+                .build();
+        this.resetTime=new Date();
+        this.highestTime=new Date();
     }
-
 
     /**
      * 统计缓存数据
