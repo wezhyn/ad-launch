@@ -6,13 +6,15 @@ import com.ad.screen.client.vo.resp.AdEntry;
 import com.ad.screen.client.vo.resp.AdScreenResponse;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wezhyn
@@ -21,9 +23,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenResponse> {
 
-    private final HashMap<Integer, AdEntry> cache=new HashMap<>(32);
+    private final HashMap<Integer, EntryWarp> cache=new HashMap<>(32);
     private final AtomicBoolean isStart=new AtomicBoolean(false);
+    private AtomicLong complete;
 
+    public AdScreenHanlder(AtomicLong complete) {
+        this.complete=complete;
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, AdScreenResponse adScreenResponse) throws Exception {
@@ -31,24 +37,25 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         channelHandlerContext.writeAndFlush(new ConfirmMsg(name));
         if (!isStart.get()) {
             if (isStart.compareAndSet(false, true)) {
-                new Thread(new ConsumerClass(cache, channelHandlerContext)).start();
+                new Thread(new ConsumerClass(cache, channelHandlerContext, complete)).start();
             }
         }
         final AdEntry entry=adScreenResponse.getNetData();
-        cache.put(entry.getEntryId()%25, entry);
+        cache.put(entry.getEntryId()%25, new EntryWarp(entry, entry.getRepeatNum()));
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
 
     private static class ConsumerClass implements Runnable {
-        private final HashMap<Integer, AdEntry> cache;
+        private final HashMap<Integer, EntryWarp> cache;
         private ChannelHandlerContext context;
+        private AtomicLong countStatistic;
 
-        public ConsumerClass(HashMap<Integer, AdEntry> cache, ChannelHandlerContext context) {
+        public ConsumerClass(HashMap<Integer, EntryWarp> cache, ChannelHandlerContext context, AtomicLong count) {
             this.cache=cache;
             this.context=context;
+            this.countStatistic=count;
         }
-
 
         @SneakyThrows
         @Override
@@ -57,17 +64,21 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
             while (true) {
                 try {
                     String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
-                    final AdEntry entry=cache.get(getIndex(count++));
+                    int index=getIndex(count++);
+                    final EntryWarp entryWarp=cache.get(index);
+                    AdEntry entry=entryWarp.getAdEntry();
                     Integer repeatNum=entry.getRepeatNum();
                     entry.setRepeatNum(--repeatNum);
-                    log.error("consumer  ： {} at {} ", entry, LocalDateTime.now());
                     if (repeatNum==0) {
                         context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                        log.error("consumer  ： {}  ", entry);
+                        countStatistic.getAndAdd(entryWarp.getInitRepeatNum());
+                        cache.remove(index);
                     }
                 } catch (Exception ignore) {
-                    log.info("consumer  ： {} 无 ", count);
+                } finally {
+                    TimeUnit.SECONDS.sleep(1);
                 }
-                TimeUnit.SECONDS.sleep(1);
             }
         }
 
@@ -75,5 +86,12 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
             int mod=count%25;
             return mod==0 ? 25 : mod;
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class EntryWarp {
+        private AdEntry adEntry;
+        private int initRepeatNum;
     }
 }

@@ -37,6 +37,7 @@ spec:
       targetPort: 5005
   selector:
     remote: java
+  sessionAffinity: ClientIP
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -126,8 +127,8 @@ spec:
   selector:
     matchLabels:
       app: screen-server
-  replicas: 1
-  minReadySeconds: 5
+  replicas: 2
+  minReadySeconds: 20
   strategy:
     # indicate which strategy we want for rolling update
     type: RollingUpdate
@@ -159,6 +160,13 @@ spec:
           ports:
             - containerPort: 8888
             - containerPort: 5005
+          resources:
+            requests:
+              cpu: 0.5
+              memory: 200M
+            limits:
+              cpu: 1.0
+              memory: 500M
           env:
             - name: TZ
               value: Asia/Shanghai

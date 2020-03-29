@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.text.DecimalFormat;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wezhyn
@@ -28,13 +29,36 @@ public class ScreenClient {
     public static final AttributeKey<String> REGISTERED_ID=AttributeKey.valueOf("equipment");
 
     public static void main(String[] args) throws InterruptedException {
-        EventLoopGroup client=new NioEventLoopGroup();
-//        String address="47.111.185.61";
-        String address="127.0.0.1";
-//        int port=31975;
+        String address="47.111.185.61";
         int port=8888;
-        String equipName="1111111111111" + AdStringUtils.getNum(new Random().nextInt(99), 2);
-        log.info("当前设备 IEMI： {}", equipName);
+        Integer begin=null;
+        for (String arg : args) {
+            try {
+                begin=Integer.valueOf(arg);
+            } catch (Exception ignore) {
+            }
+        }
+        if (begin==null) {
+            log.error("输入启动开始设备数");
+            return;
+        }
+        for (int i=0; i < 1000; i++) {
+            System.out.println(createEquipName(i));
+        }
+    }
+
+    private static String createEquipName(Integer count) {
+        String c=count.toString();
+        StringBuilder sb=new StringBuilder();
+        for (int i=0; i < 15 - c.length(); i++) {
+            sb.append("0");
+        }
+        sb.append(c);
+        return sb.toString();
+    }
+
+    private static void runOne(String address, int port, String equipName, AtomicLong count) {
+        EventLoopGroup client=new NioEventLoopGroup();
         try {
             Bootstrap b=new Bootstrap()
                     .channel(NioSocketChannel.class)
@@ -50,7 +74,7 @@ public class ScreenClient {
                                     .addLast(new ScreenProtocolOutEncoder())
 //                                    .addLast(new IdleStateHandler(120, 170, 180))
                                     .addLast(new ConfirmHandler())
-                                    .addLast(new AdScreenHanlder());
+                                    .addLast(new AdScreenHanlder(count));
                             socketChannel.eventLoop().schedule(()->{
                                 socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
                                 GpsMsg msg=simulateGps(equipName);
@@ -67,9 +91,14 @@ public class ScreenClient {
             ChannelFuture f=b.connect().sync();
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            client.shutdownGracefully().sync();
+            e.printStackTrace();
+        } finally {
+            try {
+                client.shutdownGracefully().sync();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     private static GpsMsg simulateGps(String equip) {
