@@ -107,6 +107,7 @@ public class ScreenClient {
                 e.printStackTrace();
             }
         }
+
     }
 
     private static GpsMsg simulateGps(String equip) {
