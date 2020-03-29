@@ -34,7 +34,6 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     public static final AttributeKey<AtomicBoolean> FIRST_READ_CHANNEL=AttributeKey.valueOf("channel_first_read");
 
     public static final AttributeKey<ScheduledFuture<?>> SCHEDULED_SEND=AttributeKey.valueOf("SCHEDULED_SEND_EVENT");
-    public static final AttributeKey<Map<Integer, FixedTask>> FIXED_TASK_COPY=AttributeKey.valueOf("FIXED_TASK_COPY");
     /**
      * 设备attr的key,{@link ScreenChannelInitializer#channelRead} 处设置
      */
@@ -77,8 +76,10 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 
         final ScheduledFuture<?> scheduledSend=ch.eventLoop().scheduleAtFixedRate(()->{
                     try {
-                        if (chChannel.attr(SCHEDULED_SEND).get()==null) {
-//                            客户端被关闭，定时任务取消
+                        final AtomicBoolean channelInitCompleted=chChannel.attr(FIRST_READ_CHANNEL).get();
+                        if (chChannel.attr(SCHEDULED_SEND).get()==null || channelInitCompleted==null ||
+                                !channelInitCompleted.get()) {
+//                            客户端被关闭| 客户端还未被正常初始化
                             return;
                         }
                         final PooledIdAndEquipCache equipCache=chChannel.attr(POOLED_EQUIP_CACHE).get();
