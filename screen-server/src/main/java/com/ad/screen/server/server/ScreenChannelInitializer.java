@@ -66,7 +66,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
-        ch.pipeline().addLast(new IdleStateHandler(0, 0, 60));
+        ch.pipeline().addLast(new IdleStateHandler(80, 0, 90));
         ch.pipeline().addLast(heartBeatMsgHandler);
         ch.pipeline().addLast(gpsMsgHandler);
         ch.pipeline().addLast(confirmMsgHandler);

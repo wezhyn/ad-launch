@@ -52,7 +52,8 @@ public enum FrameType {
     }, COMPLETE_NOTIFICATION(4) {
         @Override
         public Object netData(ByteBuf msg) throws Exception {
-            return msg.readCharSequence(4, StandardCharsets.US_ASCII).toString();
+            final CharSequence sequence=msg.readCharSequence(4, StandardCharsets.US_ASCII);
+            return Integer.valueOf(sequence.toString());
         }
     }, IP(2), AD(3);
 

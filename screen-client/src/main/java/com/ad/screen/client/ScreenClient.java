@@ -54,9 +54,10 @@ public class ScreenClient {
             return;
         }
         ExecutorService service=Executors.newCachedThreadPool();
-        for (AtomicInteger i=new AtomicInteger(1001); i.get() < 1005; ) {
+        AtomicInteger runnerCount=new AtomicInteger(1001);
+        for (int i=0; i < 5; i++) {
             service.submit(()->{
-                runOne(address, port, createEquipName(i.getAndIncrement()), count);
+                runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
             });
         }
         service.submit(()->{
