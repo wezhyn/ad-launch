@@ -89,6 +89,8 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 //          填充25个空白帧
             final AtomicBoolean firstRead=ctx.channel().attr(FIRST_READ_CHANNEL).get();
             if (firstRead.compareAndSet(false, true)) {
+                final String iemi=ctx.channel().attr(ScreenChannelInitializer.IEMI).get();
+                log.info("加载 ：{}", iemi);
             }
         } else {
 //            远程主机强制关闭
