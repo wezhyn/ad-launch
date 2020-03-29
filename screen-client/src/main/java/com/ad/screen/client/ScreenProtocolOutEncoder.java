@@ -34,16 +34,6 @@ public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrame>
                 .append(",")
                 .append("EOF\r\n");
         String result=sb.toString();
-        switch (msg.type()) {
-            case 4:
-            case 3: {
-                log.info("输出{}帧：{}", msg, result);
-                break;
-            }
-            default: {
-                log.debug("输出{}帧：{}", msg, result);
-            }
-        }
         out.writeBytes(result.getBytes());
         ctx.flush();
     }

@@ -47,13 +47,14 @@ public class ScreenClient {
             return;
         }
         ExecutorService service=Executors.newCachedThreadPool();
-        for (AtomicInteger i=new AtomicInteger(1001); i.get() < 1010; ) {
+        for (AtomicInteger i=new AtomicInteger(1001); i.get() < 2000; ) {
             service.submit(()->{
                 runOne(address, port, createEquipName(i.getAndIncrement()), count);
             });
         }
         TimeUnit.HOURS.sleep(1);
     }
+
 
     private static String createEquipName(Integer count) {
         String c=count.toString();

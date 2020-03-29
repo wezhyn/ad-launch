@@ -31,7 +31,7 @@ public class PooledIdAndEquipCache {
     设备信息
     */
     @Getter
-    AdEquipment equipment;
+    private volatile AdEquipment equipment;
     @Getter
     @Setter
     private volatile boolean isChannelClose;
