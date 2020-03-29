@@ -40,7 +40,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private AtomicInteger count;
 
     private ExecutorService executorService=Executors.newSingleThreadExecutor(r->{
-        final Thread thread=new Thread(r, "resume-thread-");
+        final Thread thread=new Thread(r, "resume-thread");
         thread.setDaemon(true);
         return thread;
     });
