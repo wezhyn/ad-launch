@@ -6,7 +6,9 @@ import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.mq.PrepareTaskMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,10 +22,15 @@ import java.util.concurrent.ConcurrentMap;
  * @Version V1.0
  **/
 @Service
+@Slf4j
 public class DistributeServiceImpl implements DistributeTaskI {
     @Autowired
     PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
 
+    @Scheduled(fixedDelay=3000)
+    public void scheduleReport() {
+        log.info("当前在线设备： {}", pooledIdAndEquipCacheService.getCache().size());
+    }
 
     @Override
     public List<PooledIdAndEquipCache> availableEquips(PrepareTaskMessage taskMessage) {

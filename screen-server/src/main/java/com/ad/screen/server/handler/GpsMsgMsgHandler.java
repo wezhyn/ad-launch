@@ -45,7 +45,7 @@ public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
             //更新channel内部和缓存当中的设备信息
             equip.setLongitude(x);
             equip.setLatitude(y);
-            log.info("{}的地理位置已更新", msg.getEquipmentName());
+            log.debug("{}的地理位置已更新", msg.getEquipmentName());
         }
     }
 }

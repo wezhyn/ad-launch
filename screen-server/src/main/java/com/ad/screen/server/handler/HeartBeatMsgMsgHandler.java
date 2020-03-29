@@ -27,6 +27,6 @@ public class HeartBeatMsgMsgHandler extends BaseMsgHandler<HeartBeatMsg> {
         String imei = msg.getEquipmentName();
         ConfirmScreenResponse confirmScreenResponse=new ConfirmScreenResponse(imei);
         write(ctx, confirmScreenResponse);
-        log.info("发送目标设备编号为:{}的心跳确认帧", msg.getEquipmentName());
+        log.debug("发送目标设备编号为:{}的心跳确认帧", msg.getEquipmentName());
     }
 }

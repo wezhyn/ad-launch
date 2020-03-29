@@ -1,7 +1,9 @@
 package com.ad.screen.client;
 
+import com.ad.launch.order.TaskMessage;
 import com.ad.screen.client.vo.req.GpsMsg;
 import com.ad.screen.client.vo.req.HeartBeatMsg;
+import com.google.gson.Gson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -13,8 +15,13 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,11 +54,45 @@ public class ScreenClient {
             return;
         }
         ExecutorService service=Executors.newCachedThreadPool();
-        for (AtomicInteger i=new AtomicInteger(1001); i.get() < 2000; ) {
+        for (AtomicInteger i=new AtomicInteger(1001); i.get() < 1030; ) {
             service.submit(()->{
                 runOne(address, port, createEquipName(i.getAndIncrement()), count);
             });
         }
+        service.submit(()->{
+            DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
+            // 设置NameServer的地址
+            producer.setNamesrvAddr("47.111.185.61:9876");
+            producer.setVipChannelEnabled(false);
+            int orderUid=0;
+//            while (true) {
+            orderUid=(++orderUid)%1000;
+            Random r=new Random();
+            int rate=r.nextInt(20) + 1;
+            int dn=r.nextInt(5);
+            TaskMessage taskMessage=TaskMessage.builder()
+                    .deliverNum(dn)
+                    .latitude(30.2000)
+                    .longitude(120.0000)
+                    .oid(orderUid)
+                    .produceContext(Collections.singletonList("test-" + orderUid))
+                    .rate(rate)
+                    .vertical(true)
+                    .uid(orderUid)
+                    .scope(1000D)
+                    .totalNum(dn*rate)
+                    .build();
+            Gson gson=new Gson();
+            Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
+
+            try {
+                producer.start();
+                producer.sendOneway(message);
+            } catch (MQClientException|RemotingException|InterruptedException e) {
+                e.printStackTrace();
+            }
+//            }
+        });
         TimeUnit.HOURS.sleep(1);
     }
 

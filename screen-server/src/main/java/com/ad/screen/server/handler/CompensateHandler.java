@@ -92,7 +92,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 //            远程主机强制关闭
             //持久化未完成任务
             if (!(evt instanceof ChannelInputShutdownReadComplete)) {
-                exceptionCaught(ctx, new RuntimeException("未处理的异常"));
+                throw new RuntimeException("未处理的异常: " + evt.getClass());
             }
             compensate(ctx);
         }
