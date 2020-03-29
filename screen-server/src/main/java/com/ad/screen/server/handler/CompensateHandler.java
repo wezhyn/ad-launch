@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.ad.screen.server.server.ScreenChannelInitializer.FIRST_READ_CHANNEL;
+
 
 /**
  * @author wezhyn
@@ -85,7 +87,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             }
         } else if (evt instanceof ChannelFirstReadEvent) {
 //          填充25个空白帧
-            final AtomicBoolean firstRead=ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get();
+            final AtomicBoolean firstRead=ctx.channel().attr(FIRST_READ_CHANNEL).get();
             if (firstRead.compareAndSet(false, true)) {
             }
         } else {
@@ -99,6 +101,11 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void compensate(ChannelHandlerContext ctx) {
+        final AtomicBoolean channelInitCompleted=ctx.channel().attr(FIRST_READ_CHANNEL).get();
+        if (channelInitCompleted==null || !channelInitCompleted.get()) {
+//            还未完成初始化，客户端就被关闭
+            return;
+        }
         //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
         final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
         equipCache.setChannelClose(true);
