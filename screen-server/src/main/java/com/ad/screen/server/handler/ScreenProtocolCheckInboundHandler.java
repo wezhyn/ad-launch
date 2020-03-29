@@ -110,6 +110,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                     request=readRequest(inboundMsg, sof, frameLength);
                     if (!ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get().get()) {
 //                    第一次初始化
+                        ctx.channel().attr(ScreenChannelInitializer.IEMI).set(request.getEquipmentName());
                         final PooledIdAndEquipCache equipCache=equipCacheService.getOrInit(request.getEquipmentName(), ctx.channel());
                         ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).set(equipCache);
                         ctx.fireUserEventTriggered(ChannelFirstReadEvent.INSTANCE);
