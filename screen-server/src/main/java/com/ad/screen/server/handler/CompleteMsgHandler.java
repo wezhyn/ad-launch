@@ -40,9 +40,9 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
 //        条目编号
         Integer entryId=msg.getNetData();
         int taskEntryId=entryId%ScreenChannelInitializer.SCHEDULE_NUM;
-        Task task=equipCache.getTask(taskEntryId);
-        String iemi=msg.getEquipmentName();
         try {
+            Task task=equipCache.getTask(taskEntryId);
+            String iemi=msg.getEquipmentName();
             final FixedTask preTask=task.getPreTask();
             if (preTask==null || entryId!=preTask.getEquipEntryId()) {
                 log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
@@ -50,11 +50,6 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
             } else {
                 task.setPreTask(null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            final FixedTask preTask=task.getPreTask();
             MemoryCompletion com=createMemoryRecord(preTask);
             memoryCompletionService.completeIncrMemory(com);
             if (task.getRepeatNum()==0) {
