@@ -3,6 +3,7 @@
 
 admain=deployment.apps/dep-ad-main-server
 screen=deployment.apps/dep-screen-server
+kubectl apply -f ad-launch.yaml
 kubectl patch $admain -p   "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
 kubectl patch $screen -p   "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
 

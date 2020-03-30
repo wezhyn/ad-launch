@@ -5,7 +5,6 @@ import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.dao.EquipTaskRepository;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.TaskKey;
-import com.ad.screen.server.exception.InsufficientException;
 import com.wezhyn.project.AbstractBaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,25 +49,6 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
         return getRepository().updateCrashWorkIdentify(crashServer, crashRecord, globalIdentify.getId());
     }
 
-    @Override
-    @Transactional(rollbackFor=Exception.class)
-    public void saveAndCheckOrder(EquipTask equipTask) {
-        boolean isDump=false;
-        try {
-            getRepository().save(equipTask);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            isDump=true;
-        }
-        if (!isDump) {
-            int onlineNum=pooledIdAndEquipCacheService.count();
-            Integer deliverNum=equipTask.getDeliverNum();
-            //目前没有这么多的在线车辆数,退出
-            if (onlineNum < deliverNum) {
-                throw new InsufficientException("目前没有这么多的在线车辆数");
-            }
-        }
-    }
 
     @Override
     @Transactional(rollbackFor=Exception.class)

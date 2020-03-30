@@ -38,13 +38,6 @@ public interface EquipTaskService extends BaseService<EquipTask, Integer> {
      */
     int transferCrashServer(String crashServer, int crashRecord);
 
-    /**
-     * 1. 检查车辆是否充足
-     * 2. 插入数据
-     *
-     * @param equipTask 订单信息
-     */
-    void saveAndCheckOrder(EquipTask equipTask);
 
     /**
      * 检查某个订单的是否已经完成

@@ -2,14 +2,12 @@ package com.ad.screen.server.mq;
 
 import com.ad.launch.order.TaskMessage;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
-import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
-import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.exception.InsufficientException;
-import com.ad.screen.server.service.EquipTaskService;
+import com.ad.screen.server.service.DistributeTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -34,14 +32,9 @@ import java.util.List;
 @Slf4j
 public class PayMessageListener implements RocketMQListener<TaskMessage> {
     @Autowired
-    DistributeTaskI distributeTaskI;
-    @Autowired
-    PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
-
-    @Autowired
-    private EquipTaskService equipTaskService;
-    @Autowired
     private GlobalIdentify globalIdentify;
+    @Autowired
+    private DistributeTaskService distributeTaskService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -50,21 +43,17 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
     @Override
     public void onMessage(TaskMessage taskMessage) {
         final EquipTask equipTask=createEquipTask(taskMessage);
-        Integer deliverNum=taskMessage.getDeliverNum();
         try {
-            equipTaskService.saveAndCheckOrder(equipTask);
+            final List<PooledIdAndEquipCache> ava=distributeTaskService.saveAndCheckOrder(equipTask);
+            if (ava.size()!=0) {
+                applicationEventPublisher.publishEvent(new AllocateEvent(this, false, equipTask, ava));
+            }
         } catch (InsufficientException e) {
             throw e;
         } catch (Exception ignore) {
             log.error(ignore.getMessage());
             return;
         }
-        //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
-        List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(equipTask);
-        if (available.size() < deliverNum) {
-            throw new InsufficientException("区域内可用车辆数目小于订单要求");
-        }
-        applicationEventPublisher.publishEvent(new AllocateEvent(this, false, equipTask, available));
     }
 
 

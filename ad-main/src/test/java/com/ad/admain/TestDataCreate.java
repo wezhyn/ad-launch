@@ -2,6 +2,7 @@ package com.ad.admain;
 
 import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.GenericUserRepository;
 import com.ad.admain.controller.equipment.EquipmentRepository;
 import com.ad.admain.controller.equipment.entity.Equipment;
 import com.ad.admain.controller.equipment.entity.EquipmentVerify;
@@ -30,7 +31,8 @@ public class TestDataCreate {
     private GenericUserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private GenericUserRepository genericUserRepository;
     @Autowired
     private EquipmentRepository equipmentService;
 
@@ -73,18 +75,22 @@ public class TestDataCreate {
     @Test
     public void createUser() {
         String name="wezhyn-";
-        for (int count=0; count < 10000; count++) {
-            GenericUser user=GenericUser.builder()
-                    .username(name + count)
-                    .nickName(name + count)
-                    .realName(name + count)
-                    .sex(SexEnum.MALE)
-                    .roles(AuthenticationEnum.USER)
-                    .enable(GenericUser.UserEnable.NORMAL)
-                    .password(passwordEncoder.encode("wezhyn"))
-                    .build();
-            userService.save(user);
+        for (int count=1000; count < 2000; count++) {
+            List<GenericUser> equipment=new ArrayList<>();
+            for (int i=0; i < 10; i++) {
+                int id=10*count + i;
+                GenericUser user=GenericUser.builder()
+                        .username(name + id)
+                        .nickName(name + id)
+                        .realName(name + id)
+                        .sex(SexEnum.MALE)
+                        .roles(AuthenticationEnum.USER)
+                        .enable(GenericUser.UserEnable.NORMAL)
+                        .password(passwordEncoder.encode("wezhyn"))
+                        .build();
+                equipment.add(user);
+            }
+            genericUserRepository.saveAll(equipment);
         }
-
     }
 }

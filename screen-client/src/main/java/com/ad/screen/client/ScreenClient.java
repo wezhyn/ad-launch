@@ -61,6 +61,10 @@ public class ScreenClient {
             });
         }
         service.submit(()->{
+            try {
+                Thread.sleep(70000);
+            } catch (InterruptedException e) {
+            }
             DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
             // 设置NameServer的地址
             producer.setNamesrvAddr("47.111.185.61:9876");

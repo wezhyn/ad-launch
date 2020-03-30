@@ -1,4 +1,4 @@
-package com.ad.screen.server;
+package com.ad.screen.server.service;
 
 import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.SquareUtils;
@@ -65,9 +65,4 @@ public class DistributeServiceImpl implements DistributeTaskI {
     }
 
 
-    @Override
-    public Optional<PooledIdAndEquipCache> availableSingleEquip(PrepareTaskMessage taskMessage) {
-        final List<PooledIdAndEquipCache> equipCaches=availableEquips(taskMessage);
-        return equipCaches.size()==1 ? Optional.of(equipCaches.get(0)) : Optional.empty();
-    }
 }
