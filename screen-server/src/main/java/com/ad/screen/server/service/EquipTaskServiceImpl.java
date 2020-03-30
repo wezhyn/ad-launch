@@ -1,10 +1,13 @@
 package com.ad.screen.server.service;
 
+import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.dao.EquipTaskRepository;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.TaskKey;
+import com.ad.screen.server.exception.InsufficientException;
 import com.wezhyn.project.AbstractBaseService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import java.util.List;
  * @since 03.26.2020
  */
 @Service
+@Slf4j
 public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer> implements EquipTaskService {
 
 
@@ -24,6 +28,8 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
     private EquipTaskRepository equipTaskRepository;
     @Autowired
     private GlobalIdentify globalIdentify;
+    @Autowired
+    PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
 
 
     @Override
@@ -42,6 +48,26 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
     @Transactional(rollbackFor=Exception.class)
     public int transferCrashServer(String crashServer, int crashRecord) {
         return getRepository().updateCrashWorkIdentify(crashServer, crashRecord, globalIdentify.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor=Exception.class)
+    public void saveAndCheckOrder(EquipTask equipTask) {
+        boolean isDump=false;
+        try {
+            getRepository().save(equipTask);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            isDump=true;
+        }
+        if (!isDump) {
+            int onlineNum=pooledIdAndEquipCacheService.count();
+            Integer deliverNum=equipTask.getDeliverNum();
+            //目前没有这么多的在线车辆数,退出
+            if (onlineNum < deliverNum) {
+                throw new InsufficientException("目前没有这么多的在线车辆数");
+            }
+        }
     }
 
     @Override
