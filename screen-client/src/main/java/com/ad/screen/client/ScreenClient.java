@@ -69,11 +69,11 @@ public class ScreenClient {
             // 设置NameServer的地址
             producer.setNamesrvAddr("47.111.185.61:9876");
             producer.setVipChannelEnabled(false);
-            int orderUid=4;
+            int orderUid=0;
 //            while (true) {
             orderUid=(++orderUid)%1000;
             Random r=new Random();
-            int rate=r.nextInt(100) + 1;
+            int rate=r.nextInt(20) + 1;
             int dn=r.nextInt(5);
             dn=dn==0 ? 1 : dn;
             TaskMessage taskMessage=TaskMessage.builder()

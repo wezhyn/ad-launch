@@ -3,7 +3,9 @@ package com.ad.screen.server.event;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.Task;
+import com.ad.screen.server.service.DistributeTaskService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,8 @@ import java.util.List;
 @Slf4j
 public class AllocateEventListener implements ApplicationListener<AllocateEvent> {
 
+    @Autowired
+    private DistributeTaskService distributeTaskService;
 
     @Override
     public void onApplicationEvent(AllocateEvent event) {
@@ -27,12 +31,19 @@ public class AllocateEventListener implements ApplicationListener<AllocateEvent>
         int availableNum=equipTask.getAvailableAllocateNum();
         int defaultNumPerEquip=equipTask.getAvailableAllocateNum()/equipTask.getDeliverNum();
         int length=availableEquips.size();
-        for (int i=0; i < length; i++) {
-            int numPerTask=i==length - 1 ? availableNum : defaultNumPerEquip;
-            final PooledIdAndEquipCache entry=availableEquips.get(i);
-            final Task task=createTask(equipTask, entry, numPerTask);
-            availableNum-=defaultNumPerEquip;
-            entry.insertTask(task);
+        if (distributeTaskService.checkRunningAndPut(equipTask.getTaskKey())) {
+            for (int i=0; i < length; i++) {
+                int numPerTask=i==length - 1 ? availableNum : defaultNumPerEquip;
+                final PooledIdAndEquipCache entry=availableEquips.get(i);
+                final Task task=createTask(equipTask, entry, numPerTask);
+                availableNum-=defaultNumPerEquip;
+                entry.insertTask(task);
+            }
+        } else {
+            for (PooledIdAndEquipCache availableEquip : availableEquips) {
+                availableEquip.restIncr(equipTask.getRate());
+            }
+            log.warn("{} is running", equipTask.getTaskKey());
         }
     }
 

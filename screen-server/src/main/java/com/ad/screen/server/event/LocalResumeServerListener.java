@@ -5,6 +5,7 @@ import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.ResumeRecord;
 import com.ad.screen.server.service.CompletionService;
+import com.ad.screen.server.service.DistributeTaskService;
 import com.ad.screen.server.service.EquipTaskService;
 import com.ad.screen.server.service.ResumeRecordService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private final ApplicationEventPublisher applicationEventPublisher;
     private GlobalIdentify globalIdentify=GlobalIdentify.IDENTIFY;
     private AtomicInteger count;
+    private final DistributeTaskService distributeTaskService;
 
     private ExecutorService executorService=Executors.newSingleThreadExecutor(r->{
         final Thread thread=new Thread(r, "resume-thread");
@@ -45,12 +47,13 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         return thread;
     });
 
-    public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask, ApplicationEventPublisher applicationEventPublisher) {
+    public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask, ApplicationEventPublisher applicationEventPublisher, DistributeTaskService distributeTaskService) {
         this.equipTaskService=equipTaskService;
         this.completionService=completionService;
         this.resumeRecordService=resumeRecordService;
         this.distributeTask=distributeTask;
         this.applicationEventPublisher=applicationEventPublisher;
+        this.distributeTaskService=distributeTaskService;
     }
 
     @Override
@@ -63,11 +66,18 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                 try {
                     final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
                     if (tasks.size()==0) {
-                        Thread.sleep(20000);
+                        Thread.sleep(30000);
                         continue;
                     }
                     for (int i=0; i < tasks.size(); ) {
                         EquipTask task=tasks.get(i);
+                        if (distributeTaskService.checkRunning(task.getTaskKey())) {
+                            if (i==tasks.size() - 1) {
+                                count.getAndIncrement();
+                                break;
+                            }
+                            continue;
+                        }
                         int orderId=task.getTaskKey().getOid();
 //                        转存redis中的数据到数据库,自此，一个 EquipTask 的最终信息都已经保存在了数据库中
                         Integer additionalNum=completionService.forOrderTotal(orderId);
