@@ -21,6 +21,6 @@ public class ConfirmMsgHandler extends BaseMsgHandler<ConfirmMsg> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ConfirmMsg msg) throws Exception {
-        log.info("已收到编号IMEI号为:{}的确认帧", msg.getEquipmentName());
+//        log.info("已收到编号IMEI号为:{}的确认帧", msg.getEquipmentName());
     }
 }

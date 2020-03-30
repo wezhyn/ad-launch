@@ -41,6 +41,10 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
         int taskEntryId=entryId%ScreenChannelInitializer.SCHEDULE_NUM;
         try {
             Task task=equipCache.getTask(taskEntryId);
+            if (task==null) {
+                log.warn("对应的通道已经关闭：{}", equipCache.getEquipment().getKey());
+                return;
+            }
             String iemi=msg.getEquipmentName();
             final FixedTask preTask=task.getPreTask();
             if (preTask==null || entryId!=preTask.getEquipEntryId()) {

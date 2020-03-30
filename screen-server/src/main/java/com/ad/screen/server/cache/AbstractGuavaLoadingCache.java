@@ -29,8 +29,7 @@ public abstract class AbstractGuavaLoadingCache<K, V> {
 
 
     public AbstractGuavaLoadingCache() {
-        this.cache=CacheBuilder.newBuilder().maximumSize(maximumSize)//设置缓存最大数量
-                .expireAfterWrite(expireAfterWriteDuration, timeUnit)//设置缓存国企时间
+        this.cache=CacheBuilder.newBuilder()
                 .recordStats()//启用统计
                 .build();
         this.resetTime=new Date();

@@ -110,6 +110,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         }
         //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
         final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
+        log.warn("{} 关闭", equipCache.getEquipment().getKey());
         equipCache.setChannelClose(true);
         try {
             Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
