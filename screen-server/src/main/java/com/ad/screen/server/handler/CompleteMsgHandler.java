@@ -46,6 +46,8 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
         if (preTask==null || entryId!=preTask.getEquipEntryId()) {
             log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
             return;
+        } else {
+            task.setPreTask(null);
         }
         try {
             MemoryCompletion com=createMemoryRecord(preTask);
@@ -55,9 +57,6 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                 equipCache.completeTask(taskEntryId);
                 memoryCompletionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
                 cacheService.get(iemi).restIncr(task.getRate());
-            } else {
-//                允许定时任务下一次调度发送帧
-                task.setPreTask(null);
             }
         } catch (Exception e) {
             e.printStackTrace();

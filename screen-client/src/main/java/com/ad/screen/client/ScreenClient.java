@@ -75,7 +75,7 @@ public class ScreenClient {
             } catch (MQClientException e) {
                 e.printStackTrace();
             }
-            for (int oi=0; oi < 20; oi++) {
+            for (int oi=0; oi < 2; oi++) {
                 int orderUid=oi%1000;
                 Random r=new Random();
                 int rate=r.nextInt(5) + 1;

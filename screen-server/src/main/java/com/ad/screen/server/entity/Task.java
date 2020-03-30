@@ -76,7 +76,7 @@ public class Task implements PrepareTaskMessage {
      * {@code com.ad.screen.server.server.ScreenChannelInitializer#initChannel} 出创建
      * {@code com.ad.screen.server.handler.CompleteMsgHandler#channelRead0} 处清空
      */
-    private volatile FixedTask preTask=null;
+    private FixedTask preTask=null;
 
     public Task(TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
         this.taskKey=taskKey;
