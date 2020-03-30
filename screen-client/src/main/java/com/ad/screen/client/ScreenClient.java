@@ -69,14 +69,15 @@ public class ScreenClient {
             // 设置NameServer的地址
             producer.setNamesrvAddr("47.111.185.61:9876");
             producer.setVipChannelEnabled(false);
-            int orderUid=3;
+            int orderUid=4;
 //            while (true) {
             orderUid=(++orderUid)%1000;
             Random r=new Random();
-            int rate=r.nextInt(20) + 1;
+            int rate=r.nextInt(100) + 1;
             int dn=r.nextInt(5);
+            dn=dn==0 ? 1 : dn;
             TaskMessage taskMessage=TaskMessage.builder()
-                    .deliverNum(dn==0 ? 1 : dn)
+                    .deliverNum(dn)
                     .latitude(30.2000)
                     .longitude(120.0000)
                     .oid(orderUid)
@@ -85,7 +86,7 @@ public class ScreenClient {
                     .vertical(true)
                     .uid(orderUid)
                     .scope(1000D)
-                    .totalNum(dn*rate*r.nextInt(20))
+                    .totalNum(dn*rate*(r.nextInt(3) + 1))
                     .build();
             Gson gson=new Gson();
             Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());

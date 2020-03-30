@@ -59,16 +59,15 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         log.info("本地重启服务启动");
         count=new AtomicInteger(resumeRecordService.resumeRecord());
         executorService.submit(()->{
-            final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
-            if (tasks.size()==0) {
+            while (true) {
                 try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ignore) {
-                }
-            } else {
-                for (int i=0; i < tasks.size(); ) {
-                    EquipTask task=tasks.get(i);
-                    try {
+                    final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
+                    if (tasks.size()==0) {
+                        Thread.sleep(20000);
+                        continue;
+                    }
+                    for (int i=0; i < tasks.size(); ) {
+                        EquipTask task=tasks.get(i);
                         int orderId=task.getTaskKey().getOid();
 //                        转存redis中的数据到数据库,自此，一个 EquipTask 的最终信息都已经保存在了数据库中
                         Integer additionalNum=completionService.forOrderTotal(orderId);
@@ -81,10 +80,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                         while (true) {
                             list=distributeTask.availableEquips(task);
                             if (list==null || list.size() < task.getDeliverNum()) {
-                                try {
-                                    TimeUnit.SECONDS.sleep(10);
-                                } catch (InterruptedException ignore) {
-                                }
+                                TimeUnit.SECONDS.sleep(10);
                             } else {
                                 break;
                             }
@@ -93,9 +89,10 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                         count.getAndIncrement();
                         log.info("恢复{}", task.getId());
                         i++;
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (InterruptedException ignore) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
