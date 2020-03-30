@@ -2,12 +2,14 @@ package com.ad.screen.server.entity;
 
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author wezhyn
  * @since 03.26.2020
  */
 @Getter
+@Slf4j
 public class FixedTask {
 
     public final static int EQUIP_MAX_ENTRY_ID=1000;

@@ -95,6 +95,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                             Task task=entry.getValue();
                             if (task.getPreTask()==null) {
                                 FixedTask fixedTask=new FixedTask(task);
+                                log.info("向{} 发送编号：{}", equipment.getKey(), fixedTask.getEquipEntryId());
                                 task.setPreTask(fixedTask);
                                 //将消息推送到设备上
                                 chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));

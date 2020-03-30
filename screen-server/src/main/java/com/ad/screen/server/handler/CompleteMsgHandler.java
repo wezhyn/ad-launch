@@ -35,7 +35,6 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
-        log.warn("收到了imei号为{}的第{}个条目编号的完成消息", msg.getEquipmentName(), msg.getNetData());
         final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
 //        条目编号
         Integer entryId=msg.getNetData();
@@ -48,6 +47,7 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                 log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
                 return;
             } else {
+                log.info("收到了imei号为{}的第{}个条目编号的完成消息", msg.getEquipmentName(), msg.getNetData());
                 task.setPreTask(null);
             }
             MemoryCompletion com=createMemoryRecord(preTask);
