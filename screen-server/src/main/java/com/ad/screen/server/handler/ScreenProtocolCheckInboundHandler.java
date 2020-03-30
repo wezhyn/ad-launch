@@ -206,11 +206,6 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         }
     }
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-
-
-    }
 
 
 }

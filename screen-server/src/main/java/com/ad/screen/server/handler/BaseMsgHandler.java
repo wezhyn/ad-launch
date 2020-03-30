@@ -3,6 +3,7 @@ package com.ad.screen.server.handler;
 import com.ad.screen.server.vo.IScreenFrameServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.ReadTimeoutException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
 
 
-
     public void write(ChannelHandlerContext ctx, IScreenFrameServer msg) {
         ctx.writeAndFlush(msg).addListener(future->{
             if (!future.isSuccess()) {
@@ -30,8 +30,12 @@ public abstract class BaseMsgHandler<T> extends SimpleChannelInboundHandler<T> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("exceptionCaught", cause);
-        ctx.close();
+        if (cause instanceof ReadTimeoutException) {
+            ctx.fireExceptionCaught(cause);
+        } else {
+            log.error("exceptionCaught", cause);
+            ctx.close();
+        }
     }
 
 

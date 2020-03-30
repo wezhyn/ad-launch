@@ -31,7 +31,7 @@ public class AllocateEventListener implements ApplicationListener<AllocateEvent>
         int availableNum=equipTask.getAvailableAllocateNum();
         int defaultNumPerEquip=equipTask.getAvailableAllocateNum()/equipTask.getDeliverNum();
         int length=availableEquips.size();
-        if (distributeTaskService.checkRunningAndPut(equipTask.getTaskKey())) {
+        if (event.getType()==AllocateType.COMPENSATE || distributeTaskService.checkRunningAndPut(equipTask.getTaskKey())) {
             for (int i=0; i < length; i++) {
                 int numPerTask=i==length - 1 ? availableNum : defaultNumPerEquip;
                 final PooledIdAndEquipCache entry=availableEquips.get(i);

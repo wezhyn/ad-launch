@@ -39,7 +39,7 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
 
     @Override
     public List<EquipTask> nextPreparedResume(int id, int limit) {
-        return getRepository().findEquipTasksByIdGreaterThanAndWorkIdentityAndExecutedIsFalse(id,
+        return getRepository().findEquipTasksByIdGreaterThanAndWorkIdentityAndExecutedIsFalseOrderById(id,
                 globalIdentify.getId(), PageRequest.of(0, limit));
     }
 

@@ -40,8 +40,8 @@ public class ScreenClient {
     public static final AttributeKey<String> REGISTERED_ID=AttributeKey.valueOf("equipment");
 
     public static void main(String[] args) throws InterruptedException {
-        String address="47.111.185.61";
-        int port=31975;
+        String address="127.0.0.1";
+        int port=8888;
         Integer begin=null;
         AtomicLong count=new AtomicLong(0);
         for (String arg : args) {
@@ -54,56 +54,60 @@ public class ScreenClient {
             log.error("输入启动开始设备数");
             return;
         }
+        DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
+        try {
+            // 设置NameServer的地址
+            producer.setVipChannelEnabled(false);
+            producer.setNamesrvAddr("47.111.185.61:9876");
+            producer.start();
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        }
         ExecutorService service=Executors.newCachedThreadPool();
         AtomicInteger runnerCount=new AtomicInteger(1001);
-        for (int i=0; i < 30; i++) {
+        AtomicInteger taskCount=new AtomicInteger(0);
+        Random r=new Random();
+        while (true) {
             service.submit(()->{
                 runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
             });
+            Thread.sleep(5000);
+            if (r.nextInt(2)==0) {
+                service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), true, producer));
+            }
         }
-        service.submit(()->{
-            try {
-                Thread.sleep(70000);
-            } catch (InterruptedException e) {
-            }
-            DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
-            try {
-                // 设置NameServer的地址
-                producer.setVipChannelEnabled(false);
-                producer.setNamesrvAddr("47.111.185.61:9876");
-                producer.start();
-            } catch (MQClientException e) {
-                e.printStackTrace();
-            }
-            for (int oi=0; oi < 2; oi++) {
-                int orderUid=oi%1000;
-                Random r=new Random();
-                int rate=r.nextInt(5) + 1;
-                int dn=r.nextInt(5) + 1;
-                TaskMessage taskMessage=TaskMessage.builder()
-                        .deliverNum(dn)
-                        .latitude(30.2000)
-                        .longitude(120.0000)
-                        .oid(oi)
-                        .produceContext(Collections.singletonList("test-" + orderUid))
-                        .rate(rate)
-                        .vertical(true)
-                        .uid(orderUid)
-                        .scope(1000D)
-                        .totalNum(dn*rate*(r.nextInt(10) + 1))
-                        .build();
-                Gson gson=new Gson();
-                Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
-                try {
-                    producer.send(message);
-                } catch (MQClientException|RemotingException|InterruptedException|MQBrokerException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        TimeUnit.HOURS.sleep(1);
     }
 
+    private static void sendMessage(int begin, int end, boolean isSend, DefaultMQProducer producer) {
+        if (!isSend) {
+            return;
+        }
+        for (int oi=begin; oi < end; oi++) {
+            int orderUid=oi%1000;
+            Random r=new Random();
+            int rate=r.nextInt(5) + 1;
+            int dn=r.nextInt(5) + 1;
+            TaskMessage taskMessage=TaskMessage.builder()
+                    .deliverNum(dn)
+                    .latitude(30.2000)
+                    .longitude(120.0000)
+                    .oid(oi)
+                    .produceContext(Collections.singletonList("test-" + orderUid))
+                    .rate(rate)
+                    .vertical(true)
+                    .uid(orderUid)
+                    .scope(1000D)
+                    .totalNum(dn*rate*(r.nextInt(5) + 1))
+                    .build();
+            Gson gson=new Gson();
+            Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
+            try {
+                producer.send(message);
+            } catch (MQClientException|RemotingException|InterruptedException|MQBrokerException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private static String createEquipName(Integer count) {
         String c=count.toString();

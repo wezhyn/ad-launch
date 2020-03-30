@@ -20,10 +20,7 @@ import java.util.List;
 public class AllocateEvent extends ApplicationEvent {
 
 
-    /**
-     * 是否是重启时派送的任务
-     */
-    private boolean resume;
+    private AllocateType type;
 
     /**
      * 具体派送的任务
@@ -32,10 +29,9 @@ public class AllocateEvent extends ApplicationEvent {
 
     private List<PooledIdAndEquipCache> pooledIdAndEquipCaches;
 
-
-    public AllocateEvent(Object source, boolean resume, EquipTask equipTask, List<PooledIdAndEquipCache> pooledIdAndEquipCaches) {
+    public AllocateEvent(Object source, AllocateType type, EquipTask equipTask, List<PooledIdAndEquipCache> pooledIdAndEquipCaches) {
         super(source);
-        this.resume=resume;
+        this.type=type;
         this.equipTask=equipTask;
         this.pooledIdAndEquipCaches=pooledIdAndEquipCaches;
     }

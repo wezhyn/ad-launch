@@ -6,6 +6,7 @@ import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
+import com.ad.screen.server.event.AllocateType;
 import com.ad.screen.server.exception.InsufficientException;
 import com.ad.screen.server.service.DistributeTaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
         try {
             final List<PooledIdAndEquipCache> ava=distributeTaskService.saveAndCheckOrder(equipTask);
             if (ava.size()!=0) {
-                applicationEventPublisher.publishEvent(new AllocateEvent(this, false, equipTask, ava));
+                applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.CONSUMER, equipTask, ava));
             }
         } catch (InsufficientException e) {
             throw e;

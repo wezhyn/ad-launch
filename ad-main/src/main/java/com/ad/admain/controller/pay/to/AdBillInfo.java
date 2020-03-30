@@ -22,9 +22,6 @@ import java.time.LocalDateTime;
 @Data
 @DynamicInsert
 @Entity(name="ad_bill_info")
-@Table(indexes={
-        @Index(name="bill_info_id_total_amount", columnList="gmtPayment,tradeStatus,totalAmount")
-})
 public class AdBillInfo extends BillInfo {
 
 

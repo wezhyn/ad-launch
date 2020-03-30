@@ -10,17 +10,19 @@ import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
+import com.ad.screen.server.event.AllocateType;
 import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.service.CompletionService;
+import com.ad.screen.server.service.DistributeTaskService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.ChannelInputShutdownReadComplete;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -53,6 +55,8 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     private final CompletionService completionService;
     private final ThreadPoolTaskExecutor taskExecutor;
     private final ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private DistributeTaskService distributeTaskService;
 
     public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher) {
         this.pooledIdAndEquipCacheService=pooledIdAndEquipCacheService;
@@ -68,6 +72,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         if (future!=null) {
             future.cancel(false);
         }
+        compensate(ctx);
         super.channelInactive(ctx);
     }
 
@@ -77,15 +82,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleStateEvent) {
-            //项目只设置了全部超时时间
-            IdleState state=((IdleStateEvent) evt).state();
-            //关闭连接: 长时间未接收心跳帧，或读写均为执行
-            if (state==IdleState.READER_IDLE || state==IdleState.ALL_IDLE) {
-                compensate(ctx);
-                log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
-            }
-        } else if (evt instanceof ChannelFirstReadEvent) {
+        if (evt instanceof ChannelFirstReadEvent) {
 //          填充25个空白帧
             final AtomicBoolean firstRead=ctx.channel().attr(FIRST_READ_CHANNEL).get();
             if (firstRead.compareAndSet(false, true)) {
@@ -102,16 +99,25 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (cause instanceof ReadTimeoutException) {
+            compensate(ctx);
+            log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
+        }
+    }
+
     public void compensate(ChannelHandlerContext ctx) {
         final AtomicBoolean channelInitCompleted=ctx.channel().attr(FIRST_READ_CHANNEL).get();
-        if (channelInitCompleted==null || !channelInitCompleted.get()) {
+        final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
+        if (channelInitCompleted==null || !channelInitCompleted.get() || equipCache==null ||
+                equipCache.isChannelClose()) {
 //            还未完成初始化，客户端就被关闭
             return;
+        } else {
+            log.warn("{} 关闭", equipCache.getEquipment().getKey());
+            equipCache.setChannelClose(true);
         }
-        //id  一个用于存放随着任务完成帧提交时每一个人物的完成状态
-        final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
-        log.warn("{} 关闭", equipCache.getEquipment().getKey());
-        equipCache.setChannelClose(true);
         try {
             Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
             if (unFinishedTasks==null || unFinishedTasks.size()==0) {
@@ -215,7 +221,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
             try {
-                applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, availableEquips));
+                applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.COMPENSATE, task, availableEquips));
             } catch (ChannelCloseException e) {
                 threadPoolTaskExecutor.submit(this);
             }

@@ -3,7 +3,6 @@ package com.ad.screen.server.event;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
-import com.ad.screen.server.entity.ResumeRecord;
 import com.ad.screen.server.service.CompletionService;
 import com.ad.screen.server.service.DistributeTaskService;
 import com.ad.screen.server.service.EquipTaskService;
@@ -15,7 +14,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +56,6 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        final Optional<ResumeRecord> record=resumeRecordService.getById(globalIdentify.getId());
         log.info("本地重启服务启动");
         count=new AtomicInteger(resumeRecordService.resumeRecord());
         executorService.submit(()->{
@@ -69,13 +66,15 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                         Thread.sleep(30000);
                         continue;
                     }
+                    int lastId=0;
                     for (int i=0; i < tasks.size(); ) {
                         EquipTask task=tasks.get(i);
+                        lastId=task.getId();
                         if (distributeTaskService.checkRunning(task.getTaskKey())) {
                             if (i==tasks.size() - 1) {
-                                count.getAndIncrement();
                                 break;
                             }
+                            i++;
                             continue;
                         }
                         int orderId=task.getTaskKey().getOid();
@@ -85,6 +84,8 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
 //                    检查当前订单是否已经完成
                         if (task.getExecutedNum().equals(task.getTotalNum())) {
                             equipTaskService.checkTaskExecuted(task.getId());
+                            i++;
+                            continue;
                         }
                         List<PooledIdAndEquipCache> list;
                         while (true) {
@@ -95,10 +96,14 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                                 break;
                             }
                         }
-                        applicationEventPublisher.publishEvent(new AllocateEvent(this, true, task, list));
-                        count.getAndIncrement();
+                        applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
                         log.info("恢复{}", task.getId());
                         i++;
+                    }
+                    if (lastId - 1 > count.get()) {
+                        count.set(lastId);
+                    } else {
+                        count.getAndIncrement();
                     }
                 } catch (InterruptedException ignore) {
                 } catch (Exception e) {
