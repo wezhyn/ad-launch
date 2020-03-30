@@ -34,6 +34,7 @@ public class CompletionImpl implements CompletionService {
     private GlobalIdentify globalIdentify;
 
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public void completeIncrMemory(MemoryCompletion completion) {
         final BoundHashOperations<Integer, Object, Object> boundHashOps=redisTemplate.boundHashOps(completion.getAdOrderId());
         boundHashOps.increment(completion.getDriverId(), completion.getExecutedNum());

@@ -22,7 +22,10 @@ public class CompletionImplTest {
 
     @Test
     public void delete() {
+        final BoundHashOperations<Integer, Integer, Integer> boundHashOps=redisTemplate.boundHashOps(2);
+        final Integer integer=boundHashOps.get(1011);
 
+        System.out.println(integer);
     }
 
     @Test
