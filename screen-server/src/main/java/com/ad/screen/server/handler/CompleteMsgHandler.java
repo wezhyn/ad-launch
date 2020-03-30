@@ -42,14 +42,19 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
         int taskEntryId=entryId%ScreenChannelInitializer.SCHEDULE_NUM;
         Task task=equipCache.getTask(taskEntryId);
         String iemi=msg.getEquipmentName();
-        final FixedTask preTask=task.getPreTask();
-        if (preTask==null || entryId!=preTask.getEquipEntryId()) {
-            log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
-            return;
-        } else {
-            task.setPreTask(null);
+        try {
+            final FixedTask preTask=task.getPreTask();
+            if (preTask==null || entryId!=preTask.getEquipEntryId()) {
+                log.debug("重复通知：{} at {}", msg, LocalDateTime.now());
+                return;
+            } else {
+                task.setPreTask(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
+            final FixedTask preTask=task.getPreTask();
             MemoryCompletion com=createMemoryRecord(preTask);
             memoryCompletionService.completeIncrMemory(com);
             if (task.getRepeatNum()==0) {
