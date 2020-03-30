@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ConfirmHandler extends SimpleChannelInboundHandler<ConfirmMsg> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ConfirmMsg confirmMsg) throws Exception {
-        log.info("接收到确认帧：{}", confirmMsg);
+//        log.info("接收到确认帧：{}", confirmMsg);
     }
 
     @Override

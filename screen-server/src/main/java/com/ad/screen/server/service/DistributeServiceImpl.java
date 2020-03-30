@@ -27,7 +27,7 @@ public class DistributeServiceImpl implements DistributeTaskI {
     @Autowired
     PooledIdAndEquipCacheService pooledIdAndEquipCacheService;
 
-    @Scheduled(fixedDelay=10000)
+    @Scheduled(fixedDelay=60*1000L)
     public void scheduleReport() {
         log.info("当前在线设备： {}", pooledIdAndEquipCacheService.getCache().size());
     }

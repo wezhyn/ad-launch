@@ -74,4 +74,9 @@ public class DistributeTaskServiceImpl implements DistributeTaskService {
     public boolean checkRunning(TaskKey key) {
         return runningTask.containsKey(key);
     }
+
+    @Override
+    public void remove(TaskKey key) {
+        runningTask.remove(key);
+    }
 }

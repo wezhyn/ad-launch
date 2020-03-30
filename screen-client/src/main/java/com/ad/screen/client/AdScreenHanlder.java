@@ -44,7 +44,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         }
         final AdEntry entry=adScreenResponse.getNetData();
         cache.put(entry.getEntryId()%25, new EntryWarp(entry, entry.getRepeatNum()));
-        if (new Random().nextInt(10)==0) {
+        if (new Random().nextInt(4)==0) {
 //            随机中断channel
             channelHandlerContext.channel().close();
         }
@@ -76,6 +76,8 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                     Integer repeatNum=entry.getRepeatNum();
                     entry.setRepeatNum(--repeatNum);
                     if (repeatNum==0) {
+                        context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
+                        context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
                         context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
                         log.error("consumer  ： {}  ", entry);
                         countStatistic.getAndAdd(entryWarp.getInitRepeatNum());

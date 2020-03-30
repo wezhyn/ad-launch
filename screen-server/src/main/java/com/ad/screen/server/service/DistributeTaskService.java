@@ -26,4 +26,6 @@ public interface DistributeTaskService {
 
     boolean checkRunning(TaskKey key);
 
+    void remove(TaskKey key);
+
 }

@@ -15,6 +15,7 @@ import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
@@ -55,7 +56,7 @@ public class ScreenClient {
         }
         ExecutorService service=Executors.newCachedThreadPool();
         AtomicInteger runnerCount=new AtomicInteger(1001);
-        for (int i=0; i < 20; i++) {
+        for (int i=0; i < 30; i++) {
             service.submit(()->{
                 runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
             });
@@ -66,38 +67,39 @@ public class ScreenClient {
             } catch (InterruptedException e) {
             }
             DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
-            // 设置NameServer的地址
-            producer.setNamesrvAddr("47.111.185.61:9876");
-            producer.setVipChannelEnabled(false);
-            int orderUid=1;
-//            while (true) {
-            orderUid=(++orderUid)%1000;
-            Random r=new Random();
-            int rate=r.nextInt(20) + 1;
-            int dn=r.nextInt(5);
-            dn=dn==0 ? 1 : dn;
-            TaskMessage taskMessage=TaskMessage.builder()
-                    .deliverNum(dn)
-                    .latitude(30.2000)
-                    .longitude(120.0000)
-                    .oid(orderUid)
-                    .produceContext(Collections.singletonList("test-" + orderUid))
-                    .rate(rate)
-                    .vertical(true)
-                    .uid(orderUid)
-                    .scope(1000D)
-                    .totalNum(dn*rate*(r.nextInt(3) + 1))
-                    .build();
-            Gson gson=new Gson();
-            Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
-
             try {
+                // 设置NameServer的地址
+                producer.setVipChannelEnabled(false);
+                producer.setNamesrvAddr("47.111.185.61:9876");
                 producer.start();
-                producer.sendOneway(message);
-            } catch (MQClientException|RemotingException|InterruptedException e) {
+            } catch (MQClientException e) {
                 e.printStackTrace();
             }
-//            }
+            for (int oi=0; oi < 20; oi++) {
+                int orderUid=oi%1000;
+                Random r=new Random();
+                int rate=r.nextInt(5) + 1;
+                int dn=r.nextInt(5) + 1;
+                TaskMessage taskMessage=TaskMessage.builder()
+                        .deliverNum(dn)
+                        .latitude(30.2000)
+                        .longitude(120.0000)
+                        .oid(oi)
+                        .produceContext(Collections.singletonList("test-" + orderUid))
+                        .rate(rate)
+                        .vertical(true)
+                        .uid(orderUid)
+                        .scope(1000D)
+                        .totalNum(dn*rate*(r.nextInt(10) + 1))
+                        .build();
+                Gson gson=new Gson();
+                Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
+                try {
+                    producer.send(message);
+                } catch (MQClientException|RemotingException|InterruptedException|MQBrokerException e) {
+                    e.printStackTrace();
+                }
+            }
         });
         TimeUnit.HOURS.sleep(1);
     }
