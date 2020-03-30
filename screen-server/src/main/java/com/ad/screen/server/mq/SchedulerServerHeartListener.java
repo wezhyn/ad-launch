@@ -5,13 +5,13 @@ import com.ad.screen.server.entity.ResumeRecord;
 import com.ad.screen.server.event.LocalResumeServerListener;
 import com.ad.screen.server.service.EquipTaskService;
 import com.ad.screen.server.service.ResumeRecordService;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.google.common.cache.*;
+import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
+import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.rocketmq.spring.core.RocketMQPushConsumerLifecycleListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
  */
 @RocketMQMessageListener(
         topic="${heart.producer.destination}",
-        consumerGroup="heart_beat_consumers",
+        consumerGroup="heart_beat_consumer",
         selectorExpression="*",
         messageModel=MessageModel.BROADCASTING
 )
 @Component
-public class SchedulerServerHeartListener implements RocketMQListener<ServerHeartMessage> {
+public class SchedulerServerHeartListener implements RocketMQListener<ServerHeartMessage>, RocketMQPushConsumerLifecycleListener {
 
     public static final Integer MAX_EXPIRED_TIME=20;
     private final GlobalIdentify globalIdentify;
@@ -57,6 +57,11 @@ public class SchedulerServerHeartListener implements RocketMQListener<ServerHear
         }
     }
 
+    @Override
+    public void prepareStart(DefaultMQPushConsumer consumer) {
+        consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_TIMESTAMP);
+    }
+
     public static class ServerHeartRemovalListener implements RemovalListener<String, LocalDateTime> {
 
         private final ResumeRecordService resumeRecordService;
@@ -71,7 +76,7 @@ public class SchedulerServerHeartListener implements RocketMQListener<ServerHear
 
         @Override
         public void onRemoval(RemovalNotification<String, LocalDateTime> notification) {
-            if (notification.getValue().plusMinutes(MAX_EXPIRED_TIME).isBefore(LocalDateTime.now())) {
+            if (notification.getCause()==RemovalCause.EXPIRED && notification.getValue().plusMinutes(MAX_EXPIRED_TIME).isBefore(LocalDateTime.now())) {
 //                转移当前故障机器的调度任务
                 final Optional<ResumeRecord> crashServerRecord=resumeRecordService.getById(notification.getKey());
                 int lastRecord=crashServerRecord.map(ResumeRecord::getLastResumeId).orElse(0);

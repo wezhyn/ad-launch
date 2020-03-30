@@ -29,6 +29,10 @@ public class ResumeRecord implements IBaseTo<String> {
     private LocalDateTime recordTime;
 
 
+    public ResumeRecord() {
+    }
+
+
     @Override
     public String getId() {
         return wordIdentity;

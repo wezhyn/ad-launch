@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SchedulerServerHeartProducer {
 
-    public static final Long FIXED_DELAY=60*1000L;
+    /**
+     * 每5分钟发送一条心跳帧
+     */
+    public static final Long FIXED_DELAY=300*1000L;
     private final RocketMQTemplate rocketMQTemplate;
     @Value("${heart.producer.destination}")
     private String heartDestination;
@@ -22,7 +25,7 @@ public class SchedulerServerHeartProducer {
         this.rocketMQTemplate=rocketMQTemplate;
     }
 
-    @Scheduled(fixedDelay=60*1000L)
+    @Scheduled(fixedDelay=300*1000L)
     public void send() {
         final ServerHeartMessage message=ServerHeartMessage.create();
         rocketMQTemplate.sendOneWayOrderly(heartDestination, new GenericMessage<>(message), message.getIdentify());

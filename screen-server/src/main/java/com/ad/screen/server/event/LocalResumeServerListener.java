@@ -57,8 +57,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     public void onApplicationEvent(ContextRefreshedEvent event) {
         final Optional<ResumeRecord> record=resumeRecordService.getById(globalIdentify.getId());
         log.info("本地重启服务启动");
-        count=record.map(resumeRecord->new AtomicInteger(resumeRecord.getLastResumeId()))
-                .orElseGet(()->new AtomicInteger(0));
+        count=new AtomicInteger(resumeRecordService.resumeRecord());
         executorService.submit(()->{
             final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
             if (tasks.size()==0) {

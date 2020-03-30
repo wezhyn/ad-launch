@@ -51,7 +51,14 @@ public class PayMessageListener implements RocketMQListener<TaskMessage> {
     public void onMessage(TaskMessage taskMessage) {
         final EquipTask equipTask=createEquipTask(taskMessage);
         Integer deliverNum=taskMessage.getDeliverNum();
-        equipTaskService.saveAndCheckOrder(equipTask);
+        try {
+            equipTaskService.saveAndCheckOrder(equipTask);
+        } catch (InsufficientException e) {
+            throw e;
+        } catch (Exception ignore) {
+            log.error(ignore.getMessage());
+            return;
+        }
         //目前区域内可用符合订单要求的车辆数小于订单要求投放的车辆数，退出
         List<PooledIdAndEquipCache> available=distributeTaskI.availableEquips(equipTask);
         if (available.size() < deliverNum) {
