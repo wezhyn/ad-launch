@@ -55,7 +55,7 @@ public class ScreenClient {
         }
         ExecutorService service=Executors.newCachedThreadPool();
         AtomicInteger runnerCount=new AtomicInteger(1001);
-        for (int i=0; i < 5; i++) {
+        for (int i=0; i < 20; i++) {
             service.submit(()->{
                 runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
             });
@@ -65,7 +65,7 @@ public class ScreenClient {
             // 设置NameServer的地址
             producer.setNamesrvAddr("47.111.185.61:9876");
             producer.setVipChannelEnabled(false);
-            int orderUid=0;
+            int orderUid=1;
 //            while (true) {
             orderUid=(++orderUid)%1000;
             Random r=new Random();
@@ -81,7 +81,7 @@ public class ScreenClient {
                     .vertical(true)
                     .uid(orderUid)
                     .scope(1000D)
-                    .totalNum(dn*rate)
+                    .totalNum(dn*rate*r.nextInt(20))
                     .build();
             Gson gson=new Gson();
             Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
