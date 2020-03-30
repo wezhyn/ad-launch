@@ -73,7 +73,7 @@ spec:
     metadata:
       labels:
         app: ad-main-server
-        remote: java
+#        remote: java
     spec:
       volumes:
         - name: dumps

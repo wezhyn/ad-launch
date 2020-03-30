@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,6 +36,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, AdScreenResponse adScreenResponse) throws Exception {
         String name=channelHandlerContext.channel().attr(ScreenClient.REGISTERED_ID).get();
         channelHandlerContext.writeAndFlush(new ConfirmMsg(name));
+
         if (!isStart.get()) {
             if (isStart.compareAndSet(false, true)) {
                 new Thread(new ConsumerClass(cache, channelHandlerContext, complete)).start();
@@ -42,6 +44,10 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         }
         final AdEntry entry=adScreenResponse.getNetData();
         cache.put(entry.getEntryId()%25, new EntryWarp(entry, entry.getRepeatNum()));
+        if (new Random().nextInt(10)==0) {
+//            随机中断channel
+            channelHandlerContext.channel().close();
+        }
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
