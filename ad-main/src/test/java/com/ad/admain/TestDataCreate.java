@@ -48,10 +48,10 @@ public class TestDataCreate {
 
     @Test
     public void createEquips() {
-        for (int count=0; count < 1000; count++) {
+        for (int count=2000; count < 3000; count++) {
             List<Equipment> equipment=new ArrayList<>();
-            for (int i=0; i < 9; i++) {
-                int id=9*count + i + 1000;
+            for (int i=0; i < 10; i++) {
+                int id=10*count + i;
                 Equipment feed=Equipment.builder()
                         .uid(id)
                         .feedback("feed-" + id)
@@ -75,7 +75,7 @@ public class TestDataCreate {
     @Test
     public void createUser() {
         String name="wezhyn-";
-        for (int count=1000; count < 2000; count++) {
+        for (int count=2000; count < 3000; count++) {
             List<GenericUser> equipment=new ArrayList<>();
             for (int i=0; i < 10; i++) {
                 int id=10*count + i;

@@ -8,15 +8,22 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Random;
+
 /**
  * @author wezhyn
  * @since 03.12.2020
  */
 @Slf4j
 public class ConfirmHandler extends SimpleChannelInboundHandler<ConfirmMsg> {
+    private Random r=new Random();
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ConfirmMsg confirmMsg) throws Exception {
 //        log.info("接收到确认帧：{}", confirmMsg);
+/*        if (r.nextInt(20)==0) {
+            channelHandlerContext.channel().close().sync();
+        }*/
     }
 
     @Override

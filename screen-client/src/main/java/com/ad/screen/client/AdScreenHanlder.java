@@ -44,7 +44,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
         }
         final AdEntry entry=adScreenResponse.getNetData();
         cache.put(entry.getEntryId()%25, new EntryWarp(entry, entry.getRepeatNum()));
-        if (new Random().nextInt(10)==0) {
+        if (new Random().nextInt(100)==0) {
 //            随机中断channel
             log.warn("{} 通道关闭", name);
             channelHandlerContext.channel().close().sync();

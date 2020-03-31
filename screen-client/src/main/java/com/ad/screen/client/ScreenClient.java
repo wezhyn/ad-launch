@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -68,16 +69,16 @@ public class ScreenClient {
         AtomicInteger taskCount=new AtomicInteger(0);
         Random r=new Random();
         while (true) {
-            if (runnerCount.get() < 5000) {
+            if (runnerCount.get() < 10000) {
                 service.submit(()->{
                     runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
                 });
-                Thread.sleep(5000);
-                if (r.nextInt(5)==0) {
+                Thread.sleep(100);
+                if (r.nextInt(200)==0) {
                     if (taskCount.get() > 500) {
                         continue;
                     }
-                    service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), true, producer));
+                    service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), false, producer));
                 }
             }
         }
@@ -130,6 +131,7 @@ public class ScreenClient {
             Bootstrap b=new Bootstrap()
                     .channel(NioSocketChannel.class)
                     .group(client)
+                    .option(ChannelOption.TCP_NODELAY, true)
                     .remoteAddress(address, port)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
