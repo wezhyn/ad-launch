@@ -57,6 +57,7 @@ public class AllocateEventListener implements ApplicationListener<AllocateEvent>
         //组合广告内容
 //         成功支付订单其数据是正好匹配
         return Task.TaskBuilder.aTask()
+                .equipTaskId(taskMessage.getId())
                 .taskKey(taskMessage.getTaskKey())
                 .rate(taskMessage.getRate())
                 .repeatNum(numPerTask)

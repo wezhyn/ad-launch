@@ -12,9 +12,9 @@ import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.AllocateEvent;
 import com.ad.screen.server.event.AllocateType;
 import com.ad.screen.server.event.DistributeTaskI;
+import com.ad.screen.server.event.LocalResumeServerListener;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.service.CompletionService;
-import com.ad.screen.server.service.DistributeTaskService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,7 +22,6 @@ import io.netty.channel.socket.ChannelInputShutdownReadComplete;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -55,15 +54,15 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     private final CompletionService completionService;
     private final ThreadPoolTaskExecutor taskExecutor;
     private final ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
-    private DistributeTaskService distributeTaskService;
+    private final LocalResumeServerListener resumeServerListener;
 
-    public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher) {
+    public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher, LocalResumeServerListener resumeServerListener) {
         this.pooledIdAndEquipCacheService=pooledIdAndEquipCacheService;
         this.distributeTask=distributeTask;
         this.completionService=completionService;
         this.taskExecutor=taskExecutor;
         this.applicationEventPublisher=applicationEventPublisher;
+        this.resumeServerListener=resumeServerListener;
     }
 
     @Override
@@ -139,7 +138,8 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             }
 //        当前服务器转移任务, 自此，旧数据已经被持久化
             for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
-                taskExecutor.submit(new TransferRunner(builder.build(), distributeTask, taskExecutor, applicationEventPublisher));
+                taskExecutor.submit(new TransferRunner(builder.build(), distributeTask,
+                        taskExecutor, applicationEventPublisher, resumeServerListener));
             }
             //更新设备的在线状态
             AdEquipment channelEquip=equipCache.getEquipment();
@@ -199,14 +199,19 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         private ThreadPoolTaskExecutor threadPoolTaskExecutor;
         private ApplicationEventPublisher applicationEventPublisher;
         private AtomicInteger retry;
+        private LocalResumeServerListener resumeServerListener;
 
 
-        public TransferRunner(EquipTask task, DistributeTaskI distributeTask, ThreadPoolTaskExecutor threadPoolTaskExecutor, ApplicationEventPublisher applicationEventPublisher) {
+        public TransferRunner(EquipTask task, DistributeTaskI distributeTask,
+                              ThreadPoolTaskExecutor threadPoolTaskExecutor,
+                              ApplicationEventPublisher applicationEventPublisher,
+                              LocalResumeServerListener resumeServerListener) {
             this.task=task;
             this.distributeTask=distributeTask;
             this.threadPoolTaskExecutor=threadPoolTaskExecutor;
             this.applicationEventPublisher=applicationEventPublisher;
             retry=new AtomicInteger(0);
+            this.resumeServerListener=resumeServerListener;
         }
 
         @Override
@@ -215,6 +220,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             if (availableEquips.size() < task.getDeliverNum()) {
                 if (this.retry.getAndIncrement() > MAX_RETRY) {
 //                  丢弃当前任务
+                    resumeServerListener.updateResumeCount(task.getId()==null ? 0 : task.getId());
                 } else {
                     threadPoolTaskExecutor.submit(this);
                 }

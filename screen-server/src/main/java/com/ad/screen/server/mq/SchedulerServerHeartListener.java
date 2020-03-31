@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class SchedulerServerHeartListener implements RocketMQListener<ServerHeartMessage>, RocketMQPushConsumerLifecycleListener {
 
-    public static final Integer MAX_EXPIRED_TIME=20;
+    public static final Integer MAX_EXPIRED_TIME=3;
     private final GlobalIdentify globalIdentify;
 
     private Cache<String, LocalDateTime> cache;

@@ -36,7 +36,12 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private final DistributeTaskI distributeTask;
     private final ApplicationEventPublisher applicationEventPublisher;
     private GlobalIdentify globalIdentify=GlobalIdentify.IDENTIFY;
+    /**
+     * true: 标识当前resume 线程正在处理
+     */
+    private AtomicInteger circling;
     private AtomicInteger count;
+
     private final DistributeTaskService distributeTaskService;
 
     private ExecutorService executorService=Executors.newSingleThreadExecutor(r->{
@@ -52,6 +57,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         this.distributeTask=distributeTask;
         this.applicationEventPublisher=applicationEventPublisher;
         this.distributeTaskService=distributeTaskService;
+        this.circling=new AtomicInteger(0);
     }
 
     @Override
@@ -61,6 +67,10 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         executorService.submit(()->{
             while (true) {
                 try {
+                    if (!circling.compareAndSet(0, 1)) {
+//                        正在被修改 count ( 其他 server crash)
+                        continue;
+                    }
                     final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
                     if (tasks.size()==0) {
                         Thread.sleep(30000);
@@ -87,13 +97,11 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                             i++;
                             continue;
                         }
-                        List<PooledIdAndEquipCache> list;
-                        while (true) {
+                        List<PooledIdAndEquipCache> list=null;
+                        while (list==null || list.size() < task.getDeliverNum()) {
                             list=distributeTask.availableEquips(task);
                             if (list==null || list.size() < task.getDeliverNum()) {
                                 TimeUnit.SECONDS.sleep(10);
-                            } else {
-                                break;
                             }
                         }
                         applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
@@ -108,6 +116,8 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                 } catch (InterruptedException ignore) {
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    circling.set(0);
                 }
             }
         });
@@ -120,8 +130,14 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
      * @param crashCount crashCount
      */
     public void updateResumeCount(int crashCount) {
-        if (crashCount < this.count.get()) {
-            count.set(crashCount);
+        try {
+            while (!circling.compareAndSet(0, -1)) {
+            }
+            if (crashCount < this.count.get()) {
+                count.set(crashCount);
+            }
+        } finally {
+            circling.set(0);
         }
     }
 }
