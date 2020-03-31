@@ -127,7 +127,7 @@ spec:
   selector:
     matchLabels:
       app: screen-server
-  replicas: 1
+  replicas: 2
   minReadySeconds: 20
   strategy:
     # indicate which strategy we want for rolling update
@@ -159,6 +159,7 @@ spec:
           imagePullPolicy: "Always"
           ports:
             - containerPort: 8888
+              name: netty-port
             - containerPort: 5005
           resources:
             requests:
@@ -170,6 +171,11 @@ spec:
           env:
             - name: TZ
               value: Asia/Shanghai
+          livenessProbe:
+            tcpSocket:
+              port: netty-port
+            initialDelaySeconds: 30
+            periodSeconds: 300
           volumeMounts:
             - name: dumps
               mountPath: /dumps

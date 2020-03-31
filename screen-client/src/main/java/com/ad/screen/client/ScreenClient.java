@@ -40,8 +40,8 @@ public class ScreenClient {
     public static final AttributeKey<String> REGISTERED_ID=AttributeKey.valueOf("equipment");
 
     public static void main(String[] args) throws InterruptedException {
-        String address="127.0.0.1";
-        int port=8888;
+        String address="47.111.185.61";
+        int port=31975;
         Integer begin=null;
         AtomicLong count=new AtomicLong(0);
         for (String arg : args) {
