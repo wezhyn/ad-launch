@@ -23,7 +23,7 @@ public interface EquipTaskRepository extends JpaRepository<EquipTask, Integer> {
 
     List<EquipTask> findEquipTasksByIdGreaterThanAndWorkIdentityAndExecutedIsFalseOrderById(int id, String currentId, Pageable pageable);
 
-    @Query(nativeQuery=true, value="update equip_task t set t.work_identity=:currentId where t.work_identity=:crashId and t.id >:crashRecord")
+    @Query(nativeQuery=true, value="update equip_task t set t.work_identity=:currentId where t.work_identity=:crashId and t.executed=false  and t.id >:crashRecord ")
     @Modifying
     Integer updateCrashWorkIdentify(@Param("crashId") String crashId,
                                     @Param("crashRecord") int crashRecord,
