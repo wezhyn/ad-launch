@@ -17,6 +17,9 @@ import lombok.Data;
 @Data
 public class Task implements PrepareTaskMessage {
 
+
+    private final int equipTaskId;
+
     private final int initRepeatNum;
     /**
      * 对于 repeatNum 的保护
@@ -78,7 +81,8 @@ public class Task implements PrepareTaskMessage {
      */
     private volatile FixedTask preTask=null;
 
-    public Task(TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
+    public Task(int equipTaskId, TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
+        this.equipTaskId=equipTaskId;
         this.taskKey=taskKey;
         this.rate=rate;
         this.initRepeatNum=repeatNum;
@@ -150,6 +154,7 @@ public class Task implements PrepareTaskMessage {
     }
 
     public static final class TaskBuilder {
+        private int equipTaskId;
         private TaskKey taskKey;
         private int repeatNum;
         private volatile Integer deliverUserId;
@@ -175,6 +180,11 @@ public class Task implements PrepareTaskMessage {
 
         public TaskBuilder repeatNum(int repeatNum) {
             this.repeatNum=repeatNum;
+            return this;
+        }
+
+        public TaskBuilder equipTaskId(int equipTaskId) {
+            this.equipTaskId=equipTaskId;
             return this;
         }
 
@@ -214,7 +224,7 @@ public class Task implements PrepareTaskMessage {
         }
 
         public Task build() {
-            return new Task(taskKey, rate, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
+            return new Task(equipTaskId, taskKey, rate, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
         }
     }
 }

@@ -68,12 +68,17 @@ public class ScreenClient {
         AtomicInteger taskCount=new AtomicInteger(0);
         Random r=new Random();
         while (true) {
-            service.submit(()->{
-                runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
-            });
-            Thread.sleep(5000);
-            if (r.nextInt(2)==0) {
-                service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), true, producer));
+            if (runnerCount.get() < 5000) {
+                service.submit(()->{
+                    runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
+                });
+                Thread.sleep(5000);
+                if (r.nextInt(5)==0) {
+                    if (taskCount.get() > 500) {
+                        continue;
+                    }
+                    service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), true, producer));
+                }
             }
         }
     }
