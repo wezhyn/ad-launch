@@ -65,11 +65,12 @@ public class ScreenClient {
             e.printStackTrace();
         }
         ExecutorService service=Executors.newCachedThreadPool();
-        AtomicInteger runnerCount=new AtomicInteger(1001);
+        AtomicInteger runnerCount=new AtomicInteger(begin);
+        int end=begin + 1000;
         AtomicInteger taskCount=new AtomicInteger(0);
         Random r=new Random();
         while (true) {
-            if (runnerCount.get() < 10000) {
+            if (runnerCount.get() < end) {
                 service.submit(()->{
                     runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
                 });
