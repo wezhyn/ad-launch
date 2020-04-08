@@ -25,6 +25,7 @@ public class Task implements PrepareTaskMessage {
      * 对于 repeatNum 的保护
      */
     private final Object repeatLock=new Object();
+
     //    不可达
     public static final int MAX_ROUTE=FixedTask.EQUIP_MAX_ENTRY_ID/ScreenChannelInitializer.SCHEDULE_NUM;
     /**

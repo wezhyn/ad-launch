@@ -150,7 +150,7 @@ spec:
           command: ["java"]
           args:
             - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
-            - "-XX:MaxRAMPercentage=80.0"
+            - "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0"
             - "-XX:+HeapDumpOnOutOfMemoryError"
             - "-XX:HeapDumpPath=/dumps/oom.bin"
             - "-jar"

@@ -8,7 +8,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.AttributeKey;
 import io.netty.util.ResourceLeakDetector;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +55,7 @@ public class NettyTcpServer {
                 .childHandler(screenChannelInitializer)
                 .option(ChannelOption.SO_BACKLOG, 1024) //服务端可连接队列数,对应TCP/IP协议listen函数中backlog参数
                 .childOption(ChannelOption.TCP_NODELAY, true)//立即写出
-                .childOption(ChannelOption.SO_KEEPALIVE, true)//长连接
-                .attr(AttributeKey.valueOf("TASK_MAP"), null);//接收的任务列表
+                .childOption(ChannelOption.SO_KEEPALIVE, true);//长连接
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.SIMPLE);//内存泄漏检测 开发推荐PARANOID 线上SIMPLE
         ChannelFuture channelFuture=serverBootstrap.bind(address, port).sync();
         if (channelFuture.isSuccess()) {

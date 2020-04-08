@@ -15,7 +15,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.AttributeKey;
 import javafx.geometry.Point2D;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.*;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -39,79 +42,93 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ScreenClient {
 
     public static final AttributeKey<String> REGISTERED_ID=AttributeKey.valueOf("equipment");
+    private static final Options OPTIONS=new Options();
 
-    public static void main(String[] args) throws InterruptedException {
-        String address="47.111.185.61";
-        int port=31975;
-        Integer begin=null;
-        AtomicLong count=new AtomicLong(0);
-        for (String arg : args) {
-            try {
-                begin=Integer.valueOf(arg);
-            } catch (Exception ignore) {
-            }
-        }
-        if (begin==null) {
-            log.error("输入启动开始设备数");
-            return;
-        }
-        DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
-        try {
-            // 设置NameServer的地址
-            producer.setVipChannelEnabled(false);
-            producer.setNamesrvAddr("47.111.185.61:9876");
-            producer.start();
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        }
-        ExecutorService service=Executors.newCachedThreadPool();
-        AtomicInteger runnerCount=new AtomicInteger(begin);
-        int end=begin + 1000;
-        AtomicInteger taskCount=new AtomicInteger(0);
-        Random r=new Random();
-        while (true) {
-            if (runnerCount.get() < end) {
-                service.submit(()->{
-                    runOne(address, port, createEquipName(runnerCount.getAndIncrement()), count);
-                });
-                Thread.sleep(100);
-                if (r.nextInt(200)==0) {
-                    if (taskCount.get() > 500) {
-                        continue;
-                    }
-                    service.submit(()->sendMessage(taskCount.get(), taskCount.incrementAndGet(), false, producer));
-                }
-            }
-        }
+    static {
+        OPTIONS.addOption(Option.builder()
+                .argName("smsg")
+                .longOpt("smsg")
+                .hasArg()
+                .desc("发送消息的初始编号")
+                .type(Number.class)
+                .required()
+                .build());
+        OPTIONS.addOption(Option.builder()
+                .argName("ismsg")
+                .longOpt("ismsg")
+                .hasArg()
+                .desc("是否发送消息")
+                .type(Boolean.class)
+                .required()
+                .build());
+
+        OPTIONS.addOption(Option.builder()
+                .argName("emsg")
+                .longOpt("emsg")
+                .hasArg()
+                .desc("发送消息的终止编号")
+                .type(Number.class)
+                .required()
+                .build());
+        OPTIONS.addOption(Option.builder()
+                .argName("srun")
+                .longOpt("srun")
+                .hasArg()
+                .desc("模拟设备的初始编号")
+                .type(Number.class)
+                .required()
+                .build());
+        OPTIONS.addOption(Option.builder()
+                .argName("erun")
+                .longOpt("erun")
+                .hasArg()
+                .desc("模拟设备的终止编号")
+                .type(Number.class)
+                .required()
+                .build());
+        OPTIONS.addOption(Option.builder()
+                .argName("s")
+                .longOpt("s")
+                .hasArg()
+                .desc("远程服务器地址")
+                .type(String.class)
+                .required()
+                .build());
+
+        OPTIONS.addOption(Option.builder()
+                .argName("p")
+                .longOpt("p")
+                .desc("远程服务器端口")
+                .hasArg()
+                .type(Number.class)
+                .required()
+                .build());
     }
 
-    private static void sendMessage(int begin, int end, boolean isSend, DefaultMQProducer producer) {
-        if (!isSend) {
-            return;
-        }
-        for (int oi=begin; oi < end; oi++) {
-            int orderUid=oi%1000;
-            Random r=new Random();
-            int rate=r.nextInt(5) + 1;
-            int dn=r.nextInt(5) + 1;
-            TaskMessage taskMessage=TaskMessage.builder()
-                    .deliverNum(dn)
-                    .latitude(30.2000)
-                    .longitude(120.0000)
-                    .oid(oi)
-                    .produceContext(Collections.singletonList("test-" + orderUid))
-                    .rate(rate)
-                    .vertical(true)
-                    .uid(orderUid)
-                    .scope(1000D)
-                    .totalNum(dn*rate*(r.nextInt(5) + 1))
-                    .build();
-            Gson gson=new Gson();
-            Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
-            try {
-                producer.send(message);
-            } catch (MQClientException|RemotingException|InterruptedException|MQBrokerException e) {
-                e.printStackTrace();
+    public static void main(String[] args) throws InterruptedException, ParseException {
+        final CommandLineArg command=createCommand(args);
+        ExecutorService service=Executors.newCachedThreadPool();
+        AtomicLong count=new AtomicLong(0);
+        AtomicInteger runnerCount=new AtomicInteger(command.getStartRunner());
+        AtomicInteger taskCount=new AtomicInteger(command.getStartMsg());
+        DefaultMQProducer producer=createMq();
+        while (true) {
+            if (runnerCount.get() < command.getEndRunner()) {
+                final int nowCount=runnerCount.getAndIncrement();
+                service.submit(()->{
+                    runOne(command, createEquipName(nowCount), count);
+                });
+                TimeUnit.SECONDS.sleep(1);
+            } else {
+                Thread.yield();
+            }
+            if (command.isSend && taskCount.get() < command.getEndMsg()) {
+                if (new Random().nextInt(20)==0) {
+                    final int nowCount=taskCount.getAndIncrement();
+                    service.submit(()->sendMessage(nowCount, producer));
+                }
+            } else {
+                Thread.yield();
             }
         }
     }
@@ -126,14 +143,39 @@ public class ScreenClient {
         return sb.toString();
     }
 
-    private static void runOne(String address, int port, String equipName, AtomicLong count) {
-        EventLoopGroup client=new NioEventLoopGroup();
+    private static void sendMessage(int orderNum, DefaultMQProducer producer) {
+        Random r=new Random();
+        int rate=r.nextInt(5) + 1;
+        int dn=r.nextInt(5) + 1;
+        TaskMessage taskMessage=TaskMessage.builder()
+                .deliverNum(dn)
+                .latitude(30.2000)
+                .longitude(120.0000)
+                .uid(orderNum%1000)
+                .oid(orderNum)
+                .produceContext(Collections.singletonList("test-" + orderNum))
+                .rate(rate)
+                .vertical(true)
+                .scope(1000D)
+                .totalNum(dn*rate*(r.nextInt(5) + 1))
+                .build();
+        Gson gson=new Gson();
+        Message message=new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());
+        try {
+            producer.send(message);
+        } catch (MQClientException|RemotingException|InterruptedException|MQBrokerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void runOne(CommandLineArg arg, String equipName, AtomicLong count) {
+        EventLoopGroup client=new NioEventLoopGroup(1);
         try {
             Bootstrap b=new Bootstrap()
                     .channel(NioSocketChannel.class)
                     .group(client)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .remoteAddress(address, port)
+                    .remoteAddress(arg.getServer(), arg.getPort())
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
@@ -146,10 +188,14 @@ public class ScreenClient {
                                     .addLast(new ConfirmHandler())
                                     .addLast(new AdScreenHanlder(count));
                             socketChannel.eventLoop().schedule(()->{
-                                socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
-                                GpsMsg msg=simulateGps(equipName);
-                                socketChannel.pipeline().writeAndFlush(msg);
-                            }, 0, TimeUnit.SECONDS);
+                                if (!socketChannel.pipeline().channel().isActive()) {
+                                    try {
+                                        socketChannel.pipeline().channel().close().sync();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, 3, TimeUnit.MINUTES);
                             socketChannel.eventLoop().scheduleAtFixedRate(()->{
                                 socketChannel.pipeline().writeAndFlush(new HeartBeatMsg(equipName));
                             }, 0, 1, TimeUnit.MINUTES);
@@ -179,4 +225,45 @@ public class ScreenClient {
         double y=Double.parseDouble(df.format(3020.00000 + r.nextInt(10)*0.0001d));
         return new GpsMsg(new Point2D(x, y), equip);
     }
+
+    private static DefaultMQProducer createMq() {
+        DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
+        try {
+            // 设置NameServer的地址
+            producer.setVipChannelEnabled(false);
+            producer.setNamesrvAddr("47.111.185.61:9876");
+            producer.start();
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        }
+        return producer;
+    }
+
+    private static CommandLineArg createCommand(String[] args) throws ParseException {
+        final DefaultParser parser=new DefaultParser();
+        final CommandLine commandline=parser.parse(OPTIONS, args);
+        return CommandLineArg.builder()
+                .endMsg(Integer.parseInt(commandline.getOptionValue("emsg")))
+                .startMsg(Integer.parseInt(commandline.getOptionValue("smsg")))
+                .isSend(Boolean.parseBoolean(commandline.getOptionValue("ismsg")))
+                .startRunner(Integer.parseInt(commandline.getOptionValue("srun")))
+                .endRunner(Integer.parseInt(commandline.getOptionValue("erun")))
+                .server((String) commandline.getParsedOptionValue("s"))
+                .port(Integer.parseInt(commandline.getOptionValue("p")))
+                .build();
+    }
+
+    @Builder
+    @Getter
+    private static class CommandLineArg {
+        private Integer startMsg;
+        private Integer endMsg;
+        private Integer startRunner;
+        private Integer endRunner;
+        private String server;
+        private Integer port;
+        private Boolean isSend;
+    }
+
+
 }

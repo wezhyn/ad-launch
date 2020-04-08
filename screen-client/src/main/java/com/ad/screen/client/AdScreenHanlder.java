@@ -12,7 +12,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +26,7 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
     private final HashMap<Integer, EntryWarp> cache=new HashMap<>(32);
     private final AtomicBoolean isStart=new AtomicBoolean(false);
     private AtomicLong complete;
+    private Thread thread;
 
     public AdScreenHanlder(AtomicLong complete) {
         this.complete=complete;
@@ -39,16 +39,12 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
 
         if (!isStart.get()) {
             if (isStart.compareAndSet(false, true)) {
-                new Thread(new ConsumerClass(cache, channelHandlerContext, complete)).start();
+                thread=new Thread(new ConsumerClass(cache, channelHandlerContext, complete));
+                thread.start();
             }
         }
         final AdEntry entry=adScreenResponse.getNetData();
         cache.put(entry.getEntryId()%25, new EntryWarp(entry, entry.getRepeatNum()));
-        if (new Random().nextInt(100)==0) {
-//            随机中断channel
-            log.warn("{} 通道关闭", name);
-            channelHandlerContext.channel().close().sync();
-        }
         log.info("{} 接收到 {}", name, adScreenResponse);
     }
 
@@ -70,6 +66,9 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
             int count=1;
             while (true) {
                 try {
+                    if (Thread.interrupted()) {
+                        break;
+                    }
                     String name=context.channel().attr(ScreenClient.REGISTERED_ID).get();
                     int index=getIndex(count++);
                     final EntryWarp entryWarp=cache.get(index);
@@ -77,7 +76,6 @@ public class AdScreenHanlder extends SimpleChannelInboundHandler<AdScreenRespons
                     Integer repeatNum=entry.getRepeatNum();
                     entry.setRepeatNum(--repeatNum);
                     if (repeatNum==0) {
-                        context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
                         context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
                         context.writeAndFlush(new CompleteNotificationMsg(name, entry.getEntryId()));
                         log.error("consumer  ： {}  ", entry);

@@ -7,6 +7,7 @@ import com.ad.screen.server.entity.MemoryCompletion;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.server.ScreenChannelInitializer;
 import com.ad.screen.server.service.CompletionService;
+import com.ad.screen.server.service.DistributeTaskService;
 import com.ad.screen.server.vo.req.CompleteNotificationMsg;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,6 +33,8 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
 
     @Autowired
     PooledIdAndEquipCacheService cacheService;
+    @Autowired
+    private DistributeTaskService distributeTaskService;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, CompleteNotificationMsg msg) throws Exception {
@@ -61,6 +64,7 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
                 equipCache.completeTask(taskEntryId);
                 memoryCompletionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
                 cacheService.get(iemi).restIncr(task.getRate());
+                distributeTaskService.remove(task.getTaskKey());
             }
         } catch (Exception e) {
             e.printStackTrace();

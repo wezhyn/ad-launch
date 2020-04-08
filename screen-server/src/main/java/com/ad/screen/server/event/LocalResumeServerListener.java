@@ -94,6 +94,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
 //                    检查当前订单是否已经完成
                         if (task.getExecutedNum().equals(task.getTotalNum())) {
                             equipTaskService.checkTaskExecuted(task.getId());
+                            distributeTaskService.remove(task.getTaskKey());
                             i++;
                             continue;
                         }
