@@ -33,8 +33,8 @@ public class BillInfo implements IBaseTo<Integer> {
     private Double totalAmount;
 
     @Type(type="strategyEnum")
-    @StrategyEnum(value=com.wezhyn.project.database.EnumType.NUMBER)
-    @Column(nullable=false, name="pay_type", columnDefinition="smallint comment '0：Alipay,1:Wechat' ")
+    @StrategyEnum(value = com.wezhyn.project.database.EnumType.NUMBER)
+    @Column(nullable = false, name = "pay_type", columnDefinition = "smallint default '0' comment '0：Alipay,1:Wechat' ")
     private PayType payType;
 
     @Column(name="bill_delete", columnDefinition="bit(1) default 0")

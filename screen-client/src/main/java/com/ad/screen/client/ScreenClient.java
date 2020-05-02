@@ -115,10 +115,10 @@ public class ScreenClient {
         while (true) {
             if (runnerCount.get() < command.getEndRunner()) {
                 final int nowCount=runnerCount.getAndIncrement();
-                service.submit(()->{
+                service.submit(() -> {
                     runOne(command, createEquipName(nowCount), count);
                 });
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.MILLISECONDS.sleep(300);
             } else {
                 Thread.yield();
             }

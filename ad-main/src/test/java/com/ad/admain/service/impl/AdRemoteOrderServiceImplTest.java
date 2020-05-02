@@ -28,7 +28,7 @@ public class AdRemoteOrderServiceImplTest {
 
     @Test
     public void get() {
-        Order order=orderReposity.findById(60).get();
+        Order order = orderReposity.findById(3).get();
         System.out.println(order);
     }
 

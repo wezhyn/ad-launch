@@ -70,6 +70,7 @@ public class GenericUser implements IUser {
     @ColumnDefault("''")
     @UpdateIgnore
     private String avatar;
+    @Column(name = "birth_day", columnDefinition = "timestamp default current_timestamp")
     private LocalDate birthDay;
     @Enumerated(value=EnumType.STRING)
     @ColumnDefault(value="'USER'")
@@ -78,6 +79,7 @@ public class GenericUser implements IUser {
     /**
      * 控制用户登录状态，默认：未认证，但可以登录
      * 当 {@link UserEnable#getValue()} <0 时，代表用户状态异常,限制登录
+     * {@link #isLock()}
      */
     @Enumerated(value=EnumType.STRING)
     @ColumnDefault("'NOT_AUTHENTICATION'")
@@ -89,17 +91,22 @@ public class GenericUser implements IUser {
     private String idCard;
 
 
-    @org.hibernate.annotations.Generated(value=GenerationTime.INSERT)
-    @Column(insertable=false, updatable=false)
+    @org.hibernate.annotations.Generated(value = GenerationTime.INSERT)
+    @Column(insertable = false, updatable = false)
     @ColumnDefault("current_timestamp")
     private LocalDateTime regTime;
+    @Column(insertable = false, updatable = false)
+    @org.hibernate.annotations.Generated(
+            value = GenerationTime.ALWAYS
+    )
+    @ColumnDefault("current_timestamp")
     private LocalDateTime loginTime;
     /**
      * 使用数据库生成的值，忽略前台传入
      */
-    @Column(insertable=false, updatable=false)
+    @Column(insertable = false, updatable = false)
     @org.hibernate.annotations.Generated(
-            value=GenerationTime.ALWAYS
+            value = GenerationTime.ALWAYS
     )
     @ColumnDefault("current_timestamp")
     private LocalDateTime lastModified;
@@ -129,7 +136,7 @@ public class GenericUser implements IUser {
 
     @Override
     public Boolean isLock() {
-        return enable.getEnableNum() > 0;
+        return enable.getEnableNum() >= 0;
     }
 
     @Getter

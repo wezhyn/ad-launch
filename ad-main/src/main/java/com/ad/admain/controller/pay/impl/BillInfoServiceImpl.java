@@ -48,6 +48,7 @@ public class BillInfoServiceImpl extends AbstractBaseService<AdBillInfo, Integer
         AdBillInfo orderInfo=AdBillInfo.builder()
                 .orderId(order.getId())
                 .totalAmount(Double.valueOf(order.getTotalAmount()))
+                .payType(payType)
                 .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
                 .build();
         return orderInfoRepository.save(orderInfo);

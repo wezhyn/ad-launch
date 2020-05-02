@@ -1,0 +1,45 @@
+#短期阿里云免费试用数据库配置
+custom:
+  mysql:
+    address: rm-bp1vg4ijefqn9p2r71o.mysql.rds.aliyuncs.com
+    password: Mmysql!!
+    port: 3306
+    username: fkz
+    database: fkz
+    config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
+
+
+#用于显示绑定的参数具体值
+logging:
+  level:
+    com:
+      ad:
+        screen:
+          server:
+            event: warn
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+spring:
+  data:
+    redis:
+      repositories:
+        enabled: false
+    jpa:
+      repositories:
+        enabled: true
+  redis:
+    database: 1
+    host: r-bp1881845de043a4pd.redis.rds.aliyuncs.com
+    port: 6379
+    password: Rredis!!
+    timeout: 30s
+    jedis:
+      pool:
+        max-active: -1
+        max-wait: -1
+        max-idle: 20
+        min-idle: 10
