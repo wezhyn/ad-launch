@@ -61,7 +61,7 @@ spec:
   selector:
     matchLabels:
       app: ad-main-server
-  replicas: 2
+  replicas: 1
   minReadySeconds: 5
   strategy:
     # indicate which strategy we want for rolling update
@@ -127,7 +127,7 @@ spec:
   selector:
     matchLabels:
       app: screen-server
-  replicas: 2
+  replicas: 1
   minReadySeconds: 20
   strategy:
     # indicate which strategy we want for rolling update
@@ -149,10 +149,20 @@ spec:
           image: registry.cn-hangzhou.aliyuncs.com/wezhyn/screen-server:lastest
           command: ["java"]
           args:
-            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
-            - "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0"
+            - "-server"
+            - "-XX:+UseParallelGC"
+            - "-XX:+UseParallelOldGC"
+            - "-XX:SurvivorRatio=6"
+            - "-XX:MaxRAMPercentage=80.0"
+            - "-XX:InitialRAMPercentage=80.0"
+            - "-Xmn620M"
+            - "-XX:MetaspaceSize=150M"
+            - "-XX:+PrintGCDetails"
+            - "-XX:+PrintGCDateStamps"
+            - "-Xloggc:/dumps/gc.log"
             - "-XX:+HeapDumpOnOutOfMemoryError"
             - "-XX:HeapDumpPath=/dumps/oom.bin"
+            #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
             - "-jar"
             - "screen-server.jar"
             - "--spring.profiles.avtive=tmp"
@@ -166,8 +176,8 @@ spec:
               cpu: 0.5
               memory: 200M
             limits:
-              cpu: 1.0
-              memory: 500M
+              cpu: 1.5
+              memory: 1200M
           env:
             - name: TZ
               value: Asia/Shanghai
