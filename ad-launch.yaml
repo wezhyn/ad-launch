@@ -61,7 +61,7 @@ spec:
   selector:
     matchLabels:
       app: ad-main-server
-  replicas: 2
+  replicas: 1
   minReadySeconds: 5
   strategy:
     # indicate which strategy we want for rolling update
