@@ -34,19 +34,25 @@ public class AliPayProperties {
         Properties properties=new Properties();
         try {
             properties.load(new ClassPathResource("zfb-dev.properties").getInputStream());
-            SERVER_URL=(String) properties.get("server_url");
-            APP_ID=(String) properties.get("app_id");
-            APP_PRIVATE_KEY=(String) properties.get("app_private_key");
-            CHARSET=(String) properties.get("charset");
-            ALIPAY_PUBLIC_KEY=(String) properties.get("alipay_public_key");
-            SIGN_TYPE=(String) properties.get("sign_type");
-            CALLBACK_NOTIFY_URL=properties.getProperty("alipay_notify_url");
-            AD_SYSTEM_SELLER_ID=properties.getProperty("alipay_ad_seller_system_id");
-            CERT_LOC=properties.getProperty("cert_loc");
-            CERTIFICATE_TYPE=CertificateType.valueOf(properties.getProperty("certificate_type"));
-            CERT_PATH=splicePath(properties.getProperty("cert_path"));
-            ROOT_CERT_PATH=splicePath(properties.getProperty("root_cert_path"));
-            PUBLIC_CERT_PATH=splicePath(properties.getProperty("public_cert_path"));
+            SERVER_URL = (String) properties.get("server_url");
+            APP_ID = (String) properties.get("app_id");
+            APP_PRIVATE_KEY = (String) properties.get("app_private_key");
+            CHARSET = (String) properties.get("charset");
+            ALIPAY_PUBLIC_KEY = (String) properties.get("alipay_public_key");
+            SIGN_TYPE = (String) properties.get("sign_type");
+            CALLBACK_NOTIFY_URL = properties.getProperty("alipay_notify_url");
+            AD_SYSTEM_SELLER_ID = properties.getProperty("alipay_ad_seller_system_id");
+            CERT_LOC = properties.getProperty("cert_loc");
+            CERTIFICATE_TYPE = CertificateType.valueOf(properties.getProperty("certificate_type"));
+            if ("classpath".equals(CERT_LOC.trim())) {
+                CERT_PATH = new ClassPathResource(properties.getProperty("cert_path")).getFile().getAbsolutePath();
+                ROOT_CERT_PATH = new ClassPathResource(properties.getProperty("root_cert_path")).getFile().getAbsolutePath();
+                PUBLIC_CERT_PATH = new ClassPathResource(properties.getProperty("public_cert_path")).getFile().getAbsolutePath();
+            } else {
+                CERT_PATH = splicePath(properties.getProperty("cert_path"));
+                ROOT_CERT_PATH = splicePath(properties.getProperty("root_cert_path"));
+                PUBLIC_CERT_PATH = splicePath(properties.getProperty("public_cert_path"));
+            }
         } catch (IOException e) {
             throw new RuntimeException("无支付宝应用设置");
         }
