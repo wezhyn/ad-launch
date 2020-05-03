@@ -44,14 +44,17 @@ public class BillInfoServiceImpl extends AbstractBaseService<AdBillInfo, Integer
     }
 
     @Override
-    public AdBillInfo createOrder(AdOrder order, PayType payType) {
-        AdBillInfo orderInfo=AdBillInfo.builder()
-                .orderId(order.getId())
-                .totalAmount(Double.valueOf(order.getTotalAmount()))
-                .payType(payType)
-                .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
-                .build();
-        return orderInfoRepository.save(orderInfo);
+    public AdBillInfo getOrCreateOrder(AdOrder order, PayType payType) {
+        return orderInfoRepository.findByOrderId(order.getId())
+                .orElseGet(() -> {
+                    AdBillInfo orderInfo = AdBillInfo.builder()
+                            .orderId(order.getId())
+                            .totalAmount(order.getTotalAmount())
+                            .payType(payType)
+                            .tradeStatus(TradeStatus.WAIT_BUYER_PAY)
+                            .build();
+                    return orderInfoRepository.save(orderInfo);
+                });
     }
 
     @Override

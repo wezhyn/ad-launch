@@ -21,7 +21,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 @DynamicInsert
-@Entity(name="ad_bill_info")
+@Entity(name = "ad_bill_info")
+@Table(
+        indexes = {
+                @Index(name = "order_unique", columnList = "order_id")
+        }
+)
 public class AdBillInfo extends BillInfo {
 
 

@@ -23,7 +23,7 @@ public interface BillInfoService extends BaseService<AdBillInfo, Integer> {
      * @param payType 选择支付的类型
      * @return orderInfo
      */
-    AdBillInfo createOrder(AdOrder order, PayType payType);
+    AdBillInfo getOrCreateOrder(AdOrder order, PayType payType);
 
 
     Optional<AdBillInfo> getByOrderId(Integer id);

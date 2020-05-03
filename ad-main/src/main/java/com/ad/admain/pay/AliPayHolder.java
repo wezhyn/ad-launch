@@ -130,7 +130,6 @@ public final class AliPayHolder {
     public static <T, R extends AlipayTradeAppPayModel> String signZfb(T signOrder, Function<T, R> orderMapper) {
         try {
             AlipayTradeAppPayRequest createRequest = new AlipayTradeAppPayRequest();
-
             createRequest.setBizModel(orderMapper.apply(signOrder));
             createRequest.setNotifyUrl(AliPayProperties.CALLBACK_NOTIFY_URL);
             //这里和普通的接口调用不同，使用的是sdkExecute

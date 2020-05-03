@@ -28,8 +28,8 @@ X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleH
 Accept: application/json
 
 ###
-GET http://{{url}}/api/order/76
-X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTgyNjcxMDgyLCJpYXQiOjE1ODI2MzUwODIsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IWYBLUhkexnc8E5pBPfzvPq6byotB6BM5rFuo5snVRc
+GET http://{{url}}/api/pay/7
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1ODk4MDAzOTUsImlhdCI6MTU4ODUwNDM5NSwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.Hhf1-zFOMAWg5vHpxFSj7-NiX1BjtqqMoKkhPrsbNz4
 Accept: application/json
 
 ###
