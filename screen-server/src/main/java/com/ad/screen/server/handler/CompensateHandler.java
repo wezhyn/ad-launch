@@ -57,18 +57,18 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     private final LocalResumeServerListener resumeServerListener;
 
     public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher, LocalResumeServerListener resumeServerListener) {
-        this.pooledIdAndEquipCacheService=pooledIdAndEquipCacheService;
-        this.distributeTask=distributeTask;
-        this.completionService=completionService;
-        this.taskExecutor=taskExecutor;
-        this.applicationEventPublisher=applicationEventPublisher;
-        this.resumeServerListener=resumeServerListener;
+        this.pooledIdAndEquipCacheService = pooledIdAndEquipCacheService;
+        this.distributeTask = distributeTask;
+        this.completionService = completionService;
+        this.taskExecutor = taskExecutor;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.resumeServerListener = resumeServerListener;
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        final ScheduledFuture<?> future=ctx.channel().attr(ScreenChannelInitializer.SCHEDULED_SEND).get();
-        if (future!=null) {
+        final ScheduledFuture<?> future = ctx.channel().attr(ScreenChannelInitializer.SCHEDULED_SEND).get();
+        if (future != null) {
             future.cancel(false);
         }
         compensate(ctx);
@@ -83,9 +83,9 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof ChannelFirstReadEvent) {
 //          填充25个空白帧
-            final AtomicBoolean firstRead=ctx.channel().attr(FIRST_READ_CHANNEL).get();
+            final AtomicBoolean firstRead = ctx.channel().attr(FIRST_READ_CHANNEL).get();
             if (firstRead.compareAndSet(false, true)) {
-                final String iemi=ctx.channel().attr(ScreenChannelInitializer.IEMI).get();
+                final String iemi = ctx.channel().attr(ScreenChannelInitializer.IEMI).get();
                 log.info("加载 ：{}", iemi);
             }
         } else {
@@ -98,18 +98,19 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause instanceof ReadTimeoutException) {
-            compensate(ctx);
             log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
         }
+        compensate(ctx);
     }
 
     public void compensate(ChannelHandlerContext ctx) {
-        final AtomicBoolean channelInitCompleted=ctx.channel().attr(FIRST_READ_CHANNEL).get();
-        final PooledIdAndEquipCache equipCache=ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
-        if (channelInitCompleted==null || !channelInitCompleted.get() || equipCache==null ||
+        final AtomicBoolean channelInitCompleted = ctx.channel().attr(FIRST_READ_CHANNEL).get();
+        final PooledIdAndEquipCache equipCache = ctx.channel().attr(ScreenChannelInitializer.POOLED_EQUIP_CACHE).get();
+        if (channelInitCompleted == null || !channelInitCompleted.get() || equipCache == null ||
                 equipCache.isChannelClose()) {
 //            还未完成初始化，客户端就被关闭
             return;
@@ -118,11 +119,11 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             equipCache.setChannelClose(true);
         }
         try {
-            Map<Integer, Task> unFinishedTasks=equipCache.getAllTask();
-            if (unFinishedTasks==null || unFinishedTasks.size()==0) {
+            Map<Integer, Task> unFinishedTasks = equipCache.getAllTask();
+            if (unFinishedTasks == null || unFinishedTasks.size() == 0) {
                 return;
             }
-            HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask=new HashMap<>(8);
+            HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask = new HashMap<>(8);
             for (Task task : unFinishedTasks.values()) {
 //              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
                 completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
@@ -142,8 +143,8 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                         taskExecutor, applicationEventPublisher, resumeServerListener));
             }
             //更新设备的在线状态
-            AdEquipment channelEquip=equipCache.getEquipment();
-            taskExecutor.submit(()->{
+            AdEquipment channelEquip = equipCache.getEquipment();
+            taskExecutor.submit(() -> {
                 channelEquip.setStatus(false);
                 //保存设备的最终信息
                 preserveEquipInfo(channelEquip);
@@ -165,10 +166,10 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     }
 
     private int getTaskNum(Task task) {
-        int num=task.getRepeatNum();
-        if (task.getPreTask()!=null) {
+        int num = task.getRepeatNum();
+        if (task.getPreTask() != null) {
 //            当前发布的任务还未被响应，设备已经熄火
-            num+=task.getPreTask().getRepeatNum();
+            num += task.getPreTask().getRepeatNum();
         } else {
 //            当前已经被处理，且还未开始调度
         }
@@ -193,7 +194,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         /**
          * 当重复太多次后，丢弃当前任务，由重启线程恢复当前订单
          */
-        public static final Integer MAX_RETRY=5;
+        public static final Integer MAX_RETRY = 5;
         private EquipTask task;
         private DistributeTaskI distributeTask;
         private ThreadPoolTaskExecutor threadPoolTaskExecutor;
@@ -206,21 +207,21 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                               ThreadPoolTaskExecutor threadPoolTaskExecutor,
                               ApplicationEventPublisher applicationEventPublisher,
                               LocalResumeServerListener resumeServerListener) {
-            this.task=task;
-            this.distributeTask=distributeTask;
-            this.threadPoolTaskExecutor=threadPoolTaskExecutor;
-            this.applicationEventPublisher=applicationEventPublisher;
-            retry=new AtomicInteger(0);
-            this.resumeServerListener=resumeServerListener;
+            this.task = task;
+            this.distributeTask = distributeTask;
+            this.threadPoolTaskExecutor = threadPoolTaskExecutor;
+            this.applicationEventPublisher = applicationEventPublisher;
+            retry = new AtomicInteger(0);
+            this.resumeServerListener = resumeServerListener;
         }
 
         @Override
         public void run() {
-            List<PooledIdAndEquipCache> availableEquips=distributeTask.availableEquips(task);
+            List<PooledIdAndEquipCache> availableEquips = distributeTask.availableEquips(task);
             if (availableEquips.size() < task.getDeliverNum()) {
                 if (this.retry.getAndIncrement() > MAX_RETRY) {
 //                  丢弃当前任务
-                    resumeServerListener.updateResumeCount(task.getId()==null ? 0 : task.getId());
+                    resumeServerListener.updateResumeCount(task.getId() == null ? 0 : task.getId());
                 } else {
                     threadPoolTaskExecutor.submit(this);
                 }

@@ -1,11 +1,11 @@
 #custom
 custom:
   mysql:
-    address: localhost
-    password: root
+    address: rm-bp1vg4ijefqn9p2r71o.mysql.rds.aliyuncs.com
+    password: Mmysql!!
     port: 3306
-    database: ad_test
-    username: root
+    username: fkz
+    database: fkz
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
 
 #用于显示绑定的参数具体值

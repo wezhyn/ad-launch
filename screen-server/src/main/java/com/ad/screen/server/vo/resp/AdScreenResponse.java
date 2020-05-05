@@ -56,9 +56,9 @@ public class AdScreenResponse extends AbstractScreenResponse {
                 .append(",")
                 .append(getViewMode())
                 .append(",")
-                .append(code.length())
+                .append(code.length() / 2)
                 .append(",")
-                .append(AdStringUtils.gb2312Code(view));
+                .append(code);
         return sb.toString();
 
     }

@@ -226,8 +226,8 @@ public class ScreenClient {
         return new GpsMsg(new Point2D(x, y), equip);
     }
 
-    private static DefaultMQProducer createMq() {
-        DefaultMQProducer producer=new DefaultMQProducer("test-order-message");
+    public static DefaultMQProducer createMq() {
+        DefaultMQProducer producer = new DefaultMQProducer("test-order-message");
         try {
             // 设置NameServer的地址
             producer.setVipChannelEnabled(false);

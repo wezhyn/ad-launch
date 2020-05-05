@@ -1,8 +1,8 @@
 #短期阿里云免费试用数据库配置
 custom:
   mysql:
-    address: rm-bp1953igxe5gjl45amo.mysql.rds.aliyuncs.com
-    password: wezhynfkz
+    address: rm-bp1vg4ijefqn9p2r71o.mysql.rds.aliyuncs.com
+    password: Mmysql!!
     port: 3306
     username: fkz
     database: fkz

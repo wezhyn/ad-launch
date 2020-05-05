@@ -179,7 +179,7 @@ spec:
             - "-Xloggc:/dumps/gc.log"
             - "-XX:+HeapDumpOnOutOfMemoryError"
             - "-XX:HeapDumpPath=/dumps/oom.bin"
-            #            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+            - "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
             - "-jar"
             - "screen-server.jar"
             - "--spring.profiles.avtive=tmp"
