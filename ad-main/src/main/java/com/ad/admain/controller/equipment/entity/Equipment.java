@@ -37,8 +37,8 @@ public class Equipment implements IBaseTo<Integer> {
 
     private Integer uid;
 
-    @ManyToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name="uid", insertable=false, updatable=false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {})
+    @JoinColumn(name = "uid", insertable = false, updatable = false)
     private GenericUser orderUser;
 
 
@@ -55,7 +55,10 @@ public class Equipment implements IBaseTo<Integer> {
     @ColumnDefault("0")
     private Double longitude;
 
-    @Column(name="`key`")
+    /**
+     * iemi
+     */
+    @Column(name = "`key`")
     private String key;
 
     //    @Column(insertable=false, updatable=false)

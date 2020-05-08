@@ -2,6 +2,7 @@ package com.ad.admain.controller.equipment.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +31,7 @@ public class EquipmentDto {
 
     private Double latitude;
     private Double longitude;
+    @Length(min = 15, max = 15, message = "长度限制为15")
     private String key;
     private String feedback;
 

@@ -1,0 +1,10 @@
+POST http://{{url}}/api/equipment/create
+Content-Type: application/json
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTAyMzY3MzYsImlhdCI6MTU4ODk0MDczNiwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.qHt8SJY6c2Nmeyu25LFWxStO4SYji0uAbEu3q7_p0x4
+
+
+{
+  "key": "12312312312312"
+}
+
+###

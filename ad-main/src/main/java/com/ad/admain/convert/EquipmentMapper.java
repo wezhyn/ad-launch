@@ -19,7 +19,7 @@ public interface EquipmentMapper extends AbstractMapper<Equipment, EquipmentDto>
 
     @Override
     @Mappings({
-            @Mapping(target="username", expression="java(equipment.getOrderUser().getUsername())")
+            @Mapping(target = "username", source = "equipment.orderUser.username")
     })
     EquipmentDto toDto(Equipment equipment);
 }
