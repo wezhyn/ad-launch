@@ -20,6 +20,10 @@ import java.util.List;
 public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
 
 
+    @Modifying
+    @Query(nativeQuery = true, value = "update ad_order o set o.verify= :verify , o.feedback=:feedback where id=:oId")
+    Integer verifyOrder(Integer oId, String feedback, Integer verify);
+
     /**
      * 更新订单属性
      *
@@ -28,7 +32,7 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      * @param nextStatus   下一个状态
      * @return 1
      */
-    @Modifying(clearAutomatically=true, flushAutomatically=true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.orderStatus=:originStatus")
     Integer updateOrderStatus(Integer orderId, OrderStatus originStatus, OrderStatus nextStatus);
 
@@ -40,7 +44,7 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      * @param nextStatus   下一个状态
      * @return 1
      */
-    @Modifying(clearAutomatically=true, flushAutomatically=true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ad_order o set o.orderStatus=:nextStatus where o.id=:orderId and o.uid=:uid and o.orderStatus=:originStatus")
     Integer updateOrderStatus(Integer orderId, Integer uid, OrderStatus originStatus, OrderStatus nextStatus);
 
@@ -63,7 +67,7 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
     Page<AdOrder> findAdOrdersByUidAndIsDeleteIsFalse(Integer uId, Pageable pageable);
 
 
-    @Modifying(clearAutomatically = true,flushAutomatically = true)
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ad_order o set o.executed =:executed where o.id=:oid")
     @Transactional
     Integer updateExecuted(Integer oid, Integer executed);

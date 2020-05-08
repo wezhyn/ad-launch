@@ -1,10 +1,9 @@
 package com.ad.admain.mq.order;
 
-import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.launch.order.TaskMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.TransactionSendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +17,10 @@ import javax.annotation.Resource;
  */
 @Service
 @Slf4j
-public class OrderProduceImpl implements CheckOrderStatueProduceI, PaymentOrderProduceI {
+public class CheckOrderProduceImpl implements CheckOrderStatueProduceI, PaymentOrderProduceI {
 
     @Resource
     private RocketMQTemplate rocketMQTemplate;
-    @Autowired
-    private AdOrderService orderService;
 
 
     @Override
@@ -35,8 +32,8 @@ public class OrderProduceImpl implements CheckOrderStatueProduceI, PaymentOrderP
 
     @Override
     public void paymentOrder(TaskMessage orderMessage) {
-        rocketMQTemplate.asyncSend("task_message_topic", orderMessage,
-                new com.ad.admain.mq.order.CommonSendCallback<>(orderMessage));
+        final TransactionSendResult topic = rocketMQTemplate.sendMessageInTransaction("task_message_topic",
+                new GenericMessage<>(orderMessage), orderMessage);
     }
 
 

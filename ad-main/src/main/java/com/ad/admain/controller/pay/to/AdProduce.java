@@ -5,7 +5,7 @@ import com.wezhyn.project.IBaseTo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -21,67 +21,70 @@ import java.util.List;
  * @date : 2019/12/31
  */
 @Data
-@Entity(name="ad_produce")
+@Entity(name = "ad_produce")
 @Builder
 @AllArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-@NoArgsConstructor
 public class AdProduce implements IBaseTo<Integer>, IProduce {
 
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    Integer id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
     /**
      * 广告内容, 前端返回 List<String>
      * 由 | 分割
      */
-    @Column(name="context")
-    @Convert(converter=ProduceContextConvert.class)
+    @Column(name = "context")
+    @Convert(converter = ProduceContextConvert.class)
     private List<String> produceContext;
-
     /**
      * 要求广告投放到车上的数量
      */
+    @ColumnDefault(value = "1")
     private Integer deliverNum;
-
     /**
      * 订单单价
      */
+    @Column(nullable = false)
     private Double price;
-
     /**
      * 订单数量
      */
+    @Column(nullable = false)
     private Integer num;
-
+    @Column(nullable = false)
     private Double latitude;
-
+    @Column(nullable = false)
     private Double longitude;
-
+    @Column(nullable = false)
     private Boolean vertical;
-
     /**
      * 广告投放范围
      */
-
+    @Column(nullable = false)
     private Double scope;
-
     /**
      * 广告投放频率
      */
+    @Column(nullable = false)
     private Integer rate;
-
-
-    @Column(nullable=false)
+    @Column(nullable = false)
     private LocalDate startDate;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private LocalDate endDate;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private LocalTime startTime;
-    @Column(nullable=false)
+    @Column(nullable = false)
     private LocalTime endTime;
+
+    public AdProduce(Integer id) {
+        this.id = id;
+    }
+
+    public AdProduce() {
+    }
 
 
     @Override

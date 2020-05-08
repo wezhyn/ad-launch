@@ -25,7 +25,9 @@ import java.util.List;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Entity
-@Table(name="ad_generic_user")
+@Table(name = "ad_generic_user", indexes = {
+        @Index(name = "username_index", columnList = "username", unique = true)
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -44,19 +46,19 @@ public class GenericUser implements IUser {
     }
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @UpdateIgnore
-    @Column(unique=true)
+    @Column(unique = true)
     @ColumnDefault("''")
     private String username;
     @ColumnDefault("''")
     private String nickName;
 
     @UpdateIgnore
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     @ColumnDefault("'UNKNOWN'")
     private SexEnum sex;
     @ColumnDefault("''")
@@ -72,8 +74,8 @@ public class GenericUser implements IUser {
     private String avatar;
     @Column(name = "birth_day", columnDefinition = "timestamp default current_timestamp")
     private LocalDate birthDay;
-    @Enumerated(value=EnumType.STRING)
-    @ColumnDefault(value="'USER'")
+    @Enumerated(value = EnumType.STRING)
+    @ColumnDefault(value = "'USER'")
     private AuthenticationEnum roles;
 
     /**
@@ -81,7 +83,7 @@ public class GenericUser implements IUser {
      * 当 {@link UserEnable#getValue()} <0 时，代表用户状态异常,限制登录
      * {@link #isLock()}
      */
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     @ColumnDefault("'NOT_AUTHENTICATION'")
     private UserEnable enable;
 
@@ -112,21 +114,21 @@ public class GenericUser implements IUser {
     private LocalDateTime lastModified;
 
 
-    @OneToMany(mappedBy="orderUser", cascade=CascadeType.REMOVE)
+    @OneToMany(mappedBy = "orderUser", cascade = CascadeType.REMOVE)
     private List<Equipment> equipmentList;
 
 
     @Override
     public String getSex() {
-        return this.sex==null ? SexEnum.UNKNOWN.getValue() : this.sex.getValue();
+        return this.sex == null ? SexEnum.UNKNOWN.getValue() : this.sex.getValue();
     }
 
     public void setSex(String sex) {
-        this.sex=EnumUtils.valueOfStringEnumIgnoreCase(SexEnum.class, sex);
+        this.sex = EnumUtils.valueOfStringEnumIgnoreCase(SexEnum.class, sex);
     }
 
     public void setSex(SexEnum sex) {
-        this.sex=sex;
+        this.sex = sex;
     }
 
     @Override

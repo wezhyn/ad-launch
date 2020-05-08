@@ -1,87 +1,191 @@
 package com.ad.admain.controller.pay.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Accessors(chain=true)
-@Data
+/**
+ * @author wezhyn
+ */
 @AllArgsConstructor
-@Builder
+@Getter
 @NoArgsConstructor
-public class OrderDto {
+public class OrderDto extends AbstractOrderDto {
 
-    private int id;
+    private String feedback;
 
+    public static OrderDtoBuilder builder() {
+        return new OrderDtoBuilder();
+    }
 
-    private int uid;
+    public static final class OrderDtoBuilder {
+        private String feedback;
+        private int id;
+        private int uid;
+        private String verify;
+        private int produceId;
+        private String tradeOut;
+        private List<String> produceContext;
+        private Integer deliverNum;
+        private Double totalAmount;
+        private Integer num;
+        private Double latitude;
+        private Double longitude;
+        private boolean vertical;
+        private String orderStatus;
 
-    /**
-     * 代客服审核
-     */
-    private String verify;
+        private Double scope;
+        private Integer rate;
+        private Double price;
+        private String startDate;
+        private String endDate;
+        private String startTime;
+        private String endTime;
+        private String createTime;
 
-    private int produceId;
-    private String tradeOut;
+        private OrderDtoBuilder() {
+        }
 
-    /**
-     * 广告内容, 前端返回 List<String>
-     * 由 | 分割
-     */
-    @JsonProperty("valueList")
-    private List<String> produceContext;
+        public static OrderDtoBuilder anOrderDto() {
+            return new OrderDtoBuilder();
+        }
 
-    /**
-     * 要求广告投放到车上的数量
-     */
-    private Integer deliverNum;
+        public OrderDtoBuilder feedback(String feedback) {
+            this.feedback = feedback;
+            return this;
+        }
 
-    /**
-     * 订单单价
-     */
-    @NotNull
-    private Double totalAmount;
+        public OrderDtoBuilder id(int id) {
+            this.id = id;
+            return this;
+        }
 
-    /**
-     * 订单数量
-     */
-    @NotNull
-    private Integer num;
+        public OrderDtoBuilder uid(int uid) {
+            this.uid = uid;
+            return this;
+        }
 
-    private Double latitude;
+        public OrderDtoBuilder verify(String verify) {
+            this.verify = verify;
+            return this;
+        }
 
-    private Double longitude;
+        public OrderDtoBuilder produceId(int produceId) {
+            this.produceId = produceId;
+            return this;
+        }
 
-    private boolean vertical;
+        public OrderDtoBuilder tradeOut(String tradeOut) {
+            this.tradeOut = tradeOut;
+            return this;
+        }
 
-    private String orderStatus;
+        public OrderDtoBuilder produceContext(List<String> produceContext) {
+            this.produceContext = produceContext;
+            return this;
+        }
 
-    /**
-     * 广告投放范围
-     */
+        public OrderDtoBuilder deliverNum(Integer deliverNum) {
+            this.deliverNum = deliverNum;
+            return this;
+        }
 
-    private Double scope;
+        public OrderDtoBuilder totalAmount(Double totalAmount) {
+            this.totalAmount = totalAmount;
+            return this;
+        }
 
-    /**
-     * 广告投放频率
-     */
-    private Integer rate;
+        public OrderDtoBuilder num(Integer num) {
+            this.num = num;
+            return this;
+        }
 
-    private Double price;
+        public OrderDtoBuilder latitude(Double latitude) {
+            this.latitude = latitude;
+            return this;
+        }
 
+        public OrderDtoBuilder longitude(Double longitude) {
+            this.longitude = longitude;
+            return this;
+        }
 
-    private String startDate;
-    private String endDate;
-    private String startTime;
-    private String endTime;
+        public OrderDtoBuilder vertical(boolean vertical) {
+            this.vertical = vertical;
+            return this;
+        }
 
-    private String createTime;
+        public OrderDtoBuilder orderStatus(String orderStatus) {
+            this.orderStatus = orderStatus;
+            return this;
+        }
 
+        public OrderDtoBuilder scope(Double scope) {
+            this.scope = scope;
+            return this;
+        }
 
+        public OrderDtoBuilder rate(Integer rate) {
+            this.rate = rate;
+            return this;
+        }
+
+        public OrderDtoBuilder price(Double price) {
+            this.price = price;
+            return this;
+        }
+
+        public OrderDtoBuilder startDate(String startDate) {
+            this.startDate = startDate;
+            return this;
+        }
+
+        public OrderDtoBuilder endDate(String endDate) {
+            this.endDate = endDate;
+            return this;
+        }
+
+        public OrderDtoBuilder startTime(String startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public OrderDtoBuilder endTime(String endTime) {
+            this.endTime = endTime;
+            return this;
+        }
+
+        public OrderDtoBuilder createTime(String createTime) {
+            this.createTime = createTime;
+            return this;
+        }
+
+        public OrderDto build() {
+            OrderDto orderDto = new OrderDto(feedback);
+            orderDto.setId(id);
+            orderDto.setUid(uid);
+            orderDto.setVerify(verify);
+            orderDto.setProduceId(produceId);
+            orderDto.setTradeOut(tradeOut);
+            orderDto.setProduceContext(produceContext);
+            orderDto.setDeliverNum(deliverNum);
+            orderDto.setTotalAmount(totalAmount);
+            orderDto.setNum(num);
+            orderDto.setLatitude(latitude);
+            orderDto.setLongitude(longitude);
+            orderDto.setVertical(vertical);
+            orderDto.setOrderStatus(orderStatus);
+            orderDto.setScope(scope);
+            orderDto.setRate(rate);
+            orderDto.setPrice(price);
+            orderDto.setStartDate(startDate);
+            orderDto.setEndDate(endDate);
+            orderDto.setStartTime(startTime);
+            orderDto.setEndTime(endTime);
+            orderDto.setCreateTime(createTime);
+            return orderDto;
+        }
+    }
 }

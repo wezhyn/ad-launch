@@ -36,7 +36,14 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
      */
     Optional<AdOrder> findUserOrder(Integer orderId, Integer userId);
 
+    /**
+     * 展示全部list
+     *
+     * @return list
+     */
+    Page<AdOrder> listOrdersWithUsername(int limit, int page);
 
+    int verifyOrder(AdOrder order);
 
     Optional<AdOrder> trySuccessOrder(Integer orderId, Integer uid);
 

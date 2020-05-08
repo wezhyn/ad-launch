@@ -33,6 +33,20 @@ X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleH
 Accept: application/json
 
 ###
+POST http://{{url}}/api/order/verify
+Content-Type:  application/json
+X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTAxMTg1MTYsImlhdCI6MTU4ODgyMjUxNiwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.hAWHRZ9y80tMihbNZmf1ntVbJ8qYvLrj5TVjw97TcTc
+
+{
+  "feedback": "test",
+  "verify": "pass",
+  "produceId": 32,
+  "id": 17,
+  "uid": 1,
+  "valueList": []
+}
+
+###
 POST http://{{url}}/api/order/create
 Content-Type:  application/json
 X-token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoid2V6aHluIiwiZXhwIjoxNTg0MjU0NDY3LCJpYXQiOjE1ODI5NTg0NjcsImp0aSI6IjEyIiwiaXNzIjoic3lzdGVtIn0.IgX5AYu7JUlbBItMCI8jV0upQWEzi8mbzcNukqRJMvo

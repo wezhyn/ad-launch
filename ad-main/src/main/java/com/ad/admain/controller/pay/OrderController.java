@@ -2,14 +2,16 @@ package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.pay.convert.AdOrderMapper;
+import com.ad.admain.controller.pay.convert.AdOrderWithUserMapper;
 import com.ad.admain.controller.pay.convert.ProduceMapper;
 import com.ad.admain.controller.pay.dto.AdProduceDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.AdProduce;
 import com.ad.admain.mq.order.CheckOrderMessage;
-import com.ad.admain.mq.order.CheckOrderStatueProduceI;
+import com.ad.admain.mq.order.CheckOrderProduceImpl;
 import com.ad.admain.security.AdAuthentication;
+import com.ad.launch.order.TaskMessage;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,14 +40,16 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     private final BillInfoService orderInfoService;
     private final ProduceMapper produceMapper;
     @Autowired
-    private CheckOrderStatueProduceI cancelOrderProduce;
+    private AdOrderWithUserMapper adOrderWithUserMapper;
+    @Autowired
+    private CheckOrderProduceImpl orderProduce;
 
 
     public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper, ProduceMapper produceMapper) {
-        this.orderService=orderService;
-        this.orderInfoService=orderInfoService;
-        this.orderMapper=orderMapper;
-        this.produceMapper=produceMapper;
+        this.orderService = orderService;
+        this.orderInfoService = orderInfoService;
+        this.orderMapper = orderMapper;
+        this.produceMapper = produceMapper;
     }
 
     /**
@@ -58,14 +62,14 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     @RequestMapping("/create")
     public ResponseResult create(@Valid @RequestBody AdProduceDto produceDto, BindingResult bindingResult, @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
 //        设置当前用户id
-        final AdProduce produce=produceMapper.toTo(produceDto);
+        final AdProduce produce = produceMapper.toTo(produceDto);
         if (bindingResult.hasErrors()) {
             return handleBindingResult(bindingResult);
         }
-        AdOrder order=new AdOrder(authentication.getId(), produce);
-        AdOrder savedOrder=orderService.save(order);
-        cancelOrderProduce.checkOrder(new CheckOrderMessage(savedOrder.getId(), savedOrder.getUid()));
-        if (savedOrder.getId()!=null) {
+        AdOrder order = new AdOrder(authentication.getId(), produce);
+        AdOrder savedOrder = orderService.save(order);
+        orderProduce.checkOrder(new CheckOrderMessage(savedOrder.getId(), savedOrder.getUid()));
+        if (savedOrder.getId() != null) {
             return ResponseResult.forSuccessBuilder()
                     .withData("id", savedOrder.getId())
                     .withMessage("创建订单成功")
@@ -80,7 +84,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseResult deleteOrder(
-            @PathVariable(name="id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
+            @PathVariable(name = "id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
         if (!orderService.isUserOrder(orderId, authentication.getId())) {
             throw new RuntimeException("非法访问订单");
         }
@@ -91,20 +95,26 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
 
     @GetMapping("/{id}")
     public ResponseResult userId(@PathVariable Integer id, @AuthenticationPrincipal AdAuthentication adAuthentication) {
-        final Optional<AdOrder> userOrder=getService().findUserOrder(id, adAuthentication.getId());
+        final Optional<AdOrder> userOrder = getService().findUserOrder(id, adAuthentication.getId());
         return doResponse(userOrder, "获取订单成功", "用户无该订单");
     }
 
     @GetMapping("/list")
     @PreAuthorize("isAuthenticated()")
-    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit,
-                                  @RequestParam(name="page", defaultValue="1") int page,
+    public ResponseResult getList(@RequestParam(name = "limit", defaultValue = "10") int limit,
+                                  @RequestParam(name = "page", defaultValue = "1") int page,
                                   @AuthenticationPrincipal AdAuthentication authentication) {
 
         if (authentication.isAdmin()) {
-            return listDto(limit, page);
+            final Page<AdOrder> orders = getService().listOrdersWithUsername(limit, page);
+            return ResponseResult.forSuccessBuilder()
+                    .withMessage("获取列表成功")
+                    .withData("items", adOrderWithUserMapper.toDtoList(orders.getContent()))
+                    .withData("total", orders.getTotalElements())
+                    .build();
+
         } else {
-            final Page<AdOrder> adOrders=getService().listUserOrders(authentication.getId(), PageRequest.of(page - 1, limit, Sort.by("id").descending()));
+            final Page<AdOrder> adOrders = getService().listUserOrders(authentication.getId(), PageRequest.of(page - 1, limit, Sort.by("id").descending()));
             return doResponse(adOrders);
         }
     }
@@ -112,20 +122,42 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
 
     @PostMapping("/search/{type}")
     public ResponseResult searchOrder(
-            @RequestParam(name="limit", defaultValue="10") int limit,
-            @RequestParam(name="page", defaultValue="1") int page,
+            @RequestParam(name = "limit", defaultValue = "10") int limit,
+            @RequestParam(name = "page", defaultValue = "1") int page,
             @PathVariable("type") OrderSearchType searchType,
             @RequestParam("context") String context) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<AdOrder> searchResult=getService().search(searchType, context, pageable);
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<AdOrder> searchResult = getService().search(searchType, context, pageable);
         return doResponse(searchResult);
     }
 
     @PostMapping("/verify")
     public ResponseResult verifyOrder(@RequestBody OrderDto orderDto) {
-        AdOrder order=getConvertMapper().toTo(orderDto);
-        AdOrder verifyEquipment=getService().update(order);
+        AdOrder order = getConvertMapper().toTo(orderDto);
+        getService().verifyOrder(order);
+        AdOrder savedOrder = getService().findById(order.getId());
+        if (savedOrder.getOrderStatus().getNumber() < 0) {
+            return ResponseResult.forFailureBuilder().withMessage(savedOrder.getOrderStatus().getValue()).build();
+        }
+        orderProduce.paymentOrder(createTask(savedOrder));
         return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
+    }
+
+    private TaskMessage createTask(AdOrder order) {
+        return TaskMessage.builder()
+                .deliverNum(order.getDeliverNum())
+                .latitude(order.getLatitude())
+                .longitude(order.getLongitude())
+                .numPerEquip(order.getNumPerEquip())
+                .oid(order.getId())
+                .produceContext(order.getProduceContext())
+                .rate(order.getRate())
+                .scope(order.getScope())
+                .totalNum(order.getNum())
+                .vertical(order.getProduce().getVertical())
+                .uid(order.getUid())
+                .build();
+
     }
 
 

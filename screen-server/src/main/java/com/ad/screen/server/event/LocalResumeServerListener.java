@@ -29,96 +29,88 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class LocalResumeServerListener implements ApplicationListener<ContextRefreshedEvent> {
 
-    public static final Integer DEFAULT_RESUME_STEP=1;
+    public static final Integer DEFAULT_RESUME_STEP = 1;
     private final EquipTaskService equipTaskService;
     private final CompletionService completionService;
     private final ResumeRecordService resumeRecordService;
     private final DistributeTaskI distributeTask;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private GlobalIdentify globalIdentify=GlobalIdentify.IDENTIFY;
-    /**
-     * true: 标识当前resume 线程正在处理
-     */
-    private AtomicInteger circling;
+    private GlobalIdentify globalIdentify = GlobalIdentify.IDENTIFY;
+
     private AtomicInteger count;
 
     private final DistributeTaskService distributeTaskService;
 
-    private ExecutorService executorService=Executors.newSingleThreadExecutor(r->{
-        final Thread thread=new Thread(r, "resume-thread");
+    private ExecutorService executorService = Executors.newSingleThreadExecutor(r -> {
+        final Thread thread = new Thread(r, "resume-thread");
         thread.setDaemon(true);
         return thread;
     });
 
     public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask, ApplicationEventPublisher applicationEventPublisher, DistributeTaskService distributeTaskService) {
-        this.equipTaskService=equipTaskService;
-        this.completionService=completionService;
-        this.resumeRecordService=resumeRecordService;
-        this.distributeTask=distributeTask;
-        this.applicationEventPublisher=applicationEventPublisher;
-        this.distributeTaskService=distributeTaskService;
-        this.circling=new AtomicInteger(0);
+        this.equipTaskService = equipTaskService;
+        this.completionService = completionService;
+        this.resumeRecordService = resumeRecordService;
+        this.distributeTask = distributeTask;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.distributeTaskService = distributeTaskService;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("本地重启服务启动");
-        count=new AtomicInteger(resumeRecordService.resumeRecord());
-        executorService.submit(()->{
+        count = new AtomicInteger(resumeRecordService.resumeRecord());
+        executorService.submit(() -> {
             while (true) {
                 try {
-                    if (!circling.compareAndSet(0, 1)) {
-//                        正在被修改 count ( 其他 server crash)
-                        continue;
-                    }
-                    final List<EquipTask> tasks=equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
-                    if (tasks.size()==0) {
-                        Thread.sleep(30000);
-                        continue;
-                    }
-                    int lastId=0;
-                    for (int i=0; i < tasks.size(); ) {
-                        EquipTask task=tasks.get(i);
-                        lastId=task.getId();
-                        if (distributeTaskService.checkRunning(task.getTaskKey())) {
-                            if (i==tasks.size() - 1) {
-                                break;
-                            }
-                            i++;
+                    synchronized (this) {
+                        final List<EquipTask> tasks = equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
+                        if (tasks.size() == 0) {
+                            Thread.sleep(30000);
                             continue;
                         }
-                        int orderId=task.getTaskKey().getOid();
+                        int lastId = 0;
+                        for (int i = 0; i < tasks.size(); ) {
+                            EquipTask task = tasks.get(i);
+                            lastId = task.getId();
+                            if (distributeTaskService.checkRunning(task.getTaskKey())) {
+                                if (i == tasks.size() - 1) {
+                                    break;
+                                }
+                                i++;
+                                continue;
+                            }
+                            int orderId = task.getTaskKey().getOid();
 //                        转存redis中的数据到数据库,自此，一个 EquipTask 的最终信息都已经保存在了数据库中
-                        Integer additionalNum=completionService.forOrderTotal(orderId);
-                        task.setExecutedNum(task.getExecutedNum() + additionalNum);
+                            Integer additionalNum = completionService.forOrderTotal(orderId);
+                            task.setExecutedNum(task.getExecutedNum() + additionalNum);
 //                    检查当前订单是否已经完成
-                        if (task.getExecutedNum().equals(task.getTotalNum())) {
-                            equipTaskService.checkTaskExecuted(task.getId());
-                            distributeTaskService.remove(task.getTaskKey());
-                            i++;
-                            continue;
-                        }
-                        List<PooledIdAndEquipCache> list=null;
-                        while (list==null || list.size() < task.getDeliverNum()) {
-                            list=distributeTask.availableEquips(task);
-                            if (list==null || list.size() < task.getDeliverNum()) {
-                                TimeUnit.SECONDS.sleep(10);
+                            if (task.getExecutedNum().equals(task.getTotalNum())) {
+                                equipTaskService.checkTaskExecuted(task.getId());
+                                distributeTaskService.remove(task.getTaskKey());
+                                i++;
+                                continue;
                             }
+                            List<PooledIdAndEquipCache> list = null;
+                            while (list == null || list.size() < task.getDeliverNum()) {
+                                list = distributeTask.availableEquips(task);
+                                if (list == null || list.size() < task.getDeliverNum()) {
+                                    TimeUnit.SECONDS.sleep(10);
+                                }
+                            }
+                            applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
+                            log.info("恢复{}", task.getId());
+                            i++;
                         }
-                        applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
-                        log.info("恢复{}", task.getId());
-                        i++;
-                    }
-                    if (lastId - 1 > count.get()) {
-                        count.set(lastId);
-                    } else {
-                        count.getAndIncrement();
+                        if (lastId - 1 > count.get()) {
+                            count.set(lastId);
+                        } else {
+                            count.getAndIncrement();
+                        }
                     }
                 } catch (InterruptedException ignore) {
                 } catch (Exception e) {
                     e.printStackTrace();
-                } finally {
-                    circling.set(0);
                 }
             }
         });
@@ -130,15 +122,9 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
      *
      * @param crashCount crashCount
      */
-    public void updateResumeCount(int crashCount) {
-        try {
-            while (!circling.compareAndSet(0, -1)) {
-            }
-            if (crashCount < this.count.get()) {
-                count.set(crashCount);
-            }
-        } finally {
-            circling.set(0);
+    public synchronized void updateResumeCount(int crashCount) {
+        if (crashCount < this.count.get()) {
+            count.set(crashCount);
         }
     }
 }

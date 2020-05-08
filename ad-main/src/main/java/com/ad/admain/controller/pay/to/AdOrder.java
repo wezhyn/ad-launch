@@ -24,29 +24,33 @@ import java.util.List;
  * @author wezhyn
  * @since 02.24.2020
  */
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
 @DynamicInsert
-@Entity(name="ad_order")
+@Entity(name = "ad_order")
 @Getter
 @Setter
-@Accessors(chain=true)
+@Accessors(chain = true)
 public class AdOrder extends Order implements IProduce {
 
 
-    @OneToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private AdProduce produce;
+
 
     /**
      * 订单状态，订单被更新时，需要更新该属性
      */
-    @StrategyEnum(value=EnumType.NUMBER)
-    @Type(type="strategyEnum")
+    @StrategyEnum(value = EnumType.NUMBER)
+    @Type(type = "strategyEnum")
     @ColumnDefault("'0'")
     private OrderStatus orderStatus;
 
 
     private Integer executed;
+
+    private String feedback;
+
     /**
      * 创建订单时使用
      *
@@ -54,9 +58,9 @@ public class AdOrder extends Order implements IProduce {
      * @param produce 广告
      */
     public AdOrder(Integer uid, AdProduce produce) {
-        super(uid, (produce.getPrice()*produce.getNum()), OrderVerify.WAIT_VERITY);
+        super(uid, (produce.getPrice() * produce.getNum()), OrderVerify.WAIT_VERITY);
         Assert.notNull(produce, "广告内容为空，不允许的操作");
-        this.produce=produce;
+        this.produce = produce;
     }
 
     public AdOrder() {
@@ -65,6 +69,9 @@ public class AdOrder extends Order implements IProduce {
 
     @Override
     public List<String> getProduceContext() {
+        if (produce == null) {
+            return null;
+        }
         return produce.getProduceContext();
     }
 
@@ -128,6 +135,6 @@ public class AdOrder extends Order implements IProduce {
     }
 
     public void setExecuted(Integer executed) {
-        this.executed=executed;
+        this.executed = executed;
     }
 }
