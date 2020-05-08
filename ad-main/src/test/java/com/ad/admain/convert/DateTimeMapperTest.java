@@ -14,15 +14,21 @@ public class DateTimeMapperTest {
 
     @Test
     public void convertLocalDateTime() {
-        final String s=DateTimeMapper.convertLocalDateTime(LocalDateTime.now());
+        final String s = DateTimeMapper.convertLocalDateTime(LocalDateTime.now());
         System.out.println(s);
     }
 
     @Test
+    public void parse() {
+        final LocalDateTime time = DateTimeMapper.parseLocalDateTime("2020-05-08T18:26:35+08:00");
+        System.out.println(time);
+    }
+
+    @Test
     public void convertLocalDate() {
-        final String s="2020-02-28";
-        final DateTimeFormatter DEFAULT_SYSTEM_DATE_TIME_FORMAT=DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        final LocalDate parse=LocalDate.parse(s, DEFAULT_SYSTEM_DATE_TIME_FORMAT);
+        final String s = "2020-02-28";
+        final DateTimeFormatter DEFAULT_SYSTEM_DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        final LocalDate parse = LocalDate.parse(s, DEFAULT_SYSTEM_DATE_TIME_FORMAT);
         System.out.println(parse);
     }
 }
