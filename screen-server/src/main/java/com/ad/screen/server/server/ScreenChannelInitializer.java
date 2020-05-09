@@ -61,7 +61,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        final Channel chChannel = ch.pipeline().channel();
+        final Channel chChannel=ch.pipeline().channel();
         chChannel.attr(FIRST_READ_CHANNEL).set(new AtomicBoolean(false));
         ch.pipeline().addLast(new ReadTimeoutHandler(130));
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
