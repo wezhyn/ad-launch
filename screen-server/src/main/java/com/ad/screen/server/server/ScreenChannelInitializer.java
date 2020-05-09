@@ -10,7 +10,6 @@ import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +62,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     protected void initChannel(SocketChannel ch) throws Exception {
         final Channel chChannel=ch.pipeline().channel();
         chChannel.attr(FIRST_READ_CHANNEL).set(new AtomicBoolean(false));
-        ch.pipeline().addLast(new ReadTimeoutHandler(130));
+//        ch.pipeline().addLast(new ReadTimeoutHandler(130));
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(60, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
