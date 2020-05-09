@@ -20,19 +20,19 @@ public class SingleMessageClient {
     public static void main(String[] args) {
         DefaultMQProducer producer = createMq();
         int rate = 5;
-        int dn = 1;
-        int orderNum = 2;
+        int dn = 2;
+        int orderNum = 17;
         TaskMessage taskMessage = TaskMessage.builder()
                 .deliverNum(dn)
                 .latitude(0.0)
                 .longitude(0.0)
                 .uid(orderNum % 1000)
                 .oid(orderNum)
-                .produceContext(Collections.singletonList("测试-" + orderNum))
+                .produceContext(Collections.singletonList("测试-测试-测试-测试-测试-测试-测试-" + orderNum))
                 .rate(rate)
                 .vertical(true)
                 .scope(Double.MAX_VALUE)
-                .totalNum(dn * rate * 1)
+                .totalNum(dn * rate * 2)
                 .build();
         Gson gson = new Gson();
         Message message = new Message("task_message_topic", "*", gson.toJson(taskMessage).getBytes());

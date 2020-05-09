@@ -22,6 +22,7 @@ spec:
   ports:
     - port: 8888
       targetPort: 8888
+      nodePort: 30001
   selector:
     app: screen-server
 

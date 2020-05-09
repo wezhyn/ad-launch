@@ -1,3 +1,4 @@
+
 spring:
   profiles:
     active: tmp
@@ -41,4 +42,6 @@ rocketmq:
 heart:
   producer:
     destination: screen_server_heart
-
+logging:
+  level:
+    com.ad.screen.server.handler.HeartBeatMsgMsgHandler
