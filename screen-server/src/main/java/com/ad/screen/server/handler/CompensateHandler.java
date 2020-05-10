@@ -72,7 +72,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             future.cancel(false);
         }
         compensate(ctx);
-        super.channelInactive(ctx);
     }
 
     /**
@@ -94,6 +93,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             if (!(evt instanceof ChannelInputShutdownReadComplete)) {
                 throw new RuntimeException("未处理的异常: " + evt.getClass());
             }
+            log.error("event: {}", evt);
             compensate(ctx);
         }
     }
@@ -105,7 +105,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
         }
         log.error("error:", cause);
-        compensate(ctx);
     }
 
     public void compensate(ChannelHandlerContext ctx) {
