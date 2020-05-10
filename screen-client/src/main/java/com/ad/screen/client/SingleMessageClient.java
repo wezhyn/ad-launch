@@ -20,12 +20,12 @@ public class SingleMessageClient {
     public static void main(String[] args) {
         DefaultMQProducer producer = createMq();
         int rate = 5;
-        int dn = 2;
-        int orderNum = 20;
+        int dn = 1;
+        int orderNum = 21;
         TaskMessage taskMessage = TaskMessage.builder()
                 .deliverNum(dn)
-                .latitude(30.0)
-                .longitude(120.0)
+                .latitude(0.0)
+                .longitude(0.0)
                 .uid(orderNum % 1000)
                 .oid(orderNum)
                 .produceContext(Collections.singletonList("测试-测试-测试-测试-测试-测试-测试-" + orderNum))
