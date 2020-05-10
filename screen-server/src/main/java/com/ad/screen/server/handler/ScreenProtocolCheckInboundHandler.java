@@ -84,9 +84,9 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        BaseScreenRequest<?> request;
         try {
             ByteBuf inboundMsg=(ByteBuf) msg;
-            BaseScreenRequest<?> request;
             for (; ; ) {
                 inboundMsg.markReaderIndex();
                 final int sof=findBeginOfLine(inboundMsg);
@@ -122,10 +122,10 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                     inboundMsg.skipBytes(sof + BEGIN_FIELD.readableBytes());
                 }
             }
-            ctx.fireChannelRead(request);
         } finally {
             ReferenceCountUtil.release(msg);
         }
+        ctx.fireChannelRead(request);
     }
 
     private BaseScreenRequest<?> readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {

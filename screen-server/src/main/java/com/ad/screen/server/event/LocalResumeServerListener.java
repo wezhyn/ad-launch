@@ -64,7 +64,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         executorService.submit(() -> {
             while (true) {
                 try {
-                    synchronized (this) {
+                    synchronized (LocalResumeServerListener.this) {
                         final List<EquipTask> tasks = equipTaskService.nextPreparedResume(getCount(), DEFAULT_RESUME_STEP);
                         if (tasks.size() == 0) {
                             Thread.sleep(30000);
