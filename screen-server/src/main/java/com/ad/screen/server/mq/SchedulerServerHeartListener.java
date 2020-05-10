@@ -83,7 +83,7 @@ public class SchedulerServerHeartListener implements RocketMQListener<ServerHear
                 final Optional<ResumeRecord> crashServerRecord=resumeRecordService.getById(notification.getKey());
                 int lastRecord=crashServerRecord.map(ResumeRecord::getLastResumeId).orElse(0);
                 try {
-                    Thread.sleep(new Random().nextInt((int) (SchedulerServerHeartProducer.FIXED_DELAY / 4)));
+                    Thread.sleep(new Random().nextInt((int) (SchedulerServerHeartProducer.FIXED_DELAY / 1000)));
                 } catch (InterruptedException ignore) {
                 }
                 equipTaskService.transferCrashServer(notification.getKey(), lastRecord);

@@ -21,7 +21,7 @@ public class SingleMessageClient {
         DefaultMQProducer producer = createMq();
         int rate = 5;
         int dn = 2;
-        int orderNum = 25;
+        int orderNum = 26;
         TaskMessage taskMessage = TaskMessage.builder()
                 .deliverNum(dn)
                 .latitude(30.0)
