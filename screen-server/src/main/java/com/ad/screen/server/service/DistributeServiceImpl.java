@@ -36,9 +36,9 @@ public class DistributeServiceImpl implements DistributeTaskI {
     public List<PooledIdAndEquipCache> availableEquips(PrepareTaskMessage taskMessage) {
         List<PooledIdAndEquipCache> scopeEquips=new ArrayList<>(8);
         double rate=taskMessage.getRate();
-        int driverNum=taskMessage.getDeliverNum();
-        Double[] info=SquareUtils.getSquareInfo(taskMessage.getLongitude(), taskMessage.getLatitude(), rate);
-        ConcurrentMap<String, PooledIdAndEquipCache> cache=pooledIdAndEquipCacheService.getCache().asMap();
+        int driverNum = taskMessage.getDeliverNum();
+        Double[] info = SquareUtils.getSquareInfo(taskMessage.getLongitude(), taskMessage.getLatitude(), taskMessage.getScope());
+        ConcurrentMap<String, PooledIdAndEquipCache> cache = pooledIdAndEquipCacheService.getCache().asMap();
         final Iterator<Map.Entry<String, PooledIdAndEquipCache>> cacheEntry=cache.entrySet().iterator();
         while (driverNum > 0) {
             if (!cacheEntry.hasNext()) {
