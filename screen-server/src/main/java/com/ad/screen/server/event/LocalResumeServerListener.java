@@ -1,7 +1,6 @@
 package com.ad.screen.server.event;
 
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
-import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.service.CompletionService;
 import com.ad.screen.server.service.DistributeTaskService;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 宕机重启服务
@@ -35,9 +33,10 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private final ResumeRecordService resumeRecordService;
     private final DistributeTaskI distributeTask;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private GlobalIdentify globalIdentify = GlobalIdentify.IDENTIFY;
-
-    private AtomicInteger count;
+    /**
+     * 修改为使用内置锁进行保护
+     */
+    private int count;
 
     private final DistributeTaskService distributeTaskService;
 
@@ -54,17 +53,19 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         this.distributeTask = distributeTask;
         this.applicationEventPublisher = applicationEventPublisher;
         this.distributeTaskService = distributeTaskService;
+        this.count = 0;
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("本地重启服务启动");
-        count = new AtomicInteger(resumeRecordService.resumeRecord());
+        setCount(resumeRecordService.resumeRecord());
         executorService.submit(() -> {
             while (true) {
                 try {
                     synchronized (this) {
-                        final List<EquipTask> tasks = equipTaskService.nextPreparedResume(count.get(), DEFAULT_RESUME_STEP);
+                        final List<EquipTask> tasks = equipTaskService.nextPreparedResume(getCount(), DEFAULT_RESUME_STEP);
                         if (tasks.size() == 0) {
                             Thread.sleep(30000);
                             continue;
@@ -102,10 +103,10 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                             log.info("恢复{}", task.getId());
                             i++;
                         }
-                        if (lastId - 1 > count.get()) {
-                            count.set(lastId);
+                        if (lastId - 1 > getCount()) {
+                            setCount(lastId);
                         } else {
-                            count.getAndIncrement();
+                            getAndIncrement();
                         }
                     }
                 } catch (InterruptedException ignore) {
@@ -123,8 +124,21 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
      * @param crashCount crashCount
      */
     public synchronized void updateResumeCount(int crashCount) {
-        if (crashCount < this.count.get()) {
-            count.set(crashCount);
+        if (crashCount < getCount()) {
+            setCount(crashCount);
         }
+    }
+
+    public synchronized int getCount() {
+        return this.count;
+    }
+
+    public synchronized void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public synchronized int getAndIncrement() {
+        this.count += 1;
+        return this.count;
     }
 }

@@ -184,6 +184,7 @@ spec:
             - "-jar"
             - "screen-server.jar"
             - "--spring.profiles.avtive=tmp"
+            - "--logging.level.com.ad.screen.server.handler.HeartBeatMsgMsgHandler=debug"
           imagePullPolicy: "Always"
           ports:
             - containerPort: 8888
