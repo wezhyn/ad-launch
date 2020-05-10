@@ -54,7 +54,7 @@ public class DistributeServiceImpl implements DistributeTaskI {
             double lgt=SquareUtils.format(equipment.getLongitude());
             double lat=SquareUtils.format(equipment.getLatitude());
 //            检查范围信息是否合理
-            if (lgt > info[1] && lgt < info[0] && lat > info[2] && lat < info[3]) {
+            if (lgt > info[0] && lgt < info[1] && lat > info[2] && lat < info[3]) {
                 if (pooledIdAndEquipCache.tryRestOccupy(taskMessage.getRate())) {
                     scopeEquips.add(pooledIdAndEquipCache);
                     driverNum--;
