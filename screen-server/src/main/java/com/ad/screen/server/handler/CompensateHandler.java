@@ -104,6 +104,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
         if (cause instanceof ReadTimeoutException) {
             log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
         }
+        log.error("error:", cause);
         compensate(ctx);
     }
 
