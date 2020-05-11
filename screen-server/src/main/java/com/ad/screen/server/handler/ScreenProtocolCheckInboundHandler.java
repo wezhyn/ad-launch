@@ -203,7 +203,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         int attempts = msg.readableBytes() - BEGIN_FIELD.length() + 1;
         for (int i = 0; i < attempts; i++) {
             if (BEGIN_FIELD.equals(msg.getCharSequence(i, BEGIN_FIELD.length(), StandardCharsets.ISO_8859_1).toString())) {
-                return i + BEGIN_FIELD.length();
+                return i;
             }
         }
         return -1;
