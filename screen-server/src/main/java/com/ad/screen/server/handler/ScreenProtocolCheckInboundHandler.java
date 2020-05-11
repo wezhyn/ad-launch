@@ -84,31 +84,27 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        BaseScreenRequest<?> request;
+        BaseScreenRequest<?> request = null;
         try {
             ByteBuf inboundMsg = (ByteBuf) msg;
             for (; ; ) {
-                inboundMsg.markReaderIndex();
                 final int sof = findBeginOfLine(inboundMsg);
 //              判断该信息是否大于等于最小进长度
                 if (sof == -1 || inboundMsg.readableBytes() < sof + minLength) {
                     discardMsg(ctx, inboundMsg);
+                    break;
                 }
                 int actualLengthField = sof + lengthFieldOffset;
                 int frameLength = getFrameLength(inboundMsg, actualLengthField, lengthFieldLength);
-                if (frameLength <= 0) {
-                    inboundMsg.skipBytes(sof + BEGIN_FIELD.length());
-                    continue;
-                }
 //             从帧长度推算末尾符号，不匹配，则当前数据违规
-                if (!isEndOfLine(inboundMsg, sof, frameLength)) {
+                if (frameLength < minLength || !isEndOfLine(inboundMsg, sof, frameLength)) {
                     inboundMsg.skipBytes(sof + BEGIN_FIELD.length());
                     continue;
                 }
 //            解析数据
                 try {
                     request = readRequest(inboundMsg, sof, frameLength);
-                    if (!ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get().get()) {
+                    if (request != null && !ctx.channel().attr(ScreenChannelInitializer.FIRST_READ_CHANNEL).get().get()) {
 //                    第一次初始化
                         String iemi = request.getEquipmentName();
                         if (iemi.length() != EQUIPMENT_LENGTH) {
@@ -133,12 +129,17 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         } finally {
             ReferenceCountUtil.release(msg);
         }
-        ctx.fireChannelRead(request);
+        if (request != null) {
+            ctx.fireChannelRead(request);
+        }
     }
 
     private BaseScreenRequest<?> readRequest(ByteBuf msg, int start, int frameLength) throws ParserException {
         msg.skipBytes(start + lengthFieldOffset + lengthFieldLength);
         final String equipmentName = readRequestEquipmentName(msg);
+        if (equipmentName.length() != EQUIPMENT_LENGTH) {
+            return null;
+        }
         final FrameType frameType = readType(msg);
         final Object netData = readNetData(msg, frameType);
         return ScreenRequestFactory.createRequest(equipmentName, frameType, netData);
@@ -203,7 +204,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         int attempts = msg.readableBytes() - BEGIN_FIELD.length() + 1;
         for (int i = 0; i < attempts; i++) {
             if (BEGIN_FIELD.equals(msg.getCharSequence(i, BEGIN_FIELD.length(), StandardCharsets.ISO_8859_1).toString())) {
-                return i + BEGIN_FIELD.length();
+                return i;
             }
         }
         return -1;
