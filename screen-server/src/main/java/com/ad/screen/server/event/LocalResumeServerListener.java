@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,12 +40,12 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
 
     private final DistributeTaskService distributeTaskService;
 
-    private ExecutorService executorService;
+    private final ThreadPoolTaskExecutor executorService;
 
     public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask,
                                      ApplicationEventPublisher applicationEventPublisher,
                                      DistributeTaskService distributeTaskService,
-                                     @Qualifier(value = "resume_server") ExecutorService executorService) {
+                                     @Qualifier(value = "self_taskExecutor") ThreadPoolTaskExecutor executorService) {
         this.equipTaskService = equipTaskService;
         this.executorService = executorService;
         this.completionService = completionService;
@@ -60,7 +60,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("本地重启服务启动");
         setCount(resumeRecordService.resumeRecord());
-        executorService.submit(() -> new LocalResumeServer(this, equipTaskService, completionService, distributeTask,
+        executorService.submit(new LocalResumeServer(this, equipTaskService, completionService, distributeTask,
                 applicationEventPublisher, distributeTaskService, executorService));
     }
 
@@ -97,14 +97,14 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         private final DistributeTaskI distributeTask;
         private final ApplicationEventPublisher applicationEventPublisher;
         private final DistributeTaskService distributeTaskService;
-        private final ExecutorService service;
+        private final ThreadPoolTaskExecutor service;
 
 
         public LocalResumeServer(LocalResumeServerListener listener, EquipTaskService equipTaskService,
                                  CompletionService completionService, DistributeTaskI distributeTask,
                                  ApplicationEventPublisher applicationEventPublisher,
                                  DistributeTaskService distributeTaskService,
-                                 ExecutorService service
+                                 ThreadPoolTaskExecutor service
         ) {
             this.listener = listener;
             this.equipTaskService = equipTaskService;
@@ -115,6 +115,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
             this.service = service;
         }
 
+        @SuppressWarnings("InfiniteLoopStatement")
         @Override
         public void run() {
             while (true) {
@@ -122,8 +123,8 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                     synchronized (listener) {
                         final List<EquipTask> tasks = equipTaskService.nextPreparedResume(listener.getCount(), DEFAULT_RESUME_STEP);
                         if (tasks.size() == 0) {
-                            service.submit(this);
-                            break;
+                            TimeUnit.SECONDS.sleep(10);
+                            continue;
                         }
                         int lastId = 0;
                         for (int i = 0; i < tasks.size(); ) {

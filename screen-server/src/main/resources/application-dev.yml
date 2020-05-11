@@ -28,3 +28,17 @@ spring:
         max-wait: -1
         max-idle: 20
         min-idle: 10
+#用于显示绑定的参数具体值
+logging:
+  level:
+    com:
+      ad:
+        screen:
+          server:
+            event: warn
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
