@@ -208,3 +208,99 @@ spec:
           volumeMounts:
             - name: dumps
               mountPath: /dumps
+
+---
+# frp 配置
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frps-config
+data:
+  frps.ini: |
+    [common]
+    bind_addr = 0.0.0.0
+    bind_port = 7000
+    log_file = ./frps.log
+
+    token = wezhyn
+    max_pool_count = 1000
+    allow_ports = 7000-9000,30000-40000
+
+    dashboard_addr = 0.0.0.0
+    dashboard_port = 7500
+    dashboard_user = admin
+    dashboard_pwd = admin
+    subdomain_host = zhaoo.icu
+    tls_only = false
+
+    protocol = tcp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dep-ad-frp
+spec:
+  selector:
+    matchLabels:
+      frp: screen
+  replicas: 1
+  minReadySeconds: 20
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        frp: screen
+    spec:
+      volumes:
+        - name: frps
+          configMap:
+            name: frps-config
+      containers:
+        - name: ad-screen-frp
+          image: snowdreamtech/frps
+          ports:
+            - name: bind
+              containerPort: 7000
+            - name: dashboard
+              containerPort: 7500
+            - name: screen
+              containerPort: 8888
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          volumeMounts:
+            - name: frps
+              mountPath: /etc/frp/frps.ini
+              subPath: frps.ini
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frps-svc
+spec:
+  selector:
+    frp: screen
+  type: NodePort
+  ports:
+    - name: bind
+      targetPort: bind
+      protocol: TCP
+      port: 7000
+      nodePort: 30002
+    - name: dashboard
+      targetPort: dashboard
+      protocol: TCP
+      port: 7500
+      nodePort: 30003
+    - name: screen
+      targetPort: screen
+      protocol: TCP
+      port: 8888
+      nodePort: 30004

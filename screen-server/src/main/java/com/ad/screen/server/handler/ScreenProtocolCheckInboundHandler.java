@@ -87,6 +87,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
         BaseScreenRequest<?> request = null;
         try {
             ByteBuf inboundMsg = (ByteBuf) msg;
+            inboundMsg.markReaderIndex();
             for (; ; ) {
                 final int sof = findBeginOfLine(inboundMsg);
 //              判断该信息是否大于等于最小进长度
@@ -122,7 +123,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
                     }
                     break;
                 } catch (ParserException e) {
-                    log.error("解析错误", e);
+                    log.error("解析错误");
                     inboundMsg.skipBytes(sof + BEGIN_FIELD.length());
                 }
             }
@@ -179,7 +180,10 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     private void discardMsg(ChannelHandlerContext ctx, ByteBuf msg) {
 //        无，丢弃无效数据，并打印日志
-        log.info(ByteBufUtil.hexDump(msg));
+        if (log.isDebugEnabled()) {
+            msg.resetReaderIndex();
+            log.debug("丢弃：{}", msg.toString(StandardCharsets.ISO_8859_1));
+        }
     }
 
     private int getFrameLength(ByteBuf buf, int offset, int length) {
@@ -202,7 +206,7 @@ public class ScreenProtocolCheckInboundHandler extends ChannelInboundHandlerAdap
 
     private int findBeginOfLine(ByteBuf msg) {
         int attempts = msg.readableBytes() - BEGIN_FIELD.length() + 1;
-        for (int i = 0; i < attempts; i++) {
+        for (int i = msg.readerIndex(); i < attempts; i++) {
             if (BEGIN_FIELD.equals(msg.getCharSequence(i, BEGIN_FIELD.length(), StandardCharsets.ISO_8859_1).toString())) {
                 return i;
             }
