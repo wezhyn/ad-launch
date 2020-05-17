@@ -38,15 +38,15 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
 
 
     public UserController(GenericUserService genericUserService, GenericUserMapper genericUserMapper) {
-        this.genericUserService=genericUserService;
-        this.genericUserMapper=genericUserMapper;
+        this.genericUserService = genericUserService;
+        this.genericUserMapper = genericUserMapper;
     }
 
     @GetMapping("/info")
     public NoNestResponseResult<UserDto> info(@AuthenticationPrincipal AdAuthentication authentication) {
-        String name=authentication.getName();
-        Optional<GenericUser> user=genericUserService.getUserByUsername(name);
-        return user.map(u->NoNestResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
+        String name = authentication.getName();
+        Optional<GenericUser> user = genericUserService.getUserByUsername(name);
+        return user.map(u -> NoNestResponseResult.successResponseResult("", genericUserMapper.toDto(u)))
                 .orElse(NoNestResponseResult.failureResponseResult("获取用户信息失败"));
     }
 
@@ -56,13 +56,13 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
             @AuthenticationPrincipal AdAuthentication authentication,
             @RequestBody PasswordModifyWrap passwordModifyWrap) {
 //        默认结果为失败 result==-1
-        Integer id=authentication.getId();
-        String newPwd=passwordModifyWrap.getNewPwd();
-        String oldPwd=passwordModifyWrap.getOldPwd();
-        int result=-1;
-        GenericUser genericUser=genericUserService.getById(id)
+        Integer id = authentication.getId();
+        String newPwd = passwordModifyWrap.getNewPwd();
+        String oldPwd = passwordModifyWrap.getOldPwd();
+        int result = -1;
+        GenericUser genericUser = genericUserService.getById(id)
 //        GenericUser genericUser=genericUserService.getUserByUsername(username)
-                .orElseThrow(()->new UsernameNotFoundException("无该用户信息"));
+                .orElseThrow(() -> new UsernameNotFoundException("无该用户信息"));
         if (!passwordEncoder.matches(oldPwd, genericUser.getPassword())) {
             return ResponseResult.forFailureBuilder()
                     .withMessage("旧密码错误")
@@ -70,7 +70,7 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
                     .build();
         }
         try {
-            result=genericUserService.modifyUserPasswordById(id, authentication.getName(), newPwd);
+            result = genericUserService.modifyUserPasswordById(id, authentication.getName(), newPwd);
             return ResponseResult.forSuccessBuilder()
                     .withMessage("修改密码成功")
                     .withCode(20000)
@@ -83,7 +83,7 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
     }
 
     @GetMapping("/list")
-    public ResponseResult getList(@RequestParam(name="limit", defaultValue="10") int limit, @RequestParam(name="page", defaultValue="1") int page) {
+    public ResponseResult getList(@RequestParam(name = "limit", defaultValue = "10") int limit, @RequestParam(name = "page", defaultValue = "1") int page) {
         return listDto(limit, page);
     }
 
@@ -96,17 +96,11 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
         return update(userDto);
     }
 
-    @PostMapping("/verify")
-    public ResponseResult verifyRealNameAuthentication(@RequestBody UserDto userDto, @AuthenticationPrincipal AdAuthentication authentication) {
-        userDto.setId(authentication.getId());
-        final Optional<GenericUser> updateUser=getService().updateUserAuthenticationInfo(userDto);
-        return doResponse(updateUser, "更新成功", "更新失败");
-    }
 
     @Override
     protected GenericUser preUpdate(GenericUser to) {
-        final AdAuthentication authentication=(AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        if (authentication==null) {
+        final AdAuthentication authentication = (AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
             throw new UpdateOperationException("当前用户未认证");
         }
         to.setId(authentication.getId());
@@ -120,9 +114,9 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
 
     @ExceptionHandler
     public ResponseResult handleError(Exception e) {
-        String m=e.getMessage();
+        String m = e.getMessage();
         return ResponseResult.forFailureBuilder()
-                .withMessage(m==null ? m : "操作失败")
+                .withMessage(m == null ? m : "操作失败")
                 .build();
     }
 

@@ -73,6 +73,6 @@ public class PayControllerTest {
     }
 
     private String identify() {
-        return "avsftl2208@sandbox.com";
+        return "nctpdw6922@sandbox.com";
     }
 }

@@ -32,20 +32,19 @@ public class GpsMsgMsgHandler extends BaseMsgHandler<GpsMsg> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GpsMsg msg) throws Exception {
-        String imei=msg.getEquipmentName();
-        log.debug("收到IMEI号为{}的GPS帧", imei);
-        final PooledIdAndEquipCache equipCache=ctx.channel().attr(POOLED_EQUIP_CACHE).get();
-        final AdEquipment equip=equipCache.getEquipment();
-        if (imei!=null && !"".equals(imei)) {
+        String imei = msg.getEquipmentName();
+        final PooledIdAndEquipCache equipCache = ctx.channel().attr(POOLED_EQUIP_CACHE).get();
+        final AdEquipment equip = equipCache.getEquipment();
+        if (imei != null && !"".equals(imei)) {
             //获取设备的经纬度信息
-            Point2D net=msg.getNetData();
-            DecimalFormat df=new DecimalFormat("0.00000");
-            double x=Double.parseDouble(df.format(net.getX()/100.0));
-            double y=Double.parseDouble(df.format(net.getY()/100.0));
+            Point2D net = msg.getNetData();
+            DecimalFormat df = new DecimalFormat("0.00000");
+            double x = Double.parseDouble(df.format(net.getX() / 100.0));
+            double y = Double.parseDouble(df.format(net.getY() / 100.0));
             //更新channel内部和缓存当中的设备信息
             equip.setLongitude(x);
             equip.setLatitude(y);
-            log.debug("{}的地理位置已更新", msg.getEquipmentName());
+            log.debug("{} : {}的地理位置已更新", msg.getEquipmentName(), "(" + x + " : " + y + " )");
         }
     }
 }

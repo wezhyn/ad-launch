@@ -137,10 +137,6 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                                 i++;
                                 continue;
                             }
-                            int orderId = task.getTaskKey().getOid();
-//                        转存redis中的数据到数据库,自此，一个 EquipTask 的最终信息都已经保存在了数据库中
-                            Integer additionalNum = completionService.forOrderTotal(orderId);
-                            task.setExecutedNum(task.getExecutedNum() + additionalNum);
 //                    检查当前订单是否已经完成
                             if (task.getExecutedNum().equals(task.getTotalNum())) {
                                 equipTaskService.checkTaskExecuted(task.getId());
@@ -152,7 +148,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                             while (list == null || list.size() < task.getDeliverNum()) {
                                 list = distributeTask.availableEquips(task);
                                 if (list == null || list.size() < task.getDeliverNum()) {
-                                    TimeUnit.SECONDS.sleep(1);
+                                    TimeUnit.SECONDS.sleep(10);
                                     Thread.yield();
                                 }
                             }

@@ -34,7 +34,8 @@
             <version>25.1-jre</version>
         </dependency>
 
-        <dependency>
+<!--       移除redis
+           <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <exclusions>
@@ -47,7 +48,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>

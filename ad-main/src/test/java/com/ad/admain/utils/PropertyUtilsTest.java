@@ -33,7 +33,6 @@ public class PropertyUtilsTest {
     @Test
     public void copyPropertiesTest() {
         GenericUser target=new GenericUser();
-        target.setRealName("兆兆");
         target.setUsername("zhaoo");
         target.setPassword("wezhyn");
         target.setSex(SexEnum.MALE);
@@ -41,7 +40,6 @@ public class PropertyUtilsTest {
         log.info("sourceUser: {}", target.toString());
 
         GenericUser source=new GenericUser();
-        source.setRealName("dzj");
         source.setSex(SexEnum.MALE);
         source.setPassword("passsword");
         source.setRoles(AuthenticationEnum.CUSTOMER);

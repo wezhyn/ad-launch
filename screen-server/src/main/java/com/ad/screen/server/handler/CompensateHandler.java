@@ -125,8 +125,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             }
             HashMap<TaskKey, EquipTask.EquipTaskBuilder> constructEquipTask = new HashMap<>(8);
             for (Task task : unFinishedTasks.values()) {
-//              先转移当前类帧的数据从内存到数据库（防止设备在熄火前发送了完成帧，而系统还未处理）
-                completionService.memoryToDisk(task.getOrderId(), task.getDeliverUserId());
                 if (!constructEquipTask.containsKey(task.getTaskKey())) {
                     constructEquipTask.putIfAbsent(task.getTaskKey(), fromTask(task));
                 } else {
@@ -137,7 +135,6 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                             .driverNumInc(1);
                 }
             }
-//        当前服务器转移任务, 自此，旧数据已经被持久化
             for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
                 taskExecutor.submit(new TransferRunner(builder.build(), distributeTask,
                         taskExecutor, applicationEventPublisher, resumeServerListener));

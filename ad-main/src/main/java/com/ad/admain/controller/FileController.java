@@ -34,32 +34,27 @@ public class FileController {
     private final ImgBedService imgBedService;
 
     public FileController(FileUploadService fileUploadService, QiNiuProperties qiNiuProperties, ImgBedService imgBedService) {
-        this.fileUploadService=fileUploadService;
-        this.qiNiuProperties=qiNiuProperties;
-        this.imgBedService=imgBedService;
+        this.fileUploadService = fileUploadService;
+        this.qiNiuProperties = qiNiuProperties;
+        this.imgBedService = imgBedService;
     }
 
     @PostMapping("/avatar")
-    public ResponseResult modifyUserAvatar(@RequestParam(value="img") MultipartFile file, @AuthenticationPrincipal AdAuthentication adAuthentication) throws FileUploadException {
-        IFileUpload fileUpload=fileUploadService.modifyAvatarImg(file, adAuthentication);
-        return ResponseResult.forSuccessBuilder()
-                .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
-                .withData("host", qiNiuProperties.getHostName())
-                .withData("relativeAddress", fileUpload.getRelativeName())
-                .withMessage("上传成功")
-                .build();
+    public ResponseResult modifyUserAvatar(@RequestParam(value = "img") MultipartFile file, @AuthenticationPrincipal AdAuthentication adAuthentication) throws FileUploadException {
+        IFileUpload fileUpload = fileUploadService.modifyAvatarImg(file, adAuthentication);
+        return doResponse(fileUpload, ImgBedType.AVATAR);
     }
 
     @GetMapping("{type}")
     public ResponseResult getImgBed(@PathVariable("type") ImgBedType type,
-                                    @RequestParam(name="limit", defaultValue="10") int limit,
-                                    @RequestParam(name="page", defaultValue="1") int page) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<ImgBed> imgBeds=imgBedService.getImgBedListByType(type, pageable);
-        List<ImgBed> content=imgBeds.getContent();
-        if (imgBeds.getSize() < limit && ImgBedType.GUIDE==type) {
-            for (int i=0; i < limit - imgBeds.getSize(); i++) {
-                ImgBed imgBed=ImgBed.forGuide(-1, "", "");
+                                    @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                    @RequestParam(name = "page", defaultValue = "1") int page) {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<ImgBed> imgBeds = imgBedService.getImgBedListByType(type, pageable);
+        List<ImgBed> content = imgBeds.getContent();
+        if (imgBeds.getSize() < limit && ImgBedType.GUIDE == type) {
+            for (int i = 0; i < limit - imgBeds.getSize(); i++) {
+                ImgBed imgBed = ImgBed.forGuide(-1, "", "");
                 content.add(imgBed);
             }
         }
@@ -79,45 +74,51 @@ public class FileController {
     @PostMapping("{type}")
     public ResponseResult uploadGuideImg(
             @PathVariable("type") ImgBedType type,
-            @RequestParam(value="img") MultipartFile file,
-            @RequestParam(value="key", required=false) Integer i) {
-        IFileUpload fileUpload=null;
+            @RequestParam(value = "img") MultipartFile file,
+            @RequestParam(value = "key", required = false) Integer i) {
+        IFileUpload fileUpload = null;
         try {
-            fileUpload=fileUploadService.uploadFile(file);
+            fileUpload = fileUploadService.uploadFile(file);
         } catch (FileUploadException e) {
             e.printStackTrace();
         }
-        if (fileUpload==null) {
+        if (fileUpload == null) {
             return ResponseResult.forFailureBuilder()
                     .withMessage("请重新上传图片").build();
         }
         ImgBed imgBed;
         switch (type) {
             case GUIDE: {
-                imgBed=ImgBed.forGuide(i, file.getOriginalFilename(), fileUpload.getRelativeName());
+                imgBed = ImgBed.forGuide(i, file.getOriginalFilename(), fileUpload.getRelativeName());
                 break;
             }
             case SHUFFING: {
-                imgBed=ImgBed.forShuffing(file.getOriginalFilename(), fileUpload.getRelativeName());
+                imgBed = ImgBed.forShuffing(file.getOriginalFilename(), fileUpload.getRelativeName());
                 break;
+            }
+            case ID_CARD: {
+                return doResponse(fileUpload, ImgBedType.ID_CARD);
             }
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
         }
-        ImgBed bed=imgBedService.save(imgBed);
-        final IFileUpload savedBed=fileUpload;
-        return ResponseResult.forSuccessBuilder()
-                .withMessage("上传：" + type.getValue() + " 成功")
-                .withData("address", qiNiuProperties.getHostName() + "/" + savedBed.getRelativeName())
-                .withData("host", qiNiuProperties.getHostName())
-                .withData("relativeAddress", savedBed.getRelativeName()).build();
-
+        ImgBed bed = imgBedService.save(imgBed);
+        return doResponse(fileUpload, type);
     }
 
-    @ExceptionHandler(value={FileUploadException.class})
+    @ExceptionHandler(value = {FileUploadException.class})
     public ResponseResult handleFileError(Exception e) {
         return ResponseResult.forFailureBuilder()
                 .withMessage("上传文件失败")
+                .build();
+    }
+
+    public ResponseResult doResponse(IFileUpload fileUpload, ImgBedType type) {
+        return ResponseResult.forSuccessBuilder()
+                .withData("address", qiNiuProperties.getHostName() + "/" + fileUpload.getRelativeName())
+                .withData("host", qiNiuProperties.getHostName())
+                .withData("relativeAddress", fileUpload.getRelativeName())
+                .withMessage("上传：" + type.getValue() + " 成功")
                 .build();
     }
 

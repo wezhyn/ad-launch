@@ -13,6 +13,8 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * @author wezhyn
  * @since 12.01.2019
@@ -20,11 +22,16 @@ import org.junit.Test;
 public class AliPayHolderTest {
 
     @Test
-    public void str() throws AlipayApiException {
-        AlipayTradeAppPayRequest createRequest=new AlipayTradeAppPayRequest();
+    public void login() throws AlipayApiException, UnsupportedEncodingException {
+        System.out.println(AliPayHolder.getLoginSign(1));
+    }
 
-        AlipayTradeAppPayModel model=new AlipayTradeAppPayModel();
-        String body="Test";
+    @Test
+    public void str() throws AlipayApiException {
+        AlipayTradeAppPayRequest createRequest = new AlipayTradeAppPayRequest();
+
+        AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
+        String body = "Test";
         model.setBody(body);
         model.setSubject("test-subject");
         model.setTotalAmount("100");
@@ -74,7 +81,7 @@ public class AliPayHolderTest {
         model.setPayeeInfo(payee);
         model.setRemark("test");
         request.setBizModel(model);
-        AlipayFundTransUniTransferResponse response=AliPayHolder.ALI_PAY_CLIENT.certificateExecute(request);
+        AlipayFundTransUniTransferResponse response = AliPayHolder.instance().certificateExecute(request);
         if (response.isSuccess()) {
             System.out.println("调用成功");
         } else {

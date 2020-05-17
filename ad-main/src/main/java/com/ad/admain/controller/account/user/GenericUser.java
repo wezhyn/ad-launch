@@ -48,6 +48,10 @@ public class GenericUser implements IUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private CertificationCard certificationCard;
+
     @UpdateIgnore
     @Column(unique = true)
     @ColumnDefault("''")
@@ -86,11 +90,6 @@ public class GenericUser implements IUser {
     @Enumerated(value = EnumType.STRING)
     @ColumnDefault("'NOT_AUTHENTICATION'")
     private UserEnable enable;
-
-    @ColumnDefault("''")
-    private String realName;
-    @ColumnDefault("''")
-    private String idCard;
 
 
     @org.hibernate.annotations.Generated(value = GenerationTime.INSERT)
@@ -141,9 +140,25 @@ public class GenericUser implements IUser {
         return enable.getEnableNum() >= 0;
     }
 
+    @Override
+    public String getRealName() {
+        if (certificationCard != null) {
+            return certificationCard.getRealName();
+        }
+        return "";
+    }
+
+    @Override
+    public String getIdCard() {
+        if (certificationCard != null) {
+            return certificationCard.getIdCard();
+        }
+        return "";
+    }
+
     @Getter
     @AllArgsConstructor
-    public static enum UserEnable implements BaseEnum {
+    public enum UserEnable implements BaseEnum {
         /**
          * 用户状态
          */
@@ -152,8 +167,8 @@ public class GenericUser implements IUser {
         MODIFY_AUTHENTICATION(10, "modify"),
         FORBID(-1, "forbid");
 
-        private int enableNum;
-        private String enableStatus;
+        private final int enableNum;
+        private final String enableStatus;
 
 
         @Override
@@ -185,8 +200,6 @@ public class GenericUser implements IUser {
                 ", birthDay=" + birthDay +
                 ", roles=" + roles +
                 ", enable=" + enable +
-                ", realName='" + realName + '\'' +
-                ", idCard='" + idCard + '\'' +
                 ", regTime=" + regTime +
                 ", loginTime=" + loginTime +
                 ", lastModified=" + lastModified +

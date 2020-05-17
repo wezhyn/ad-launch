@@ -53,7 +53,6 @@ public class GenericUserMapperTest {
                 .sex(SexEnum.MALE)
                 .birthDay(LocalDate.now())
                 .email("sss@vip.com")
-                .idCard("1")
                 .mobilePhone("1")
                 .build();
         System.out.println(genericUserMapper.toDto(genericUser));
@@ -63,7 +62,6 @@ public class GenericUserMapperTest {
     public void update() {
 
         GenericUser source=new GenericUser();
-        source.setRealName("兆兆");
         source.setUsername("zhaoo");
         source.setPassword("zhaoo");
         source.setSex(SexEnum.MALE);

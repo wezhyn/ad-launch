@@ -1,9 +1,10 @@
 package com.ad.admain.controller.account;
 
 import com.ad.admain.controller.account.user.GenericUser;
-import com.ad.admain.controller.account.user.UserDto;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.wezhyn.project.BaseService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -17,6 +18,8 @@ public interface GenericUserService extends BaseService<GenericUser, Integer>, C
 
 
     int modifyUserPasswordById(Integer id, String username, String password);
+
+    Page<GenericUser> getUserListWithAuth(boolean auth, Pageable pageable);
 
 
     Optional<GenericUser> getUserByUsername(String username);
@@ -34,9 +37,8 @@ public interface GenericUserService extends BaseService<GenericUser, Integer>, C
     /**
      * 仅当 {@link GenericUser#getEnable()}  == {@code NOT_AUTHENTICATION} 时，才更新实名信息
      *
-     * @param userDto userDto
      * @return user
      */
-    Optional<GenericUser> updateUserAuthenticationInfo(UserDto userDto);
+    Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg, String aftImg, Integer id);
 
 }

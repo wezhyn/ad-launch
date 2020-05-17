@@ -148,7 +148,6 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
                 .deliverNum(order.getDeliverNum())
                 .latitude(order.getLatitude())
                 .longitude(order.getLongitude())
-                .numPerEquip(order.getNumPerEquip())
                 .oid(order.getId())
                 .produceContext(order.getProduceContext())
                 .rate(order.getRate())

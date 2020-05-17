@@ -22,18 +22,12 @@ public class GenericUserServiceImplTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Test
-    public void updatePassword() {
-        String password="wezhyn";
-        String username=password;
-        genericUserService.modifyUserPasswordById(2, username, passwordEncoder.encode(password));
 
+    @Test
+    public void show() {
+        genericUserService.updateUserAuthenticationInfo("12", "123", "", "", 29993);
     }
 
 
-    @Test
-    public void deleteCascadeEquipment() {
-        genericUserService.delete(5);
-    }
 
 }

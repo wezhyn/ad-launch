@@ -31,6 +31,11 @@ public class CheckOrderProduceImpl implements CheckOrderStatueProduceI, PaymentO
     }
 
     @Override
+    public void authOrder(UserAuthMessage message) {
+        rocketMQTemplate.sendMessageInTransaction(UserAuthMessage.MESSAGE_TOPIC, new GenericMessage<>(message), message);
+    }
+
+    @Override
     public void paymentOrder(TaskMessage orderMessage) {
         final TransactionSendResult topic = rocketMQTemplate.sendMessageInTransaction("task_message_topic",
                 new GenericMessage<>(orderMessage), orderMessage);

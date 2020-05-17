@@ -53,7 +53,7 @@ public class EquipTaskServiceImpl extends AbstractBaseService<EquipTask, Integer
     @Override
     @Transactional(rollbackFor=Exception.class)
     public int checkTaskExecuted(int id) {
-        return getRepository().updateEquipStatus(globalIdentify.getId(), id);
+        return getRepository().tryTaskComplete(globalIdentify.getId(), id);
     }
 
     @Override

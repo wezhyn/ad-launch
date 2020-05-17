@@ -43,6 +43,7 @@ public abstract class GenericUserMapper implements AbstractMapper<GenericUser, U
 
     @Override
     @Mapping(target="equipmentList", ignore=true)
-    @InheritInverseConfiguration(name="toDto")
+    @InheritInverseConfiguration(name = "toDto")
+    @Mapping(target = "certificationCard", ignore = true)
     public abstract GenericUser toTo(UserDto userDto);
 }

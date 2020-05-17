@@ -1,4 +1,4 @@
-package com.ad.screen.server.service;
+package com.ad.screen.server.dao;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,18 +8,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author wezhyn
- * @since 03.27.2020
+ * @since 05.16.2020
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class TestServiceTest {
-
+public class EquipTaskRepositoryTest {
 
     @Autowired
-    private TestService testService;
+    private EquipTaskRepository equipTaskRepository;
 
     @Test
-    public void save() {
-        testService.save();
+    public void tryTaskComplete() {
+        System.out.println(equipTaskRepository.tryTaskComplete("10.32.128.2", 22));
     }
 }

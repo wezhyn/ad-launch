@@ -1,17 +1,15 @@
 package com.ad.screen.server.service;
 
-import com.ad.screen.server.config.GlobalIdentify;
 import com.ad.screen.server.dao.DiskCompletionRepository;
-import com.ad.screen.server.dao.EquipTaskRepository;
 import com.ad.screen.server.entity.DiskCompletion;
-import com.ad.screen.server.entity.MemoryCompletion;
+import com.ad.screen.server.entity.TaskKey;
+import com.ad.screen.server.event.CompleteTaskEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 /**
  * @ClassName CompletionImpl
@@ -23,52 +21,33 @@ import java.util.Map;
 @Service
 public class CompletionImpl implements CompletionService {
 
-    @Autowired
-    private RedisTemplate<Integer, Integer> redisTemplate;
 
     @Autowired
     private DiskCompletionRepository diskCompletionRepository;
     @Autowired
-    private EquipTaskRepository equipTaskRepository;
+    private EquipTaskService equipTaskService;
     @Autowired
-    private GlobalIdentify globalIdentify;
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Qualifier("self_taskExecutor")
+    @Autowired
+    private ThreadPoolTaskExecutor executorService;
 
     @Override
-    @Transactional(rollbackFor=Exception.class)
-    public void completeIncrMemory(MemoryCompletion completion) {
-        final BoundHashOperations<Integer, Object, Object> boundHashOps=redisTemplate.boundHashOps(completion.getAdOrderId());
-        boundHashOps.increment(completion.getDriverId(), completion.getExecutedNum());
+    @Transactional(rollbackFor = Exception.class)
+    public void completeNumIncr(int orderId, int driverId, int num) {
+        diskCompletionRepository.createOrIncrComplete(driverId, orderId, num);
     }
 
     @Override
-    @Transactional(rollbackFor=Exception.class)
-    public Integer forOrderTotal(Integer orderId) {
-        final Map<Object, Object> entries=redisTemplate.opsForHash().entries(orderId);
-        int totalNul=0;
-        for (Map.Entry<Object, Object> entry : entries.entrySet()) {
-            Integer driverId=(Integer) entry.getKey();
-            Integer driverExe=(Integer) entry.getValue();
-            diskCompletionRepository.save(new DiskCompletion(driverExe, orderId, driverId));
-            totalNul+=driverExe;
+    public void tryComplete(int orderId, int driverId) {
+        final DiskCompletion disk = diskCompletionRepository.findByAdOrderIdAndDriverId(orderId, driverId);
+        if (disk != null) {
+            final Integer totalExe = disk.getExecutedNum();
+            equipTaskService.mergeTaskExecStatistics(new TaskKey(orderId, driverId), totalExe);
+            if (equipTaskService.checkTaskExecuted(orderId) > 0) {
+                executorService.submit(() -> applicationEventPublisher.publishEvent(new CompleteTaskEvent(disk, orderId)));
+            }
         }
-        if (totalNul > 0) {
-            equipTaskRepository.executeNumInc(globalIdentify.getId(), orderId, totalNul);
-            redisTemplate.delete(orderId);
-        }
-        return totalNul;
-    }
-
-    @Override
-    @Transactional(rollbackFor=Exception.class)
-    public Integer memoryToDisk(Integer orderId, Integer driverId) {
-        final BoundHashOperations<Integer, Integer, Integer> boundHashOps=redisTemplate.boundHashOps(orderId);
-        Integer exec=boundHashOps.get(driverId);
-        if (exec!=null) {
-            boundHashOps.delete(driverId);
-            equipTaskRepository.executeNumInc(globalIdentify.getId(), orderId, exec);
-            diskCompletionRepository.save(new DiskCompletion(exec, orderId, driverId));
-            equipTaskRepository.updateEquipStatus(globalIdentify.getId(), orderId);
-        }
-        return exec;
     }
 }

@@ -1,0 +1,19 @@
+POST http://{{url}}/api/auth/alipay
+Content-Type: application/json
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5ODgyMjUsImlhdCI6MTU4OTY5MjIyNSwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.eWBdKnvOljNSJJZzPMmnaquWZd3zzuFQOllT81s_GfA
+
+{}
+
+###
+GET http://{{url}}/api/authentication/list?auth=false
+X-Token:eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5MDU5NTUsImlhdCI6MTU4OTYwOTk1NSwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.ofc6_ThuJa7aeUrLZ0neAsSvfxS-yUmqg3iGvh57LGE
+Accept: application/json
+
+###
+
+GET http://{{url}}/api/auth/sign
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5MjI0MjIsImlhdCI6MTU4OTYyNjQyMiwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.hAcJ_q9qrJqJsObb3G0DDkDb4PpmYfHlZWq-PZYGpCw
+Accept: application/json
+
+
+

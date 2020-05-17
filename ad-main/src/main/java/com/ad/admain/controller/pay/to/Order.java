@@ -33,7 +33,6 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
                 ", orderUser=" + orderUser +
                 ", uid=" + uid +
                 ", totalAmount=" + totalAmount +
-                ", numPerEquip=" + numPerEquip +
                 ", tradeOut=" + tradeOut +
                 ", createTime=" + createTime +
                 ", modifyTime=" + modifyTime +
@@ -57,7 +56,6 @@ public class Order implements IBaseTo<Integer>, ITradeInfo {
 
     private Double totalAmount;
 
-    private Integer numPerEquip;
 
     private Long tradeOut;
 

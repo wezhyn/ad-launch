@@ -1,7 +1,8 @@
 package com.ad.admain.service;
 
-import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.account.impl.GenericUserServiceImpl;
 import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.SocialType;
 import com.ad.launch.user.AuthenticationEnum;
 import com.wezhyn.project.account.SexEnum;
 import org.junit.Test;
@@ -24,14 +25,20 @@ import java.util.Optional;
 public class GenericUserServiceTest {
 
     @Autowired
-    private GenericUserService genericUserService;
+    private GenericUserServiceImpl genericUserService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Test
+    public void bind() {
+//        System.out.println(genericUserService.bindUser(23, "test-social", SocialType.ALIPAY));
+        System.out.println(genericUserService.isAuth(23, SocialType.ALIPAY));
+    }
+
+    @Test
     public void saveGenericUser() {
-        for (int i=0; i < 100; i++) {
-            GenericUser genericUser=GenericUser.builder()
+        for (int i = 0; i < 100; i++) {
+            GenericUser genericUser = GenericUser.builder()
                     .username("wezhyn" + i)
                     .password(passwordEncoder.encode("wezhyn"))
                     .roles(AuthenticationEnum.CUSTOMER)

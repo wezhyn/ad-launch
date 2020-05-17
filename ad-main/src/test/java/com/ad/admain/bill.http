@@ -1,3 +1,12 @@
+POST http://{{url}}/api/pay/withdraw
+Content-Type: application/json
+
+{
+  "withdraw": 100
+}
+
+###
+
 GET http://{{url}}/api/billinfo/list
 Accept: application/json
 

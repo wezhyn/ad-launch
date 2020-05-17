@@ -221,6 +221,7 @@ data:
     bind_addr = 0.0.0.0
     bind_port = 7000
     log_file = ./frps.log
+    vhost_http_port = 8889
 
     token = wezhyn
     max_pool_count = 1000
@@ -268,7 +269,9 @@ spec:
             - name: dashboard
               containerPort: 7500
             - name: screen
-              containerPort: 8888
+              containerPort: 30004
+            - name: ad
+              containerPort: 8889
           env:
             - name: TZ
               value: Asia/Shanghai
@@ -302,5 +305,10 @@ spec:
     - name: screen
       targetPort: screen
       protocol: TCP
-      port: 8888
+      port: 30004
       nodePort: 30004
+    - name: ad
+      targetPort: ad
+      protocol: TCP
+      port: 8889
+      nodePort: 30006

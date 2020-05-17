@@ -13,12 +13,12 @@ public enum ImgBedType implements StringEnum {
     /**
      * 图床类型
      */
-    GUIDE("guide"), SHUFFING("shuffing"), AVATAR("avatar");
+    GUIDE("guide"), SHUFFING("shuffing"), AVATAR("avatar"), ID_CARD("card");
 
     private String value;
 
     ImgBedType(String value) {
-        this.value=value;
+        this.value = value;
     }
 
     @Override

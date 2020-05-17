@@ -16,18 +16,18 @@ spring:
       repositories:
         enabled: true
 
-  redis:
-    database: 0
-    host: r-bp1881845de043a4pd.redis.rds.aliyuncs.com
-    port: 6379
-    password: Rredis!!
-    timeout: 30s
-    jedis:
-      pool:
-        max-active: -1
-        max-wait: -1
-        max-idle: 20
-        min-idle: 10
+#  redis:
+#    database: 0
+#    host: r-bp1881845de043a4pd.redis.rds.aliyuncs.com
+#    port: 6379
+#    password: Rredis!!
+#    timeout: 30s
+#    jedis:
+#      pool:
+#        max-active: -1
+#        max-wait: -1
+#        max-idle: 20
+#        min-idle: 10
 #用于显示绑定的参数具体值
 logging:
   level:

@@ -60,7 +60,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        final Channel chChannel=ch.pipeline().channel();
+        final Channel chChannel = ch.pipeline().channel();
         chChannel.attr(FIRST_READ_CHANNEL).set(new AtomicBoolean(false));
 //        ch.pipeline().addLast(new ReadTimeoutHandler(130));
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
@@ -103,7 +103,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         e.printStackTrace();
                     }
                 }
-                , 0, 300, TimeUnit.SECONDS
+                , 0, 50, TimeUnit.SECONDS
         );
 
         chChannel.attr(SCHEDULED_SEND).set(scheduledSend);
@@ -114,7 +114,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         return AdScreenResponse.builder()
                 .entryId(task.getEquipEntryId())
                 .view(task.getTask().getView())
-                .verticalView(task.getTask().getVerticalView())
+                .verticalView(task.getTask().getVerticalView() == null ? false : task.getTask().getVerticalView())
                 .repeatNum(task.getRepeatNum())
                 .imei(iemi)
                 .viewLength((byte) task.getTask().getView().length())

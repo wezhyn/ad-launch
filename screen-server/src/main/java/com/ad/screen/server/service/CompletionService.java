@@ -1,7 +1,5 @@
 package com.ad.screen.server.service;
 
-import com.ad.screen.server.entity.MemoryCompletion;
-
 /**
  * @ClassName CompletionI
  * @Description
@@ -11,19 +9,23 @@ import com.ad.screen.server.entity.MemoryCompletion;
  **/
 public interface CompletionService {
 
-    void completeIncrMemory(MemoryCompletion completion);
+    /**
+     * 增加完成数据
+     *
+     * @param orderId  orderId
+     * @param driverId driverId
+     * @param num      Num
+     */
+    void completeNumIncr(int orderId, int driverId, int num);
 
-
-    Integer forOrderTotal(Integer orderId);
 
     /**
-     * 获取并删除统计信息,并检查订单是否已经完成
+     * 尝试标识该任务结束
      *
-     * @param orderId  订单id
-     * @param driverId 设备所有者id
-     * @return 执行次数
+     * @param orderId  orderId
+     * @param driverId driverId
      */
-    Integer memoryToDisk(Integer orderId, Integer driverId);
+    void tryComplete(int orderId, int driverId);
 
 
 }

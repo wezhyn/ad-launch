@@ -20,12 +20,12 @@ import java.util.List;
 public class AllocateEvent extends ApplicationEvent {
 
 
-    private AllocateType type;
+    private final AllocateType type;
 
     /**
      * 具体派送的任务
      */
-    private EquipTask equipTask;
+    private final EquipTask equipTask;
 
     private List<PooledIdAndEquipCache> pooledIdAndEquipCaches;
 

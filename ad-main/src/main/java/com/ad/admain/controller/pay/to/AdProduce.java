@@ -26,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-public class AdProduce implements IBaseTo<Integer>, IProduce {
+public class AdProduce implements IBaseTo<Integer>, IProduce, Cloneable {
 
 
     @Id
@@ -147,4 +147,8 @@ public class AdProduce implements IBaseTo<Integer>, IProduce {
         return endTime;
     }
 
+    @Override
+    public AdProduce clone() throws CloneNotSupportedException {
+        return (AdProduce) super.clone();
+    }
 }

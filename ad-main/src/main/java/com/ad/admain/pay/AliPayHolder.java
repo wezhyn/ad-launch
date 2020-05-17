@@ -10,16 +10,22 @@ import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
 import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.internal.util.AlipaySignature;
+import com.alipay.api.internal.util.AntCertificationUtil;
+import com.alipay.api.internal.util.file.FileUtils;
 import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.Security;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,6 +124,48 @@ public final class AliPayHolder {
         return parseMap;
     }
 
+    public static String getLoginSign(Integer id) {
+        try {
+            SortedMap<String, String> map = new TreeMap<>();
+            map.put("alipay_root_cert_sn", AntCertificationUtil.getRootCertSN(readFileToString(AliPayProperties.ROOT_CERT_PATH)));
+            map.put("app_cert_sn", AlipaySignature.getCertSN(AliPayProperties.CERT_PATH));
+            map.put("apiname", "com.alipay.account.auth");
+            map.put("method", "alipay.open.auth.sdk.code.get");
+            map.put("app_id", AliPayProperties.APP_ID);
+            map.put("app_name", "mc");
+            map.put("biz_type", "openservice");
+            map.put("pid", AliPayProperties.AD_SYSTEM_SELLER_ID);
+            map.put("product_id", "APP_FAST_LOGIN");
+            map.put("scope", "kuaijie");
+            map.put("target_id", id.toString());
+            map.put("auth_type", "AUTHACCOUNT");
+            Security.addProvider(new BouncyCastleProvider());
+            map.put("sign_type", AliPayProperties.SIGN_TYPE);
+            String signStr = AlipaySignature.getSignContent(map);
+            String sign = AlipaySignature.rsaSign(signStr, AliPayProperties.APP_PRIVATE_KEY, AliPayProperties.CHARSET, AliPayProperties.SIGN_TYPE);
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                sb.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), AliPayProperties.CHARSET)).append("&");
+            }
+            sb.append("sign").append("=").append(URLEncoder.encode(sign, AliPayProperties.CHARSET));
+            return sb.toString();
+        } catch (AlipayApiException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private static String readFileToString(String rootCertPath) throws AlipayApiException {
+        try {
+            File file = new File(rootCertPath);
+            String client = FileUtils.readFileToString(file);
+            return client;
+        } catch (IOException e) {
+            throw new AlipayApiException(e);
+        }
+
+    }
+
     /**
      * 订单请求
      *
@@ -150,7 +198,7 @@ public final class AliPayHolder {
         AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         request.setBizModel(model);
         try {
-            AlipayFundTransUniTransferResponse response = ALI_PAY_CLIENT.certificateExecute(request);
+            AlipayFundTransUniTransferResponse response = instance().certificateExecute(request);
             return new WithDrawResponse(response);
         } catch (AlipayApiException e) {
             throw new WithdrawException(e);

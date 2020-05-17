@@ -11,9 +11,11 @@
     <dubbo:registry address="nacos://47.111.185.61:8848"/>
 
     <dubbo:reference interface="com.ad.launch.user.RemoteUserServiceI" id="remoteUserService"
-                     />
+    />
     <dubbo:reference interface="com.ad.launch.order.RemoteEquipmentServiceI" id="remoteEquipmentService"
     />
     <dubbo:reference interface="com.ad.launch.order.RemoteAdOrderServiceI" id="remoteAdOrderService"
+    />
+    <dubbo:reference interface="com.ad.launch.order.RemoteRevenueServiceI" id="remoteRevenueService"
     />
 </beans>

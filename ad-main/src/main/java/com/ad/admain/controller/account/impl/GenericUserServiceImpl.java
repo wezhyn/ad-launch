@@ -1,12 +1,12 @@
 package com.ad.admain.controller.account.impl;
 
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.user.GenericUser;
-import com.ad.admain.controller.account.user.GenericUserRepository;
-import com.ad.admain.controller.account.user.UserDto;
+import com.ad.admain.controller.account.user.*;
 import com.ad.admain.security.jwt.JwtDetailService;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +23,22 @@ import java.util.Optional;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Integer> implements GenericUserService {
+public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Integer> implements GenericUserService, SocialUserService {
 
     private final GenericUserRepository genericUserRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtDetailService jwtDetailService;
+    @Autowired
+    private CertificationCardRepository certificationCardRepository;
+
+    @Autowired
+    private SocialUserRepository socialUserRepository;
 
     @Autowired
     public GenericUserServiceImpl(GenericUserRepository genericUserRepository) {
-        this.genericUserRepository=genericUserRepository;
+        this.genericUserRepository = genericUserRepository;
     }
 
     /*
@@ -53,13 +58,19 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     }
 
     @Override
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public int modifyUserPasswordById(Integer id, String username, String password) {
-        String newPasword=passwordEncoder.encode(password);
-        String secret=com.wezhyn.project.utils.StringUtils.getRandomString(50);
+        String newPasword = passwordEncoder.encode(password);
+        String secret = com.wezhyn.project.utils.StringUtils.getRandomString(50);
 //        todo:解耦
         jwtDetailService.saveSecretByUsername(id, username, secret);
         return genericUserRepository.updateUserPassword(id, newPasword);
+    }
+
+    @Override
+    public Page<GenericUser> getUserListWithAuth(boolean auth, Pageable pageable) {
+        return getRepository().findGenericUsersByEnable(auth ? GenericUser.UserEnable.NORMAL : GenericUser.UserEnable.NOT_AUTHENTICATION,
+                pageable);
     }
 
     @Override
@@ -72,7 +83,7 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
         if (StringUtils.isEmpty(username)) {
             return Optional.empty();
         }
-        Optional<GenericUser> user=getRepository().findByUsername(username);
+        Optional<GenericUser> user = getRepository().findByUsername(username);
         return user.map(GenericUser::getAvatar);
     }
 
@@ -83,16 +94,24 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
 
 
     @Override
-    public Optional<GenericUser> updateUserAuthenticationInfo(UserDto userDto) {
-        final Optional<GenericUser> savedUser=getRepository().findById(userDto.getId());
-        return Optional.of(savedUser.map(u->{
-            if (u.getEnable().getEnableNum()==0) {
-                u.setRealName(userDto.getRealname());
-                u.setIdCard(userDto.getIdCard());
-                return save(u);
-            }
-            return null;
-        }).get());
+    @Transactional(rollbackFor = Exception.class)
+    public Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg, String aftImg, Integer id) {
+        return genericUserRepository.findById(id)
+                .filter(g -> g.getEnable() == GenericUser.UserEnable.NOT_AUTHENTICATION)
+                .map(u -> {
+                    CertificationCard certificationCard = u.getCertificationCard();
+                    if (certificationCard == null) {
+                        certificationCard = new CertificationCard();
+                    }
+                    certificationCard.setIdCard(idCard);
+                    certificationCard.setRealName(realName);
+                    certificationCard.setIdCardPreImg(preImg);
+                    certificationCard.setIdCardAftImg(aftImg);
+                    certificationCard.setUid(id);
+                    certificationCard = certificationCardRepository.save(certificationCard);
+                    u.setCertificationCard(certificationCard);
+                    return genericUserRepository.save(u);
+                });
     }
 
     @Override
@@ -106,5 +125,17 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     @Override
     public int modifyUserAvatar(String username, String avatar) {
         return genericUserRepository.updateUserAvatar(username, avatar);
+    }
+
+    @Override
+    public boolean isAuth(Integer userId, SocialType type) {
+        return socialUserRepository.existsBySocialTypeAndUid(type, userId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public SocialUser bindUser(Integer uid, String socialId, SocialType type) {
+        SocialUser socialUser = new SocialUser(null, null, uid, socialId, type, null);
+        return this.socialUserRepository.save(socialUser);
     }
 }

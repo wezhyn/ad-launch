@@ -82,7 +82,6 @@ public class TestDataCreate {
                 GenericUser user=GenericUser.builder()
                         .username(name + id)
                         .nickName(name + id)
-                        .realName(name + id)
                         .sex(SexEnum.MALE)
                         .roles(AuthenticationEnum.USER)
                         .enable(GenericUser.UserEnable.NORMAL)

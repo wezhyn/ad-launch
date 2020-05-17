@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
  * @author wezhyn
  * @since 03.27.2020
  */
-@Entity(name="ad_completion")
+@Entity(name = "ad_completion")
 @Getter
 @Table(
-        indexes={
-                @Index(name="order_driver_id", columnList="order_id,deliver_id")
+        indexes = {
+                @Index(name = "order_driver_id", columnList = "order_id,deliver_id", unique = true)
         }
 )
 @DynamicInsert
@@ -27,26 +27,26 @@ public class DiskCompletion implements ICompletion {
     /**
      * 订单的编号
      */
-    @Column(name="order_id")
+    @Column(name = "order_id")
     Integer adOrderId;
     /**
      * 设备所有者id
      */
-    @Column(name="deliver_id")
+    @Column(name = "deliver_id")
     Integer driverId;
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="record_time", columnDefinition="timestamp  null  default current_timestamp")
+    @Column(name = "record_time", columnDefinition = "timestamp  null  default current_timestamp")
     private LocalDateTime recordTime;
 
     public DiskCompletion() {
     }
 
     public DiskCompletion(Integer executedNum, Integer adOrderId, Integer driverId) {
-        this.executedNum=executedNum;
-        this.adOrderId=adOrderId;
-        this.driverId=driverId;
+        this.executedNum = executedNum;
+        this.adOrderId = adOrderId;
+        this.driverId = driverId;
     }
 
     @Override

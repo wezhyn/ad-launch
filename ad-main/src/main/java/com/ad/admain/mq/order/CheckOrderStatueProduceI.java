@@ -13,4 +13,6 @@ public interface CheckOrderStatueProduceI {
      * @param message id,uid
      */
     void checkOrder(final CheckOrderMessage message);
+
+    void authOrder(final UserAuthMessage message);
 }

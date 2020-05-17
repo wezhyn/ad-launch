@@ -1,16 +1,21 @@
 package com.ad.admain.mq.order;
 
+import com.ad.admain.controller.account.impl.SocialUserService;
+import com.ad.admain.controller.account.user.SocialType;
 import com.ad.admain.controller.pay.AdOrderService;
+import com.ad.admain.controller.pay.BillInfoService;
 import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.pay.TradeStatus;
 import com.ad.launch.order.TaskMessage;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
 import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author wezhyn
@@ -22,7 +27,15 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
 
     @Autowired
     private AdOrderService adOrderService;
-    private ConcurrentMap<String, Object> cache = new ConcurrentHashMap<>();
+    @Autowired
+    private SocialUserService socialUserService;
+    @Autowired
+    private BillInfoService billInfoService;
+
+
+    private Cache<String, Object> cache = CacheBuilder.newBuilder()
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build();
 
     public static String getTransId(Message msg) {
         return (String) msg.getHeaders().get("rocketmq_TRANSACTION_ID");
@@ -32,19 +45,45 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
     public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
         if (arg instanceof TaskMessage) {
             TaskMessage message = (TaskMessage) arg;
-            cache.putIfAbsent(getTransId(msg), message);
+            cache.put(getTransId(msg), message);
             return handleOrder(getTransId(msg), message);
+        } else if (arg instanceof UserAuthMessage) {
+            cache.put(getTransId(msg), arg);
+            return RocketMQLocalTransactionState.UNKNOWN;
         }
-
         return RocketMQLocalTransactionState.ROLLBACK;
     }
 
     @Override
     public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
-        final Object obj = cache.get(getTransId(msg));
+        final Object obj = cache.getIfPresent(getTransId(msg));
         if (obj != null) {
             if (obj instanceof TaskMessage) {
                 return handleOrder(getTransId(msg), (TaskMessage) obj);
+            } else if (obj instanceof UserAuthMessage) {
+                UserAuthMessage authMessage = (UserAuthMessage) obj;
+                return billInfoService.getByOrderId(authMessage.getOrderId())
+                        .filter(b -> b.getTradeStatus() == TradeStatus.TRADE_SUCCESS)
+                        .map(b -> {
+                            SocialType type;
+                            switch (b.getPayType()) {
+                                case ALI_PAY: {
+                                    type = SocialType.ALIPAY;
+                                    break;
+                                }
+                                case WECHAT: {
+                                    type = SocialType.WECHAT;
+                                    break;
+                                }
+                                default: {
+                                    throw new RuntimeException("未知支付来源");
+                                }
+                            }
+                            socialUserService.bindUser(authMessage.getUid(), b.getBuyerId(), type);
+                            cache.invalidate(getTransId(msg));
+                            return RocketMQLocalTransactionState.ROLLBACK;
+                        })
+                        .orElse(RocketMQLocalTransactionState.UNKNOWN);
             }
         }
         return RocketMQLocalTransactionState.ROLLBACK;
@@ -54,7 +93,7 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
         final AdOrder savedOrder = adOrderService.findById(message.getOid());
         switch (savedOrder.getVerify()) {
             case PASSING_VERIFY: {
-                cache.remove(transId);
+                cache.invalidate(transId);
                 if (savedOrder.getOrderStatus().getNumber() >= 1 && savedOrder.getOrderStatus().getNumber() <= 3) {
                     return RocketMQLocalTransactionState.COMMIT;
                 } else {
@@ -65,7 +104,7 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
                 return RocketMQLocalTransactionState.UNKNOWN;
             }
             default: {
-                cache.remove(transId);
+                cache.invalidate(transId);
                 return RocketMQLocalTransactionState.ROLLBACK;
             }
         }

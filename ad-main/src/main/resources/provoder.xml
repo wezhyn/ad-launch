@@ -20,6 +20,8 @@
                    group="${spring.profiles.active}" version="1.0.0"/>
     <dubbo:service interface="com.ad.launch.order.RemoteAdOrderServiceI" ref="remoteAdOrderService"
                    group="${spring.profiles.active}" version="1.0.0"/>
+    <dubbo:service interface="com.ad.launch.order.RemoteRevenueServiceI" ref="remoteRevenueService"
+                   group="${spring.profiles.active}" version="1.0.0"/>
     <!-- 和本地bean一样实现服务 -->
     <bean id="remoteUserService" class="com.ad.admain.remote.RemoteUserService">
         <constructor-arg type="com.ad.admain.remote.convert.RemoteUserMapper" ref="remoteUserMapperImpl"/>

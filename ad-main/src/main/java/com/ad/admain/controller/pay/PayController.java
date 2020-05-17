@@ -38,7 +38,7 @@ public class PayController {
 
     @Autowired
     private GenericUserService userService;
-    private static final Function<RefundOrder, AlipayTradeRefundModel> ORDER_REFUND_ALIPAY_MAPPER = b -> {
+    public static final Function<RefundOrder, AlipayTradeRefundModel> ORDER_REFUND_ALIPAY_MAPPER = b -> {
         AlipayTradeRefundModel model = new AlipayTradeRefundModel();
         model.setOutTradeNo(String.valueOf(b.getAdOrderId()));
         model.setTradeNo(b.getOutTradeNo());
@@ -50,7 +50,7 @@ public class PayController {
         return model;
     };
 
-    private static final Function<AdOrder, AlipayTradeAppPayModel> ORDER_ALIPAY_MAPPER = o -> {
+    public static final Function<AdOrder, AlipayTradeAppPayModel> ORDER_ALIPAY_MAPPER = o -> {
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         String body = o.getProduceContext().stream()
                 .filter(Objects::nonNull)
@@ -225,7 +225,7 @@ public class PayController {
     }
 
     private String identifyName() {
-        return "avsftl2208@sandbox.com";
+        return "puibgx4870@sandbox.com";
     }
 
     private String identify() {

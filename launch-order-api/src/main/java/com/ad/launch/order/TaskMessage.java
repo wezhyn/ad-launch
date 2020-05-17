@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -31,7 +30,6 @@ public class TaskMessage {
 
     private Integer totalNum;
 
-    private Integer numPerEquip;
 
     private Integer deliverNum;
 

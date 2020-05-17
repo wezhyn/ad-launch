@@ -42,9 +42,9 @@ public interface EquipTaskService extends BaseService<EquipTask, Integer> {
     /**
      * 检查某个订单的是否已经完成
      *
-     * @param id id
+     * @param orderId id
      * @return 1 ： succeed
      */
-    int checkTaskExecuted(int id);
+    int checkTaskExecuted(int orderId);
 
 }
