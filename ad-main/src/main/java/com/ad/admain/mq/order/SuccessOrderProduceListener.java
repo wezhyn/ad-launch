@@ -4,7 +4,10 @@ import com.ad.admain.controller.account.impl.SocialUserService;
 import com.ad.admain.controller.account.user.SocialType;
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.BillInfoService;
+import com.ad.admain.controller.pay.impl.RefundBillInfoServiceImpl;
 import com.ad.admain.controller.pay.to.AdOrder;
+import com.ad.admain.controller.pay.to.OrderStatus;
+import com.ad.admain.controller.pay.to.PayType;
 import com.ad.admain.pay.TradeStatus;
 import com.ad.launch.order.TaskMessage;
 import com.google.common.cache.Cache;
@@ -31,6 +34,8 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
     private SocialUserService socialUserService;
     @Autowired
     private BillInfoService billInfoService;
+    @Autowired
+    private RefundBillInfoServiceImpl refundBillInfoService;
 
 
     private Cache<String, Object> cache = CacheBuilder.newBuilder()
@@ -57,6 +62,7 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
     @Override
     public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
         final Object obj = cache.getIfPresent(getTransId(msg));
+
         if (obj != null) {
             if (obj instanceof TaskMessage) {
                 return handleOrder(getTransId(msg), (TaskMessage) obj);
@@ -79,7 +85,10 @@ public class SuccessOrderProduceListener implements RocketMQLocalTransactionList
                                     throw new RuntimeException("未知支付来源");
                                 }
                             }
-                            socialUserService.bindUser(authMessage.getUid(), b.getBuyerId(), type);
+                            if (refundBillInfoService.refund(authMessage.getOrderId(), authMessage.getUid(),
+                                    OrderStatus.SUCCESS_PAYMENT, 0.01, "验证成功", PayType.ALI_PAY)) {
+                                socialUserService.bindUser(authMessage.getUid(), b.getBuyerId(), type);
+                            }
                             cache.invalidate(getTransId(msg));
                             return RocketMQLocalTransactionState.ROLLBACK;
                         })

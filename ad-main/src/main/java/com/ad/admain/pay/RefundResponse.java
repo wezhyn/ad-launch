@@ -12,7 +12,22 @@ public class RefundResponse implements RefundNotification {
 
 
     public RefundResponse(AlipayTradeRefundResponse response) {
-        this.response=response;
+        this.response = response;
+    }
+
+    @Override
+    public String getOutTradeNo() {
+        return response.getTradeNo();
+    }
+
+    @Override
+    public String getRefundCurrency() {
+        return response.getRefundCurrency();
+    }
+
+    @Override
+    public String getRefundFee() {
+        return response.getRefundFee();
     }
 
     @Override

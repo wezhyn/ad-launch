@@ -120,9 +120,10 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
                     nextStatus = OrderStatus.WAITING_PAYMENT;
                     break;
                 }
+                case REFUNDED:
                 case REFUNDING: {
                     if (currentStatus.getNumber() > 0 && currentStatus.getNumber() < OrderStatus.EXECUTION_COMPLETED.getNumber()) {
-                        nextStatus = OrderStatus.REFUNDING;
+                        nextStatus = orderStatus;
                     }
                     break;
                 }

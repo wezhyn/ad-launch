@@ -40,7 +40,7 @@ public class AliPayHolderTest {
         createRequest.setBizModel(model);
         createRequest.setNotifyUrl(AliPayProperties.CALLBACK_NOTIFY_URL);
         //这里和普通的接口调用不同，使用的是sdkExecute
-        AlipayTradeAppPayResponse response=AliPayHolder.ALI_PAY_CLIENT.sdkExecute(createRequest);
+        AlipayTradeAppPayResponse response = AliPayHolder.ALI_PAY_CLIENT.sdkExecute(createRequest);
         if (response.isSuccess()) {
             System.out.println(response);
         }
@@ -49,15 +49,15 @@ public class AliPayHolderTest {
 
     @Test
     public void refund() throws AlipayApiException {
-        AlipayTradeRefundRequest request=new AlipayTradeRefundRequest();
-        AlipayTradeRefundModel model=new AlipayTradeRefundModel();
-        model.setOutTradeNo("74");
-        model.setTradeNo("2020022422001406181000040391");
-        model.setRefundAmount("10");
-        model.setRefundReason("测试用例");
-        model.setOutRequestNo("H1H1H4");
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+        model.setOutTradeNo("69");
+        model.setTradeNo("2020051722001406180500783252");
+        model.setRefundAmount("0.01");
+        model.setRefundReason("身份验证结算");
+        model.setOutRequestNo("-69");
         request.setBizModel(model);
-        AlipayTradeRefundResponse response=AliPayHolder.ALI_PAY_CLIENT.certificateExecute(request);
+        AlipayTradeRefundResponse response = AliPayHolder.instance().certificateExecute(request);
         if (response.isSuccess()) {
             System.out.println("success");
         } else {
@@ -67,14 +67,14 @@ public class AliPayHolderTest {
 
     @Test
     public void transferAccount() throws AlipayApiException {
-        AlipayFundTransUniTransferRequest request=new AlipayFundTransUniTransferRequest();
-        AlipayFundTransUniTransferModel model=new AlipayFundTransUniTransferModel();
+        AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
+        AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
         model.setOutBizNo("123123345");
         model.setTransAmount("1111");
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");
         model.setOrderTitle("test");
         model.setBizScene("DIRECT_TRANSFER");
-        Participant payee=new Participant();
+        Participant payee = new Participant();
         payee.setIdentity("nctss2pdw6922@sandbox.com");
         payee.setIdentityType("ALIPAY_LOGON_ID");
         payee.setName("沙箱环境");
