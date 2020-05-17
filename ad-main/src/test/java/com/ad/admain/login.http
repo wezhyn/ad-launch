@@ -7,6 +7,10 @@ Content-Type: application/json
 }
 
 ###
+POST http://{{url}}/api/user/logout
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5OTA4NjcsImlhdCI6MTU4OTY5NDg2NywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.rDPd6ou7-0GGalFe-9m9p_rWcV4xhGwBJ84RqoTEDUE
+
+###
 GET http://{{url}}/api/user/info
 X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5MDc5MzEsImlhdCI6MTU4OTYxMTkzMSwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.kvqhMxk1WAwDsNkrzstC2hlB14Wod2XildfP5ZXDJiE
 

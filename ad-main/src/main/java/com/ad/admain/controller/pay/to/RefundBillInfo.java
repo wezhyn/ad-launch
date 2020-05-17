@@ -70,7 +70,7 @@ public class RefundBillInfo extends BillInfo {
         private String buyerId;
         private String sellerId;
 
-        private RefundBillInfoBuilder() {
+        public RefundBillInfoBuilder() {
         }
 
         public static RefundBillInfoBuilder aRefundBillInfo() {

@@ -12,6 +12,12 @@ public interface RefundNotification {
      */
     boolean isSuccess();
 
+    String getOutTradeNo();
+
+    String getRefundFee();
+
+    String getRefundCurrency();
+
 
     String err();
 }

@@ -2,10 +2,10 @@ package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.account.GenericUserService;
 import com.ad.admain.controller.pay.dto.RefundOrderDto;
+import com.ad.admain.controller.pay.impl.RefundBillInfoServiceImpl;
 import com.ad.admain.controller.pay.to.*;
 import com.ad.admain.pay.AliPayHolder;
 import com.ad.admain.pay.PayException;
-import com.ad.admain.pay.RefundNotification;
 import com.ad.admain.pay.WithDrawNotification;
 import com.ad.admain.pay.exception.WithdrawException;
 import com.ad.admain.security.AdAuthentication;
@@ -63,7 +63,7 @@ public class PayController {
         return model;
     };
     @Autowired
-    private RefundBillInfoService refundBillInfoService;
+    private RefundBillInfoServiceImpl refundBillInfoService;
 
 
     @Autowired
@@ -101,11 +101,9 @@ public class PayController {
                     .withMessage("请支付")
                     .withData("sign", sign)
                     .build();
-        }).orElseGet(() -> {
-            return ResponseResult.forFailureBuilder()
-                    .withMessage("订单不存在")
-                    .build();
-        });
+        }).orElseGet(() -> ResponseResult.forFailureBuilder()
+                .withMessage("订单不存在")
+                .build());
     }
 
     @PostMapping("/refund/{id}")
@@ -130,37 +128,16 @@ public class PayController {
                 }
                 case SUCCESS_PAYMENT: {
 //                    第一次退款
-                    final AdBillInfo orderInfo = billInfoService.getByOrderId(uo.getId()).get();
-//                    并发控制委托 mysql
-                    if (!orderService.modifyOrderStatus(uo.getId(), OrderStatus.REFUNDING)) {
-                        throw new PayException("退款失败");
-                    }
-                    Assert.notNull(orderInfo, "系统异常");
-                    RefundOrder refundOrder = RefundOrder.createRefundOrder(authentication.getId(), refundOrderDto.getRefundAmount(), refundOrderDto.getRefundReason())
-                            .outTradeNo(orderInfo.getAlipayTradeNo())
-                            .adOrderId(orderInfo.getOrderId())
-                            .build();
-                    try {
-                        final RefundNotification refundResponse = AliPayHolder.refundAmount(refundOrder, ORDER_REFUND_ALIPAY_MAPPER);
-                        if (refundResponse.isSuccess()) {
-                            RefundBillInfo refundBill = RefundBillInfo.fromOrder(refundOrder)
-                                    .build();
-                            refundBillInfoService.save(refundBill);
-                            orderService.modifyOrderStatus(uo.getId(), OrderStatus.REFUNDED);
-                            return ResponseResult
-                                    .forSuccessBuilder()
-                                    .withMessage("退款成功")
-                                    .build();
-                        } else {
-                            orderService.rollbackRefundOrderStatus(uo.getId(), originStatus);
-                            return ResponseResult.forFailureBuilder()
-                                    .withMessage(refundResponse.err())
-                                    .build();
-                        }
-                    } catch (Exception e) {
-                        orderService.rollbackRefundOrderStatus(uo.getId(), originStatus);
-                        e.printStackTrace();
-                        throw new PayException(e);
+                    if (refundBillInfoService.refund(refundOrderDto.getAdOrderId(), authentication.getId(), uo.getOrderStatus(),
+                            refundOrderDto.getRefundAmount(), refundOrderDto.getRefundReason(), PayType.ALI_PAY)) {
+                        return ResponseResult
+                                .forSuccessBuilder()
+                                .withMessage("退款成功")
+                                .build();
+                    } else {
+                        return ResponseResult.forFailureBuilder()
+                                .withMessage("退款异常")
+                                .build();
                     }
                 }
                 case REFUNDING: {
@@ -179,11 +156,9 @@ public class PayController {
                     throw new PayException("暂未开动");
                 }
             }
-        }).orElseGet(() -> {
-            return ResponseResult.forFailureBuilder()
-                    .withMessage("退款失败")
-                    .build();
-        });
+        }).orElseGet(() -> ResponseResult.forFailureBuilder()
+                .withMessage("退款失败")
+                .build());
     }
 
     @PostMapping("/withdraw")

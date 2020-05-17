@@ -1,6 +1,6 @@
 POST http://{{url}}/api/auth/alipay
 Content-Type: application/json
-X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5ODgyMjUsImlhdCI6MTU4OTY5MjIyNSwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.eWBdKnvOljNSJJZzPMmnaquWZd3zzuFQOllT81s_GfA
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5OTEzMTcsImlhdCI6MTU4OTY5NTMxNywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.iiukPABLJvtC-vXhYUsGp107EZUmqSzQkvAvi0PGGDg
 
 {}
 

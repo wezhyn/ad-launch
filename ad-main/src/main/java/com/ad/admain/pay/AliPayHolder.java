@@ -206,7 +206,7 @@ public final class AliPayHolder {
 
     }
 
-    public static <T, R extends AlipayTradeRefundModel> RefundNotification refundAmount(T order, Function<T, R> orderMapper) throws RefundException {
+    public static <T, R extends AlipayTradeRefundModel> RefundNotification refundAmount(T order, Function<T, R> orderMapper) {
         final R model = orderMapper.apply(order);
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         request.setBizModel(model);
