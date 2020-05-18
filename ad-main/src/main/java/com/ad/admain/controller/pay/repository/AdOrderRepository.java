@@ -74,4 +74,6 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
 
 
     List<AdOrder> findAdOrdersByOrderStatusEquals(OrderStatus orderStatus);
+
+    Page<AdOrder> findByOrderStatusGreaterThanAndIsDeleteIsFalse(OrderStatus orderStatus, Pageable pageable);
 }

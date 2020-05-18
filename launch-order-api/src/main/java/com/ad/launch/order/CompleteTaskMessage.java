@@ -20,12 +20,12 @@ public class CompleteTaskMessage {
      */
     private Double orderCost;
 
-    private LocalDateTime endTime;
+    private String endTime;
 
     public CompleteTaskMessage(Integer orderId, Double orderCost) {
         this.orderId = orderId;
         this.orderCost = orderCost;
-        this.endTime = LocalDateTime.now();
+        this.endTime = LocalDateTime.now().toString();
     }
 
     public CompleteTaskMessage() {

@@ -163,6 +163,10 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         return adOrderRepository.updateExecuted(oid, executed);
     }
 
+    public Page<AdOrder> getPayList(Pageable pageable) {
+        return adOrderRepository.findByOrderStatusGreaterThanAndIsDeleteIsFalse(OrderStatus.WAITING_PAYMENT, pageable);
+    }
+
     @Override
     public List<AdOrder> findByEnum(Integer type) {
         OrderStatus orderStatus = null;

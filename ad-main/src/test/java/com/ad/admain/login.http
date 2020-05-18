@@ -1,4 +1,4 @@
-POST http://{{url}}/api/user/login
+POST http://{{url}}/api/admin/login
 Content-Type: application/json
 
 {

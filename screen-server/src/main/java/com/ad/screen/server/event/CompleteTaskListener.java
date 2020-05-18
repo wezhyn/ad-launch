@@ -50,7 +50,7 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
         BigDecimal cost = new BigDecimal(0);
         for (DiskCompletion completion : completions) {
             final Double amount = calculateAmount(completion.getExecutedNum(), completion.getTimeScope());
-            cost.add(new BigDecimal(amount));
+            cost = cost.add(new BigDecimal(amount));
             deliverIncomeService.saveOrIncr(completion.getDriverId(), amount, completion.getRecordTime());
             log.debug("{} 增加收入 {}", completion.getDriverId(), amount);
         }
