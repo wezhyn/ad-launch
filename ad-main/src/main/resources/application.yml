@@ -13,7 +13,7 @@ management:
     enabled: false
 spring:
   profiles:
-    active: dev
+    active: tmp
   #    active: dev
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

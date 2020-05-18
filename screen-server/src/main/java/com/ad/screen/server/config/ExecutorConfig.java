@@ -2,8 +2,9 @@ package com.ad.screen.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -20,14 +21,8 @@ public class ExecutorConfig {
      * @return executor
      */
     @Bean(name = "self_taskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(1000);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setThreadNamePrefix("self_async_task");
-        executor.initialize();
-        return executor;
+    public ScheduledExecutorService threadPoolTaskExecutor() {
+        return new ScheduledThreadPoolExecutor(2, t -> new Thread(t, "self_async_task"),
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

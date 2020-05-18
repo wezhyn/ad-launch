@@ -193,7 +193,7 @@ public final class AliPayHolder {
         }
     }
 
-    public static <T, R extends AlipayFundTransUniTransferModel> WithDrawNotification handleWithDraw(T order, Function<T, R> orderMapper) throws WithdrawException {
+    public static <T, R extends AlipayFundTransUniTransferModel> WithDrawNotification handleWithDraw(T order, Function<T, R> orderMapper) {
         final R model = orderMapper.apply(order);
         AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         request.setBizModel(model);

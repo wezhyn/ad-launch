@@ -41,14 +41,13 @@ public class PayControllerTest {
     @Test
     public void withdraw() throws WithdrawException {
         ResponseResult responseResult;
-        IUser user=GenericUser.builder()
+        IUser user = GenericUser.builder()
                 .username("wezhyn")
                 .build();
-        TransferOrder order=TransferOrder.builder(66D, user)
+        TransferOrder order = TransferOrder.builder(66D, 1)
                 .verify(OrderVerify.PASSING_VERIFY)
                 .identify(identify())
-                .identifyName(identifyName())
-                .identityType("ALIPAY_LOGON_ID")
+                .identityType("ALIPAY_USER_ID")
                 .remark(String.format("%s -test", LocalDateTime.now()))
                 .build();
         order.setId(ThreadLocalRandom.current().nextInt(100000));
@@ -68,11 +67,8 @@ public class PayControllerTest {
         return true;
     }
 
-    private String identifyName() {
-        return "沙箱环境";
-    }
 
     private String identify() {
-        return "nctpdw6922@sandbox.com";
+        return "2088102179506184";
     }
 }

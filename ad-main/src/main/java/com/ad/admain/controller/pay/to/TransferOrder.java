@@ -1,6 +1,5 @@
 package com.ad.admain.controller.pay.to;
 
-import com.ad.launch.user.IUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.Assert;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
  * @author wezhyn
  * @since 02.24.2020
  */
-@Entity(name="ad_transfer_order")
+@Entity(name = "ad_transfer_order")
 @Setter
 @Getter
 public class TransferOrder extends Order {
@@ -41,7 +40,7 @@ public class TransferOrder extends Order {
     private String remark;
 
 
-    public static TransferOrderBuilder builder(Double totalAmount, IUser user) {
+    public static TransferOrderBuilder builder(Double totalAmount, Integer user) {
         return new TransferOrderBuilder(totalAmount, user);
     }
 
@@ -55,59 +54,59 @@ public class TransferOrder extends Order {
         private Double totalAmount;
         private OrderVerify verify;
 
-        private TransferOrderBuilder(Double totalAmount, IUser user) {
+        private TransferOrderBuilder(Double totalAmount, Integer userId) {
             totalAmount(totalAmount)
-                    .orderName(user);
+                    .orderName(userId);
         }
 
 
         public TransferOrderBuilder identify(String identify) {
-            this.identify=identify;
+            this.identify = identify;
             return this;
         }
 
         public TransferOrderBuilder identityType(String identityType) {
-            this.identityType=identityType;
+            this.identityType = identityType;
             return this;
         }
 
-        private void orderName(IUser user) {
+        private void orderName(Integer userId) {
             Assert.notNull(totalAmount, "账单金额不能为null");
-            Assert.notNull(user, "用户不能为空");
-            this.orderName=String.format("%s 提现 %f 钱 %s ", user.getUsername(), totalAmount, LocalDateTime.now());
+            Assert.notNull(userId, "用户不能为空");
+            this.orderName = String.format("%s 提现 %f 钱 %s ", userId, totalAmount, LocalDateTime.now());
         }
 
         public TransferOrderBuilder identifyName(String identifyName) {
-            this.identifyName=identifyName;
+            this.identifyName = identifyName;
             return this;
         }
 
         public TransferOrderBuilder remark(String remark) {
-            this.remark=remark;
+            this.remark = remark;
             return this;
         }
 
 
         private TransferOrderBuilder totalAmount(Double totalAmount) {
-            this.totalAmount=totalAmount;
+            this.totalAmount = totalAmount;
             return this;
         }
 
         public TransferOrderBuilder verify(OrderVerify verify) {
-            this.verify=verify;
+            this.verify = verify;
             return this;
         }
 
         public TransferOrder build() {
-            TransferOrder transferOrder=new TransferOrder();
+            TransferOrder transferOrder = new TransferOrder();
             transferOrder.setOrderName(orderName);
             transferOrder.setId(id);
             transferOrder.setTotalAmount(totalAmount);
             transferOrder.setVerify(verify);
-            transferOrder.identifyName=this.identifyName;
-            transferOrder.identify=this.identify;
-            transferOrder.identityType=this.identityType;
-            transferOrder.remark=this.remark;
+            transferOrder.identifyName = this.identifyName;
+            transferOrder.identify = this.identify;
+            transferOrder.identityType = this.identityType;
+            transferOrder.remark = this.remark;
             return transferOrder;
         }
     }

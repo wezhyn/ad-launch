@@ -6,7 +6,7 @@ package com.ad.admain.pay.exception;
  * @author wezhyn
  * @since 02.24.2020
  */
-public class WithdrawException extends Exception {
+public class WithdrawException extends RuntimeException {
 
     public WithdrawException(String message) {
         super(message);

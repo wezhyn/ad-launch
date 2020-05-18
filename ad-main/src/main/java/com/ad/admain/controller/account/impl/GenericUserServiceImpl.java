@@ -133,6 +133,11 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     }
 
     @Override
+    public SocialUser getUser(Integer userId, SocialType type) {
+        return socialUserRepository.findByUidAndSocialType(userId, type);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public SocialUser bindUser(Integer uid, String socialId, SocialType type) {
         SocialUser socialUser = new SocialUser(null, null, uid, socialId, type, null);

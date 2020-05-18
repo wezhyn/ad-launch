@@ -3,18 +3,15 @@ package com.ad.screen.server.handler;
 import com.ad.launch.order.AdEquipment;
 import com.ad.launch.order.RemoteEquipmentServiceI;
 import com.ad.screen.server.ChannelFirstReadEvent;
-import com.ad.screen.server.cache.ChannelCloseException;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.cache.PooledIdAndEquipCacheService;
 import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.entity.TaskKey;
-import com.ad.screen.server.event.AllocateEvent;
-import com.ad.screen.server.event.AllocateType;
 import com.ad.screen.server.event.DistributeTaskI;
 import com.ad.screen.server.event.LocalResumeServerListener;
 import com.ad.screen.server.server.ScreenChannelInitializer;
-import com.ad.screen.server.service.CompletionService;
+import com.ad.screen.server.service.DistributeTaskService;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -22,16 +19,15 @@ import io.netty.channel.socket.ChannelInputShutdownReadComplete;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ad.screen.server.server.ScreenChannelInitializer.FIRST_READ_CHANNEL;
 
@@ -51,22 +47,26 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
     @Resource
     private RemoteEquipmentServiceI equipmentService;
     private final DistributeTaskI distributeTask;
-    private final CompletionService completionService;
-    private final ThreadPoolTaskExecutor taskExecutor;
+    private final ScheduledExecutorService taskExecutor;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final LocalResumeServerListener resumeServerListener;
+    private final DistributeTaskService distributeTaskService;
 
-    public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask, CompletionService completionService, ThreadPoolTaskExecutor taskExecutor, ApplicationEventPublisher applicationEventPublisher, LocalResumeServerListener resumeServerListener) {
+
+    public CompensateHandler(PooledIdAndEquipCacheService pooledIdAndEquipCacheService, DistributeTaskI distributeTask,
+                             @Qualifier("self_taskExecutor") ScheduledExecutorService taskExecutor,
+                             ApplicationEventPublisher applicationEventPublisher,
+                             LocalResumeServerListener resumeServerListener, DistributeTaskService distributeTaskService) {
         this.pooledIdAndEquipCacheService = pooledIdAndEquipCacheService;
         this.distributeTask = distributeTask;
-        this.completionService = completionService;
         this.taskExecutor = taskExecutor;
         this.applicationEventPublisher = applicationEventPublisher;
         this.resumeServerListener = resumeServerListener;
+        this.distributeTaskService = distributeTaskService;
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         final ScheduledFuture<?> future = ctx.channel().attr(ScreenChannelInitializer.SCHEDULED_SEND).get();
         if (future != null) {
             future.cancel(false);
@@ -79,7 +79,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
      * 避免主机强制退出后，循环 BaseHandler 触发补偿
      */
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof ChannelFirstReadEvent) {
 //          填充25个空白帧
             final AtomicBoolean firstRead = ctx.channel().attr(FIRST_READ_CHANNEL).get();
@@ -100,7 +100,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
 
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof ReadTimeoutException) {
             log.warn("客户端{}读取写入超时", ctx.channel().remoteAddress());
         }
@@ -136,8 +136,11 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                 }
             }
             for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
-                taskExecutor.submit(new TransferRunner(builder.build(), distributeTask,
-                        taskExecutor, applicationEventPublisher, resumeServerListener));
+                final EquipTask task = builder.build();
+                taskExecutor.execute(new TransferTask(task, distributeTask,
+                        applicationEventPublisher, resumeServerListener));
+                log.debug("提交任务转移 : orderId {}", task.getTaskKey().getOid());
+                distributeTaskService.remove(task.getTaskKey());
             }
             //更新设备的在线状态
             AdEquipment channelEquip = equipCache.getEquipment();
@@ -187,48 +190,5 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
                 .executedNum(0);
     }
 
-    private static class TransferRunner implements Runnable {
-        /**
-         * 当重复太多次后，丢弃当前任务，由重启线程恢复当前订单
-         */
-        public static final Integer MAX_RETRY = 5;
-        private EquipTask task;
-        private DistributeTaskI distributeTask;
-        private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-        private ApplicationEventPublisher applicationEventPublisher;
-        private AtomicInteger retry;
-        private LocalResumeServerListener resumeServerListener;
 
-
-        public TransferRunner(EquipTask task, DistributeTaskI distributeTask,
-                              ThreadPoolTaskExecutor threadPoolTaskExecutor,
-                              ApplicationEventPublisher applicationEventPublisher,
-                              LocalResumeServerListener resumeServerListener) {
-            this.task = task;
-            this.distributeTask = distributeTask;
-            this.threadPoolTaskExecutor = threadPoolTaskExecutor;
-            this.applicationEventPublisher = applicationEventPublisher;
-            retry = new AtomicInteger(0);
-            this.resumeServerListener = resumeServerListener;
-        }
-
-        @Override
-        public void run() {
-            List<PooledIdAndEquipCache> availableEquips = distributeTask.availableEquips(task);
-            if (availableEquips.size() < task.getDeliverNum()) {
-                if (this.retry.getAndIncrement() > MAX_RETRY) {
-//                  丢弃当前任务
-                    resumeServerListener.updateResumeCount(task.getId() == null ? 0 : task.getId());
-                } else {
-                    threadPoolTaskExecutor.submit(this);
-                }
-                return;
-            }
-            try {
-                applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.COMPENSATE, task, availableEquips));
-            } catch (ChannelCloseException e) {
-                threadPoolTaskExecutor.submit(this);
-            }
-        }
-    }
 }

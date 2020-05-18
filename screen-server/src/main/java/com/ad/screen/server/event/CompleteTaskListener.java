@@ -1,16 +1,18 @@
 package com.ad.screen.server.event;
 
+import com.ad.launch.order.CompleteTaskMessage;
 import com.ad.launch.order.RemoteRevenueServiceI;
 import com.ad.launch.order.RevenueConfig;
 import com.ad.screen.server.dao.DiskCompletionRepository;
 import com.ad.screen.server.entity.DiskCompletion;
+import com.ad.screen.server.mq.CompleteTaskCallback;
 import com.ad.screen.server.service.DeliverIncomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.lang.ref.WeakReference;
-import java.time.LocalTime;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -24,29 +26,40 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
     private final DeliverIncomeService deliverIncomeService;
     private final RemoteRevenueServiceI remoteRevenueService;
     private volatile WeakReference<RevenueConfig> revenueConfig;
+    private final CompleteTaskCallback completeTaskCallback;
 
     public CompleteTaskListener(DiskCompletionRepository diskCompletionRepository, DeliverIncomeService deliverIncomeService,
-                                RemoteRevenueServiceI remoteRevenueService) {
+                                RemoteRevenueServiceI remoteRevenueService, CompleteTaskCallback completeTaskCallback) {
         this.diskCompletionRepository = diskCompletionRepository;
         this.deliverIncomeService = deliverIncomeService;
         this.remoteRevenueService = remoteRevenueService;
+        RevenueConfig revenue;
+        try {
+            revenue = remoteRevenueService.getRevenueConfig();
+        } catch (Exception e) {
+            revenue = null;
+        }
+        this.revenueConfig = new WeakReference<>(revenue);
+        this.completeTaskCallback = completeTaskCallback;
     }
 
 
     @Override
     public void onApplicationEvent(CompleteTaskEvent completeTaskEvent) {
         final List<DiskCompletion> completions = diskCompletionRepository.findAllByAdOrderId(completeTaskEvent.getOrderId());
+        BigDecimal cost = new BigDecimal(0);
         for (DiskCompletion completion : completions) {
-            final Double amount = calculateAmount(completion.getExecutedNum());
-            deliverIncomeService.saveOrIncr(completion.getDriverId(), amount);
+            final Double amount = calculateAmount(completion.getExecutedNum(), completion.getTimeScope());
+            cost.add(new BigDecimal(amount));
+            deliverIncomeService.saveOrIncr(completion.getDriverId(), amount, completion.getRecordTime());
             log.debug("{} 增加收入 {}", completion.getDriverId(), amount);
         }
-
+        completeTaskCallback.send(new CompleteTaskMessage(completeTaskEvent.getOrderId(), cost.doubleValue()));
     }
 
-    public Double calculateAmount(int exeNum) {
+    public Double calculateAmount(int exeNum, int timeScope) {
         RevenueConfig config = revenueConfig();
-        return config.revenue(LocalTime.now()) * exeNum;
+        return config.revenue(timeScope) * exeNum;
     }
 
     public RevenueConfig revenueConfig() {

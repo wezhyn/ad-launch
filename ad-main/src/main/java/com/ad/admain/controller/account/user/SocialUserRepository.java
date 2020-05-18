@@ -10,4 +10,6 @@ public interface SocialUserRepository extends JpaRepository<SocialUser, Integer>
 
 
     Boolean existsBySocialTypeAndUid(SocialType type, Integer uid);
+
+    SocialUser findByUidAndSocialType(Integer uid, SocialType type);
 }

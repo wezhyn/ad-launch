@@ -69,14 +69,15 @@ public class AliPayHolderTest {
     public void transferAccount() throws AlipayApiException {
         AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
         AlipayFundTransUniTransferModel model = new AlipayFundTransUniTransferModel();
-        model.setOutBizNo("123123345");
-        model.setTransAmount("1111");
+        model.setOutBizNo("1");
+        model.setTransAmount("11");
         model.setProductCode("TRANS_ACCOUNT_NO_PWD");
         model.setOrderTitle("test");
         model.setBizScene("DIRECT_TRANSFER");
         Participant payee = new Participant();
-        payee.setIdentity("nctss2pdw6922@sandbox.com");
-        payee.setIdentityType("ALIPAY_LOGON_ID");
+        payee.setIdentity("2088102179506184");
+        payee.setIdentityType("ALIPAY_USER_ID");
+
         payee.setName("沙箱环境");
         model.setPayeeInfo(payee);
         model.setRemark("test");

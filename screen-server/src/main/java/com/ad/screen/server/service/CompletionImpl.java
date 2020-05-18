@@ -1,15 +1,17 @@
 package com.ad.screen.server.service;
 
+import com.ad.launch.order.RevenueConfig;
 import com.ad.screen.server.dao.DiskCompletionRepository;
-import com.ad.screen.server.entity.DiskCompletion;
 import com.ad.screen.server.entity.TaskKey;
 import com.ad.screen.server.event.CompleteTaskEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @ClassName CompletionImpl
@@ -31,23 +33,27 @@ public class CompletionImpl implements CompletionService {
 
     @Qualifier("self_taskExecutor")
     @Autowired
-    private ThreadPoolTaskExecutor executorService;
+    private ExecutorService executorService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void completeNumIncr(int orderId, int driverId, int num) {
-        diskCompletionRepository.createOrIncrComplete(driverId, orderId, num);
+        diskCompletionRepository.createOrIncrComplete(driverId, orderId, num, RevenueConfig.revenueScope(LocalDateTime.now()));
     }
 
     @Override
     public void tryComplete(int orderId, int driverId) {
-        final DiskCompletion disk = diskCompletionRepository.findByAdOrderIdAndDriverId(orderId, driverId);
-        if (disk != null) {
-            final Integer totalExe = disk.getExecutedNum();
-            equipTaskService.mergeTaskExecStatistics(new TaskKey(orderId, driverId), totalExe);
+        Integer driverExe = diskCompletionRepository.findByAdOrderIdAndDriverId(orderId, driverId);
+        if (driverExe != null) {
+            equipTaskService.mergeTaskExecStatistics(new TaskKey(orderId, driverId), driverExe);
             if (equipTaskService.checkTaskExecuted(orderId) > 0) {
-                executorService.submit(() -> applicationEventPublisher.publishEvent(new CompleteTaskEvent(disk, orderId)));
+                executorService.submit(() -> applicationEventPublisher.publishEvent(new CompleteTaskEvent(this, orderId)));
             }
         }
+    }
+
+    @Override
+    public Integer getOrderExecutedNumInComplete(Integer orderId) {
+        return diskCompletionRepository.orderExecutedStatistic(orderId);
     }
 }

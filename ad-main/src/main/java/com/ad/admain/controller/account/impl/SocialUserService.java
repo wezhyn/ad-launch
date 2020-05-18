@@ -14,4 +14,7 @@ public interface SocialUserService {
 
 
     SocialUser bindUser(Integer uid, String socialId, SocialType type);
+
+
+    SocialUser getUser(Integer userId, SocialType type);
 }

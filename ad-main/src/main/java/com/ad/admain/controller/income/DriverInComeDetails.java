@@ -1,15 +1,13 @@
-package com.ad.screen.server.entity;
+package com.ad.admain.controller.income;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenerationTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -31,12 +29,15 @@ public class DriverInComeDetails {
 
     private Double amount;
 
+    @Column(insertable = false, updatable = false)
+    @org.hibernate.annotations.Generated(
+            value = GenerationTime.ALWAYS
+    )
     @ColumnDefault("current_timestamp")
     private LocalDateTime recordTime;
 
-    public DriverInComeDetails(Integer driverId, Double amount, LocalDateTime recordTime) {
+    public DriverInComeDetails(Integer driverId, Double amount) {
         this.driverId = driverId;
         this.amount = amount;
-        this.recordTime = recordTime;
     }
 }

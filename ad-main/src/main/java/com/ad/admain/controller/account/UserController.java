@@ -1,8 +1,8 @@
-package com.ad.admain.controller.account.user;
+package com.ad.admain.controller.account;
 
 import com.ad.admain.controller.AbstractBaseController;
-import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.PasswordModifyWrap;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.UserDto;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.GenericUserMapper;
 import com.ad.admain.security.AdAuthentication;

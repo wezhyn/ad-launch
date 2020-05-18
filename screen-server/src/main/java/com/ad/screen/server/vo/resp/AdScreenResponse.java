@@ -32,12 +32,12 @@ public class AdScreenResponse extends AbstractScreenResponse {
     private String view;
 
 
-    public AdScreenResponse(String imei, Integer entryId, Integer repeatNum, boolean verticalView, String view,byte viewLength) {
+    public AdScreenResponse(String imei, Integer entryId, Integer repeatNum, boolean verticalView, String view, byte viewLength) {
         super(imei, FrameType.AD);
-        this.entryId=entryId;
-        this.repeatNum=repeatNum;
-        this.verticalView=verticalView;
-        this.view=view;
+        this.entryId = entryId;
+        this.repeatNum = repeatNum;
+        this.verticalView = verticalView;
+        this.view = view;
         this.viewLength = viewLength;
     }
 
@@ -48,8 +48,8 @@ public class AdScreenResponse extends AbstractScreenResponse {
 
     @Override
     public String netData() {
-        StringBuilder sb=new StringBuilder();
-        final String code=AdStringUtils.gb2312Code(view);
+        StringBuilder sb = new StringBuilder();
+        final String code = AdStringUtils.gb2312Code(view);
         sb.append(entryId)
                 .append(",")
                 .append(getRepeatNum())
@@ -74,10 +74,11 @@ public class AdScreenResponse extends AbstractScreenResponse {
 
     private String getRepeatNum() {
 
-        StringBuilder s=new StringBuilder(String.valueOf(repeatNum));
-        for (int i=0; i < 4 - s.length(); i++) {
-            s.insert(0, "0");
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < 4 - repeatNum.toString().length(); i++) {
+            s.append("0");
         }
+        s.append(repeatNum);
         return s.toString();
     }
 
@@ -88,6 +89,7 @@ public class AdScreenResponse extends AbstractScreenResponse {
         private String view;
         private String imei;
         private byte viewLength;
+
         private AdScreenResponseBuilder() {
         }
 
@@ -97,32 +99,32 @@ public class AdScreenResponse extends AbstractScreenResponse {
 
 
         public AdScreenResponseBuilder entryId(Integer entryId) {
-            this.entryId=entryId;
+            this.entryId = entryId;
             return this;
         }
 
         public AdScreenResponseBuilder repeatNum(Integer repeatNum) {
-            this.repeatNum=repeatNum;
+            this.repeatNum = repeatNum;
             return this;
         }
 
         public AdScreenResponseBuilder verticalView(boolean verticalView) {
-            this.verticalView=verticalView;
+            this.verticalView = verticalView;
             return this;
         }
 
 
         public AdScreenResponseBuilder view(String view) {
-            this.view=view;
+            this.view = view;
             return this;
         }
 
-        public AdScreenResponseBuilder imei(String imei){
-            this.imei=imei;
+        public AdScreenResponseBuilder imei(String imei) {
+            this.imei = imei;
             return this;
         }
 
-        public AdScreenResponseBuilder viewLength(byte viewLength){
+        public AdScreenResponseBuilder viewLength(byte viewLength) {
             this.viewLength = viewLength;
             return this;
         }

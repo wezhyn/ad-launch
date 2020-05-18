@@ -134,11 +134,11 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     @PostMapping("/verify")
     public ResponseResult verifyOrder(@RequestBody OrderDto orderDto) {
         AdOrder order = getConvertMapper().toTo(orderDto);
-        getService().verifyOrder(order);
         AdOrder savedOrder = getService().findById(order.getId());
-        if (savedOrder.getOrderStatus().getNumber() < 0) {
+        if (savedOrder.getOrderStatus().getNumber() <= 0) {
             return ResponseResult.forFailureBuilder().withMessage(savedOrder.getOrderStatus().getValue()).build();
         }
+        getService().verifyOrder(order);
         orderProduce.paymentOrder(createTask(savedOrder));
         return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
     }

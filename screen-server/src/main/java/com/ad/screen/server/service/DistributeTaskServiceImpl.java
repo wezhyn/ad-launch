@@ -31,8 +31,8 @@ public class DistributeTaskServiceImpl implements DistributeTaskService {
     @Autowired
     private DistributeTaskI distributeTaskI;
 
-    private final Object KEY_VALUE=new Object();
-    private ConcurrentMap<TaskKey, Object> runningTask=new ConcurrentHashMap<>(128);
+    private final Object KEY_VALUE = new Object();
+    private final ConcurrentMap<TaskKey, Object> runningTask = new ConcurrentHashMap<>(128);
 
     @Override
     @Transactional(rollbackFor=Exception.class)

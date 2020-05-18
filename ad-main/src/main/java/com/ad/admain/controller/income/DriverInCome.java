@@ -1,4 +1,4 @@
-package com.ad.screen.server.entity;
+package com.ad.admain.controller.income;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +28,7 @@ public class DriverInCome {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer id;
+
     @Column(name = "driver_id", columnDefinition = "decimal(15,5)")
     private Integer driverId;
 

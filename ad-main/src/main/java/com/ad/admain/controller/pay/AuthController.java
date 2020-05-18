@@ -2,6 +2,7 @@ package com.ad.admain.controller.pay;
 
 import com.ad.admain.controller.account.impl.SocialUserService;
 import com.ad.admain.controller.account.user.SocialType;
+import com.ad.admain.controller.account.user.SocialUser;
 import com.ad.admain.controller.pay.to.*;
 import com.ad.admain.mq.order.CheckOrderStatueProduceI;
 import com.ad.admain.mq.order.UserAuthMessage;
@@ -54,6 +55,24 @@ public class AuthController {
     private CheckOrderStatueProduceI checkOrderStatueProduce;
     @Autowired
     private AdOrderService orderService;
+
+
+    @GetMapping("/info")
+    public ResponseResult authInfo(@AuthenticationPrincipal AdAuthentication adAuthentication) {
+        final SocialUser user = socialUserService.getUser(adAuthentication.getId(), SocialType.ALIPAY);
+        if (user != null) {
+            return ResponseResult.forSuccessBuilder()
+                    .withData("alipayId", user.getSocialAccountId())
+                    .withData("username", user.getOrderUser().getUsername())
+                    .withData("bindTime", user.getRegisterTime())
+                    .withData("status", true)
+                    .build();
+        } else {
+            return ResponseResult.forSuccessBuilder()
+                    .withData("status", false)
+                    .withMessage("无认证信息").build();
+        }
+    }
 
     @PostMapping("/alipay")
     public ResponseResult alipayAuth(@AuthenticationPrincipal AdAuthentication adAuthentication) throws CloneNotSupportedException {

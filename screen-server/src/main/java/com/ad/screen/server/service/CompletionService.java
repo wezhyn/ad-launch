@@ -28,4 +28,15 @@ public interface CompletionService {
     void tryComplete(int orderId, int driverId);
 
 
+    /**
+     * 不等于总执行数量
+     * <p>
+     * 总执行数量=complete#exeNum+EquipTask#exeNum
+     *
+     * @param orderId order
+     * @return int
+     */
+    Integer getOrderExecutedNumInComplete(Integer orderId);
+
+
 }

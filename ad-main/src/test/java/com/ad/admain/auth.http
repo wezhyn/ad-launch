@@ -1,3 +1,7 @@
+GET http://{{url}}/api/auth/info
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTEwMDYwMDQsImlhdCI6MTU4OTcxMDAwNCwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.pI5IE_AJd7jh7HrCRl-m9UZHmpLMuOwfuumKoi_3hyY
+
+###
 POST http://{{url}}/api/auth/alipay
 Content-Type: application/json
 X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTA5OTk2MTMsImlhdCI6MTU4OTcwMzYxMywianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.oRbGny1xYblPWFUUBsbdkPog8vCj0yX8dP2dK4yg13s

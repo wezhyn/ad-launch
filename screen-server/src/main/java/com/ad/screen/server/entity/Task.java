@@ -18,7 +18,7 @@ import lombok.Data;
 public class Task implements PrepareTaskMessage {
 
 
-    private final int equipTaskId;
+    private final Integer equipTaskId;
 
     private final int initRepeatNum;
     /**
@@ -82,17 +82,17 @@ public class Task implements PrepareTaskMessage {
      */
     private volatile FixedTask preTask=null;
 
-    public Task(int equipTaskId, TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
-        this.equipTaskId=equipTaskId;
-        this.taskKey=taskKey;
-        this.rate=rate;
-        this.initRepeatNum=repeatNum;
-        this.repeatNum=repeatNum;
-        this.deliverUserId=deliverUserId;
-        this.longitude=longitude;
-        this.latitude=latitude;
-        this.scope=scope;
-        this.verticalView=verticalView;
+    public Task(Integer equipTaskId, TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
+        this.equipTaskId = equipTaskId;
+        this.taskKey = taskKey;
+        this.rate = rate;
+        this.initRepeatNum = repeatNum;
+        this.repeatNum = repeatNum;
+        this.deliverUserId = deliverUserId;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.scope = scope;
+        this.verticalView = verticalView;
         this.view=view;
         this.repeatRoute=0;
         this.preTask=null;
@@ -155,7 +155,7 @@ public class Task implements PrepareTaskMessage {
     }
 
     public static final class TaskBuilder {
-        private int equipTaskId;
+        private Integer equipTaskId;
         private TaskKey taskKey;
         private int repeatNum;
         private volatile Integer deliverUserId;

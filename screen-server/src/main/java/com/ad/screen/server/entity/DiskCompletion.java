@@ -1,6 +1,7 @@
 package com.ad.screen.server.entity;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
@@ -14,10 +15,11 @@ import java.time.LocalDateTime;
 @Getter
 @Table(
         indexes = {
-                @Index(name = "order_driver_id", columnList = "order_id,deliver_id", unique = true)
+                @Index(name = "order_driver_id_with_day", columnList = "order_id,deliver_id,time_scope", unique = true)
         }
 )
 @DynamicInsert
+@ToString
 public class DiskCompletion implements ICompletion {
 
     /**
@@ -34,6 +36,14 @@ public class DiskCompletion implements ICompletion {
      */
     @Column(name = "deliver_id")
     Integer driverId;
+
+    /**
+     * 对应{@link com.ad.launch.order.RevenueConfig 中的几个时间段}
+     * 使用{@link com.ad.launch.order.RevenueConfig#revenueScope} 计算
+     */
+    @Column(name = "time_scope", nullable = false)
+    private Integer timeScope;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -43,11 +53,6 @@ public class DiskCompletion implements ICompletion {
     public DiskCompletion() {
     }
 
-    public DiskCompletion(Integer executedNum, Integer adOrderId, Integer driverId) {
-        this.executedNum = executedNum;
-        this.adOrderId = adOrderId;
-        this.driverId = driverId;
-    }
 
     @Override
     public Integer getDriverId() {

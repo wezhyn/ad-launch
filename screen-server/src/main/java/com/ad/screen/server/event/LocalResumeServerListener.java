@@ -7,14 +7,15 @@ import com.ad.screen.server.service.DistributeTaskService;
 import com.ad.screen.server.service.EquipTaskService;
 import com.ad.screen.server.service.ResumeRecordService;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Async;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,19 +34,17 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private final ResumeRecordService resumeRecordService;
     private final DistributeTaskI distributeTask;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DistributeTaskService distributeTaskService;
+    private final ScheduledExecutorService executorService;
     /**
      * 修改为使用内置锁进行保护
      */
     private int count;
 
-    private final DistributeTaskService distributeTaskService;
-
-    private final ThreadPoolTaskExecutor executorService;
-
     public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask,
                                      ApplicationEventPublisher applicationEventPublisher,
                                      DistributeTaskService distributeTaskService,
-                                     @Qualifier(value = "self_taskExecutor") ThreadPoolTaskExecutor executorService) {
+                                     @Qualifier(value = "self_taskExecutor") ScheduledExecutorService executorService) {
         this.equipTaskService = equipTaskService;
         this.executorService = executorService;
         this.completionService = completionService;
@@ -84,10 +83,6 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         this.count = count;
     }
 
-    public synchronized int getAndIncrement() {
-        this.count += 1;
-        return this.count;
-    }
 
     @Slf4j
     private static class LocalResumeServer implements Runnable {
@@ -97,15 +92,16 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         private final DistributeTaskI distributeTask;
         private final ApplicationEventPublisher applicationEventPublisher;
         private final DistributeTaskService distributeTaskService;
-        private final ThreadPoolTaskExecutor service;
+        private static final int MAX_RETRY_NUM = 10;
+        private final ScheduledExecutorService service;
+        private int retryNum = 0;
 
 
         public LocalResumeServer(LocalResumeServerListener listener, EquipTaskService equipTaskService,
                                  CompletionService completionService, DistributeTaskI distributeTask,
                                  ApplicationEventPublisher applicationEventPublisher,
                                  DistributeTaskService distributeTaskService,
-                                 ThreadPoolTaskExecutor service
-        ) {
+                                 ScheduledExecutorService service) {
             this.listener = listener;
             this.equipTaskService = equipTaskService;
             this.completionService = completionService;
@@ -115,16 +111,20 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
             this.service = service;
         }
 
-        @SuppressWarnings("InfiniteLoopStatement")
         @Override
+        @Async.Schedule
         public void run() {
             while (true) {
                 try {
                     synchronized (listener) {
                         final List<EquipTask> tasks = equipTaskService.nextPreparedResume(listener.getCount(), DEFAULT_RESUME_STEP);
                         if (tasks.size() == 0) {
-                            TimeUnit.SECONDS.sleep(10);
-                            continue;
+                            if (retryNum <= MAX_RETRY_NUM) {
+                                service.schedule(this, scheduleTime(), TimeUnit.SECONDS);
+                            }
+                            return;
+                        } else {
+                            retryNum = 0;
                         }
                         int lastId = 0;
                         for (int i = 0; i < tasks.size(); ) {
@@ -137,35 +137,45 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                                 i++;
                                 continue;
                             }
+                            Integer hasCompleted = completionService.getOrderExecutedNumInComplete(task.getTaskKey().getOid());
+                            task.setExecutedNum(task.getExecutedNum() + (hasCompleted == null ? 0 : hasCompleted));
 //                    检查当前订单是否已经完成
                             if (task.getExecutedNum().equals(task.getTotalNum())) {
-                                equipTaskService.checkTaskExecuted(task.getId());
-                                distributeTaskService.remove(task.getTaskKey());
-                                i++;
-                                continue;
+                                if (equipTaskService.checkTaskExecuted(task.getId()) > 0) {
+                                    applicationEventPublisher.publishEvent(new CompleteTaskEvent(this, task.getTaskKey().getOid()));
+                                    distributeTaskService.remove(task.getTaskKey());
+                                    i++;
+                                    continue;
+                                }
                             }
                             List<PooledIdAndEquipCache> list = null;
                             while (list == null || list.size() < task.getDeliverNum()) {
                                 list = distributeTask.availableEquips(task);
                                 if (list == null || list.size() < task.getDeliverNum()) {
-                                    TimeUnit.SECONDS.sleep(10);
+                                    TimeUnit.MILLISECONDS.sleep(scheduleTime() * 100);
                                     Thread.yield();
                                 }
                             }
                             applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
+                            retryNum = retryNum / 2;
                             log.info("恢复{}", task.getId());
                             i++;
                         }
-                        if (lastId - 1 > listener.getCount()) {
-                            listener.setCount(lastId);
-                        } else {
-                            listener.getAndIncrement();
-                        }
+                        listener.setCount(lastId);
                     }
                 } catch (InterruptedException ignore) {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+        public int scheduleTime() {
+            retryNum++;
+            if (retryNum < MAX_RETRY_NUM) {
+                return (int) Math.pow(2, retryNum);
+            } else {
+                return (int) Math.pow(2, MAX_RETRY_NUM);
             }
         }
     }

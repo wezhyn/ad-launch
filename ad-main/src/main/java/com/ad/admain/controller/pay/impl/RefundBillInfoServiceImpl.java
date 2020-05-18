@@ -7,7 +7,6 @@ import com.ad.admain.controller.pay.to.PayType;
 import com.ad.admain.controller.pay.to.RefundBillInfo;
 import com.ad.admain.controller.pay.to.RefundOrder;
 import com.ad.admain.pay.AliPayHolder;
-import com.ad.admain.pay.RefundNotification;
 import com.ad.admain.pay.TradeStatus;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +50,10 @@ public class RefundBillInfoServiceImpl extends AbstractBaseService<RefundBillInf
                                 .adOrderId(b.getOrderId())
                                 .build())
                         .map(r -> AliPayHolder.refundAmount(r, ORDER_REFUND_ALIPAY_MAPPER))
-                        .filter(RefundNotification::isSuccess)
                         .map(r -> {
+                            if (!r.isSuccess()) {
+                                throw new RuntimeException("退款异常： " + r.err());
+                            }
                             RefundBillInfo refundBill = new RefundBillInfo.RefundBillInfoBuilder()
                                     .orderId(orderId)
                                     .operatorId("System")

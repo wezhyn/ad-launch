@@ -1,6 +1,5 @@
-package com.ad.screen.server.dao;
+package com.ad.admain.controller.income;
 
-import com.ad.screen.server.entity.DriverInCome;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +15,15 @@ public interface DeliverIncomeRepository extends JpaRepository<DriverInCome, Int
     @Query(nativeQuery = true, value = "insert into driver_in_come(driver_id,amount)" +
             "values(:driverId,:mount) on duplicate key update amount=amount+:mount")
     int saveOrUpdate(int driverId, double mount);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "update driver_in_come set amount=amount-:amount where driver_id=:userId")
+    int decrUserAmount(Integer userId, Double amount);
+
+    @Query(nativeQuery = true, value = "select amount from driver_in_come where driver_id=:userId")
+    double getUserAmount(Integer userId);
+
+    @Query(nativeQuery = true, value = "select amount from driver_in_come where driver_id=:userId for update ")
+    double getUserAmountSync(Integer userId);
 
 }
