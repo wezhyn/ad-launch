@@ -83,7 +83,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                                 continue;
                             }
                             Integer hasCompleted = completionService.getOrderExecutedNumInComplete(task.getTaskKey().getOid());
-                            task.setExecutedNum(task.getExecutedNum() + (hasCompleted == null ? 0 : hasCompleted));
+                            task.setExecutedNum(hasCompleted == null ? 0 : hasCompleted);
 //                    检查当前订单是否已经完成
                             if (task.getExecutedNum().equals(task.getTotalNum())) {
                                 if (equipTaskService.checkTaskExecuted(task.getId()) > 0) {
