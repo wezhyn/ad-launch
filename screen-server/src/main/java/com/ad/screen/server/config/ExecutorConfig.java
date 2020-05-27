@@ -22,7 +22,7 @@ public class ExecutorConfig {
      */
     @Bean(name = "self_taskExecutor")
     public ScheduledExecutorService threadPoolTaskExecutor() {
-        return new ScheduledThreadPoolExecutor(2, t -> new Thread(t, "self_async_task"),
+        return new ScheduledThreadPoolExecutor(5, t -> new Thread(t, "self_async_task"),
                 new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

@@ -5,7 +5,7 @@ import com.ad.screen.server.entity.EquipTask;
 import com.ad.screen.server.event.AllocateEvent;
 import com.ad.screen.server.event.AllocateType;
 import com.ad.screen.server.event.DistributeTaskI;
-import com.ad.screen.server.event.LocalResumeServerListener;
+import com.ad.screen.server.event.LocalResumeState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -25,16 +25,13 @@ public class TransferTask implements Runnable {
     private DistributeTaskI distributeTask;
     private ApplicationEventPublisher applicationEventPublisher;
     private int retryNum = 0;
-    private LocalResumeServerListener resumeServerListener;
 
 
     public TransferTask(EquipTask task, DistributeTaskI distributeTask,
-                        ApplicationEventPublisher applicationEventPublisher,
-                        LocalResumeServerListener resumeServerListener) {
+                        ApplicationEventPublisher applicationEventPublisher) {
         this.task = task;
         this.distributeTask = distributeTask;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.resumeServerListener = resumeServerListener;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class TransferTask implements Runnable {
             e.printStackTrace();
         }
 //                  丢弃当前任务
-        resumeServerListener.updateResumeCount(task.getId() == null ? 0 : task.getId());
+        LocalResumeState.INSTANCE.resetResumeIndex(() -> task.getId() == null ? 0 : task.getId());
         log.debug("重置本地恢复服务");
     }
 

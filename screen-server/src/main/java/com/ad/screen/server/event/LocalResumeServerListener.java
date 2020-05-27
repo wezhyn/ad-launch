@@ -7,13 +7,13 @@ import com.ad.screen.server.service.DistributeTaskService;
 import com.ad.screen.server.service.EquipTaskService;
 import com.ad.screen.server.service.ResumeRecordService;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Async;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +36,8 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
     private final ApplicationEventPublisher applicationEventPublisher;
     private final DistributeTaskService distributeTaskService;
     private final ScheduledExecutorService executorService;
-    /**
-     * 修改为使用内置锁进行保护
-     */
-    private int count;
+
+    private final LocalResumeState localResumeState;
 
     public LocalResumeServerListener(EquipTaskService equipTaskService, CompletionService completionService, ResumeRecordService resumeRecordService, DistributeTaskI distributeTask,
                                      ApplicationEventPublisher applicationEventPublisher,
@@ -52,89 +50,36 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
         this.distributeTask = distributeTask;
         this.applicationEventPublisher = applicationEventPublisher;
         this.distributeTaskService = distributeTaskService;
-        this.count = 0;
+        this.localResumeState = LocalResumeState.INSTANCE;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         log.info("本地重启服务启动");
-        setCount(resumeRecordService.resumeRecord());
-        executorService.submit(new LocalResumeServer(this, equipTaskService, completionService, distributeTask,
-                applicationEventPublisher, distributeTaskService, executorService));
+        localResumeState.setResumeIndex(resumeRecordService.resumeRecord());
+        executorService.submit(new LocalResumeServer());
     }
 
 
-    /**
-     * 用于故障节点转移
-     *
-     * @param crashCount crashCount
-     */
-    public synchronized void updateResumeCount(int crashCount) {
-        if (crashCount < getCount()) {
-            setCount(crashCount);
-        }
-    }
-
-    public synchronized int getCount() {
-        return this.count;
-    }
-
-    public synchronized void setCount(Integer count) {
-        this.count = count;
-    }
-
-
-    @Slf4j
-    private static class LocalResumeServer implements Runnable {
-        private final LocalResumeServerListener listener;
-        private final EquipTaskService equipTaskService;
-        private final CompletionService completionService;
-        private final DistributeTaskI distributeTask;
-        private final ApplicationEventPublisher applicationEventPublisher;
-        private final DistributeTaskService distributeTaskService;
+    private class LocalResumeServer implements Runnable {
         private static final int MAX_RETRY_NUM = 10;
-        private final ScheduledExecutorService service;
         private int retryNum = 0;
 
-
-        public LocalResumeServer(LocalResumeServerListener listener, EquipTaskService equipTaskService,
-                                 CompletionService completionService, DistributeTaskI distributeTask,
-                                 ApplicationEventPublisher applicationEventPublisher,
-                                 DistributeTaskService distributeTaskService,
-                                 ScheduledExecutorService service) {
-            this.listener = listener;
-            this.equipTaskService = equipTaskService;
-            this.completionService = completionService;
-            this.distributeTask = distributeTask;
-            this.applicationEventPublisher = applicationEventPublisher;
-            this.distributeTaskService = distributeTaskService;
-            this.service = service;
-        }
-
         @Override
-        @Async.Schedule
         public void run() {
             while (true) {
                 try {
-                    synchronized (listener) {
-                        final List<EquipTask> tasks = equipTaskService.nextPreparedResume(listener.getCount(), DEFAULT_RESUME_STEP);
+                    synchronized (localResumeState) {
+                        final List<EquipTask> tasks = fetchRecoverTask();
                         if (tasks.size() == 0) {
-                            if (retryNum <= MAX_RETRY_NUM) {
-                                service.schedule(this, scheduleTime(), TimeUnit.SECONDS);
-                            }
+                            executorService.schedule(this, scheduleTime(), TimeUnit.SECONDS);
                             return;
-                        } else {
-                            retryNum = 0;
                         }
+                        retryNum = 0;
                         int lastId = 0;
-                        for (int i = 0; i < tasks.size(); ) {
-                            EquipTask task = tasks.get(i);
+                        for (EquipTask task : tasks) {
                             lastId = task.getId();
                             if (distributeTaskService.checkRunning(task.getTaskKey())) {
-                                if (i == tasks.size() - 1) {
-                                    break;
-                                }
-                                i++;
                                 continue;
                             }
                             Integer hasCompleted = completionService.getOrderExecutedNumInComplete(task.getTaskKey().getOid());
@@ -144,7 +89,6 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                                 if (equipTaskService.checkTaskExecuted(task.getId()) > 0) {
                                     applicationEventPublisher.publishEvent(new CompleteTaskEvent(this, task.getTaskKey().getOid()));
                                     distributeTaskService.remove(task.getTaskKey());
-                                    i++;
                                     continue;
                                 }
                             }
@@ -159,15 +103,22 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
                             applicationEventPublisher.publishEvent(new AllocateEvent(this, AllocateType.RESUME, task, list));
                             retryNum = retryNum / 2;
                             log.info("恢复{}", task.getId());
-                            i++;
                         }
-                        listener.setCount(lastId);
+                        localResumeState.setResumeIndex(lastId);
                     }
-                } catch (InterruptedException ignore) {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+        }
+
+        public List<EquipTask> fetchRecoverTask() {
+            try {
+                return equipTaskService.nextPreparedResume(localResumeState.getResumeIndex(), DEFAULT_RESUME_STEP);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return Collections.emptyList();
         }
 
         public int scheduleTime() {

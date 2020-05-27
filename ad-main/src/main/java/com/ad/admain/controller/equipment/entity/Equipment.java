@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  * <p>
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
-@Entity(name="ad_equipment")
+@Entity(name = "ad_equipment")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 public class Equipment implements IBaseTo<Integer> {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private Integer uid;
@@ -58,10 +58,9 @@ public class Equipment implements IBaseTo<Integer> {
     /**
      * iemi
      */
-    @Column(name = "`key`")
+    @Column(name = "`key`", unique = true, nullable = false, columnDefinition = "char(15)")
     private String key;
 
-    //    @Column(insertable=false, updatable=false)
     @ColumnDefault("current_timestamp")
     private LocalDateTime createTime;
 
@@ -75,15 +74,15 @@ public class Equipment implements IBaseTo<Integer> {
     private Boolean status;
 
     @ColumnDefault("0")
-    @Type(type="strategyEnum")
-    @StrategyEnum(value=EnumType.NUMBER)
+    @Type(type = "strategyEnum")
+    @StrategyEnum(value = EnumType.NUMBER)
     private EquipmentVerify verify;
 
     @ColumnDefault("''")
     private String feedback;
 
 
-    @Column(name="remain")
+    @Column(name = "remain")
     @ColumnDefault("10")
     private Integer remain;
 

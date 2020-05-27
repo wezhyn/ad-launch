@@ -138,7 +138,7 @@ public class CompensateHandler extends ChannelInboundHandlerAdapter {
             for (EquipTask.EquipTaskBuilder builder : constructEquipTask.values()) {
                 final EquipTask task = builder.build();
                 taskExecutor.execute(new TransferTask(task, distributeTask,
-                        applicationEventPublisher, resumeServerListener));
+                        applicationEventPublisher));
                 log.debug("提交任务转移 : orderId {}", task.getTaskKey().getOid());
                 distributeTaskService.remove(task.getTaskKey());
             }
