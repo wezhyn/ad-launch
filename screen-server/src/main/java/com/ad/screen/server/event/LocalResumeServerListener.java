@@ -62,7 +62,7 @@ public class LocalResumeServerListener implements ApplicationListener<ContextRef
 
 
     private class LocalResumeServer implements Runnable {
-        private static final int MAX_RETRY_NUM = 10;
+        private static final int MAX_RETRY_NUM = 6;
         private int retryNum = 0;
 
         @Override

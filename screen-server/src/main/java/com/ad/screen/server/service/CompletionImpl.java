@@ -43,7 +43,7 @@ public class CompletionImpl implements CompletionService {
 
     @Override
     public void tryComplete(int orderId, int driverId) {
-        Integer driverExe = diskCompletionRepository.findByAdOrderIdAndDriverId(orderId, driverId);
+        Integer driverExe = getOrderExecutedNumInComplete(orderId);
         if (driverExe != null) {
             equipTaskService.mergeTaskExecStatistics(new TaskKey(orderId, driverId), driverExe);
             if (equipTaskService.checkTaskExecuted(orderId) > 0) {

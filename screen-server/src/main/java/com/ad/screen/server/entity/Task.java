@@ -18,16 +18,15 @@ import lombok.Data;
 public class Task implements PrepareTaskMessage {
 
 
-    private final Integer equipTaskId;
-
     private final int initRepeatNum;
+    /**
+     * 不可达
+     */
+    public static final int MAX_ROUTE = FixedTask.EQUIP_MAX_ENTRY_ID / ScreenChannelInitializer.SCHEDULE_NUM;
     /**
      * 对于 repeatNum 的保护
      */
-    private final Object repeatLock=new Object();
-
-    //    不可达
-    public static final int MAX_ROUTE=FixedTask.EQUIP_MAX_ENTRY_ID/ScreenChannelInitializer.SCHEDULE_NUM;
+    private final Object repeatLock = new Object();
     /**
      * 与 EquipTask 相同: 订单id，发布设备的用户
      */
@@ -72,18 +71,15 @@ public class Task implements PrepareTaskMessage {
      * 广告显示内容
      */
     private String view;
-
-
     /**
      * 保存之前发送的 FixedTask
      * 因为一个Task只属于一个Channel，单线程情况下，已下的修改均是可见，无并发修改
      * {@code com.ad.screen.server.server.ScreenChannelInitializer#initChannel} 出创建
      * {@code com.ad.screen.server.handler.CompleteMsgHandler#channelRead0} 处清空
      */
-    private volatile FixedTask preTask=null;
+    private volatile FixedTask preTask = null;
 
-    public Task(Integer equipTaskId, TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
-        this.equipTaskId = equipTaskId;
+    public Task(TaskKey taskKey, int rate, int repeatNum, Integer deliverUserId, Double longitude, Double latitude, Double scope, Boolean verticalView, String view) {
         this.taskKey = taskKey;
         this.rate = rate;
         this.initRepeatNum = repeatNum;
@@ -93,9 +89,9 @@ public class Task implements PrepareTaskMessage {
         this.latitude = latitude;
         this.scope = scope;
         this.verticalView = verticalView;
-        this.view=view;
-        this.repeatRoute=0;
-        this.preTask=null;
+        this.view = view;
+        this.repeatRoute = 0;
+        this.preTask = null;
     }
 
     @Override
@@ -130,15 +126,15 @@ public class Task implements PrepareTaskMessage {
 
     public int repeatReduce(int reduce) {
         synchronized (repeatLock) {
-            repeatRoute=(++repeatRoute)%MAX_ROUTE;
+            repeatRoute = (++repeatRoute) % MAX_ROUTE;
             if (repeatNum - reduce > 0) {
-                repeatNum-=reduce;
+                repeatNum -= reduce;
                 return reduce;
-            } else if (repeatNum==0) {
+            } else if (repeatNum == 0) {
                 throw new RuntimeException("当前帧已经分配完成");
             } else {
-                int oldValue=repeatNum;
-                repeatNum=0;
+                int oldValue = repeatNum;
+                repeatNum = 0;
                 return oldValue;
             }
         }
@@ -155,7 +151,6 @@ public class Task implements PrepareTaskMessage {
     }
 
     public static final class TaskBuilder {
-        private Integer equipTaskId;
         private TaskKey taskKey;
         private int repeatNum;
         private volatile Integer deliverUserId;
@@ -174,58 +169,54 @@ public class Task implements PrepareTaskMessage {
         }
 
         public TaskBuilder taskKey(TaskKey taskKey) {
-            this.taskKey=taskKey;
+            this.taskKey = taskKey;
             return this;
         }
 
 
         public TaskBuilder repeatNum(int repeatNum) {
-            this.repeatNum=repeatNum;
+            this.repeatNum = repeatNum;
             return this;
         }
 
-        public TaskBuilder equipTaskId(int equipTaskId) {
-            this.equipTaskId=equipTaskId;
-            return this;
-        }
 
         public TaskBuilder rate(int rate) {
-            this.rate=rate;
+            this.rate = rate;
             return this;
         }
 
         public TaskBuilder deliverUserId(Integer deliverUserId) {
-            this.deliverUserId=deliverUserId;
+            this.deliverUserId = deliverUserId;
             return this;
         }
 
         public TaskBuilder longitude(Double longitude) {
-            this.longitude=longitude;
+            this.longitude = longitude;
             return this;
         }
 
         public TaskBuilder latitude(Double latitude) {
-            this.latitude=latitude;
+            this.latitude = latitude;
             return this;
         }
 
         public TaskBuilder scope(Double scope) {
-            this.scope=scope;
+            this.scope = scope;
             return this;
         }
 
         public TaskBuilder verticalView(Boolean verticalView) {
-            this.verticalView=verticalView;
+            this.verticalView = verticalView;
             return this;
         }
 
         public TaskBuilder view(String view) {
-            this.view=view;
+            this.view = view;
             return this;
         }
 
         public Task build() {
-            return new Task(equipTaskId, taskKey, rate, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
+            return new Task(taskKey, rate, repeatNum, deliverUserId, longitude, latitude, scope, verticalView, view);
         }
     }
 }
