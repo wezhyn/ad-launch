@@ -1,5 +1,7 @@
 package com.ad.screen.server.service;
 
+import com.ad.screen.server.entity.TaskKey;
+
 /**
  * @ClassName CompletionI
  * @Description
@@ -22,10 +24,9 @@ public interface CompletionService {
     /**
      * 尝试标识该任务结束
      *
-     * @param orderId  orderId
-     * @param driverId driverId
+     * @param taskKey key
      */
-    void tryComplete(int orderId, int driverId);
+    void tryComplete(TaskKey taskKey);
 
 
     /**

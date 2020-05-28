@@ -92,6 +92,9 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
                         for (Map.Entry<Integer, Task> entry : received.entrySet()) {
                             Task task = entry.getValue();
+                            if (task.getAvailableAllocateNum() == 0) {
+
+                            }
                             if (task.getPreTask() == null) {
                                 FixedTask fixedTask = new FixedTask(task);
                                 task.setPreTask(fixedTask);

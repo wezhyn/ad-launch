@@ -1,5 +1,6 @@
 package com.ad.screen.server.service;
 
+import com.ad.screen.server.entity.TaskKey;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class CompletionServiceTest {
 
     @Test
     public void completeNumIncr() {
-        completionService.completeNumIncr(2, 2, 10);
+        completionService.tryComplete(new TaskKey(98, 1));
 
     }
 }

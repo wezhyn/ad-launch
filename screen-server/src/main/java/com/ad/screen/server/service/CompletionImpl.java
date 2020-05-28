@@ -42,12 +42,12 @@ public class CompletionImpl implements CompletionService {
     }
 
     @Override
-    public void tryComplete(int orderId, int driverId) {
-        Integer driverExe = getOrderExecutedNumInComplete(orderId);
+    public void tryComplete(TaskKey taskKey) {
+        Integer driverExe = getOrderExecutedNumInComplete(taskKey.getOid());
         if (driverExe != null) {
-            equipTaskService.mergeTaskExecStatistics(new TaskKey(orderId, driverId), driverExe);
-            if (equipTaskService.checkTaskExecuted(orderId) > 0) {
-                executorService.submit(() -> applicationEventPublisher.publishEvent(new CompleteTaskEvent(this, orderId)));
+            equipTaskService.mergeTaskExecStatistics(taskKey, driverExe);
+            if (equipTaskService.checkTaskExecuted(taskKey.getOid()) > 0) {
+                executorService.submit(() -> applicationEventPublisher.publishEvent(new CompleteTaskEvent(this, taskKey.getOid())));
             }
         }
     }

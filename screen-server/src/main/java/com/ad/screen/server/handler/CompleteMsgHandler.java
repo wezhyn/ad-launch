@@ -59,7 +59,7 @@ public class CompleteMsgHandler extends BaseMsgHandler<CompleteNotificationMsg> 
             memoryCompletionService.completeNumIncr(preTask.getTask().getOrderId(), preTask.getTask().getDeliverUserId(), preTask.getRepeatNum());
             if (task.getRepeatNum() == 0) {
                 equipCache.completeTask(taskEntryId);
-                memoryCompletionService.tryComplete(task.getOrderId(), task.getDeliverUserId());
+                memoryCompletionService.tryComplete(task.getTaskKey());
                 cacheService.get(iemi).restIncr(task.getRate());
                 distributeTaskService.remove(task.getTaskKey());
             }
