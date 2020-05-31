@@ -23,7 +23,7 @@ import java.util.Map;
 @ToString
 public class RevenueConfig implements Serializable {
 
-    private static final int[] TIME_SCOPE = {7, 10, 16, 17, 20, 21, 24};
+    private static final int[] TIME_SCOPE = {6, 9, 15, 16, 19, 20, 24};
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private RevenueConfigPair seven = new RevenueConfigPair(TIME_SCOPE[0], 0.01);

@@ -15,10 +15,18 @@ import java.time.LocalTime;
 public class RevenueConfigTest {
     @Test
     public void index() {
-        final int time = new RevenueConfig().revenueScope(LocalDateTime.of(LocalDate.now(),
-                LocalTime.of(20, 0)));
-        System.out.println(time);
-        System.out.println(new RevenueConfig().revenue(time));
+        final LocalDate noe = LocalDate.now();
+
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(6, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(7, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(15, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(16, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(17, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(18, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(19, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(20, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(21, 59))));
+        System.out.println(RevenueConfig.revenueScope(LocalDateTime.of(noe, LocalTime.of(22, 59))));
     }
 
     @Test

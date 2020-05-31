@@ -59,7 +59,7 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
 
     public Double calculateAmount(int exeNum, int timeScope) {
         RevenueConfig config = revenueConfig();
-        return config.revenue(timeScope) * exeNum;
+        return BigDecimal.valueOf(config.revenue(timeScope)).multiply(new BigDecimal(0.3 * exeNum)).doubleValue();
     }
 
     public RevenueConfig revenueConfig() {
