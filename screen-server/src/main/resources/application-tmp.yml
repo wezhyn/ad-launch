@@ -17,6 +17,7 @@ logging:
         screen:
           server:
             event: warn
+            server: debug
     org:
       hibernate:
         type:

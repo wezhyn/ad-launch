@@ -40,6 +40,10 @@ public class DeliverIncomeService {
         return deliverIncomeDetailsRepository.findByDriverId(did, pageable);
     }
 
+    public Page<DriverInComeDetails> getWithdrawRecord(Integer did, double minAmount, Pageable pageable) {
+        return deliverIncomeDetailsRepository.findByDriverIdAndAmountLessThan(did, minAmount, pageable);
+    }
+
 
     public List<DriverInComeDayRecord> weekRevenue(Integer did, LocalDate endDate) {
         LocalDateTime endTime = LocalDateTime.of(endDate, LocalTime.MIN);

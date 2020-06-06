@@ -17,6 +17,8 @@ import java.util.List;
 public interface DeliverIncomeDetailsRepository extends JpaRepository<DriverInComeDetails, Integer> {
 
 
+    Page<DriverInComeDetails> findByDriverIdAndAmountLessThan(Integer did, double minMount, Pageable pageable);
+
     Page<DriverInComeDetails> findByDriverId(Integer did, Pageable pageable);
 
     @Query(nativeQuery = true, value = "select date_format(record_time,'%Y-%m-%d') as date ,sum(amount) as amount" +
