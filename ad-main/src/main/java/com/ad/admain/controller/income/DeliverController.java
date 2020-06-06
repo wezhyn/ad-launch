@@ -6,6 +6,7 @@ import com.wezhyn.project.controller.ResponseResult;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class DeliverController {
         this.deliverIncomeService = deliverIncomeService;
     }
 
+
     @GetMapping(value = "/details/day")
     public ResponseResult detailsDay(@AuthenticationPrincipal AdAuthentication adAuthentication) {
         final List<DriverInComeDayRecord> records = deliverIncomeService.weekRevenue(adAuthentication.getId(), LocalDate.now());
@@ -47,6 +49,19 @@ public class DeliverController {
                 .withData("items", details.getContent())
                 .withData("total", details.getTotalElements())
                 .build();
+    }
+
+    @GetMapping(value = "/withdraw")
+    public ResponseResult withdrawRecord(@AuthenticationPrincipal AdAuthentication adAuthentication,
+                                         @RequestParam(name = "limit", defaultValue = "10") int limit,
+                                         @RequestParam(name = "page", defaultValue = "1") int page) {
+        final Page<DriverInComeDetails> details = deliverIncomeService.getWithdrawRecord(adAuthentication.getId(), 0d, PageRequest.of(
+                page - 1, limit, Sort.Direction.DESC, "id"));
+        return ResponseResult.forSuccessBuilder()
+                .withData("items", details.getContent())
+                .withData("total", details.getTotalElements())
+                .build();
+
     }
 
     @PostMapping(value = "/withdraw")

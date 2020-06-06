@@ -8,6 +8,14 @@ GET http://{{url}}/api/wallet/details/day
 Accept: application/json
 X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoidXNlciIsInVzZXJuYW1lIjoiemhhb28iLCJleHAiOjE1OTEwMTI2MjIsImlhdCI6MTU4OTcxNjYyMiwianRpIjoiMSIsImlzcyI6InN5c3RlbSJ9.X6viggWeA_z9IaXXYeHys75LSe2kZDcWERoRySsD9BE
 
+
+###
+GET http://{{url}}/api/wallet/withdraw
+Content-Type: application/json
+X-Token: eyJhbGciOiJIUzI1NiJ9.eyJhdXRoIjoiZGV2ZWxvcGVyIiwidXNlcm5hbWUiOiJ6aGFvbyIsImV4cCI6MTU5MjcwMjgxMywiaWF0IjoxNTkxNDA2ODEzLCJqdGkiOiIxIiwiaXNzIjoic3lzdGVtIn0.F24QijgLs0Nyl2umTDmWHNSQoFCqrayUNmiDfEOIHNs
+
+{}
+
 ###
 POST http://{{url}}/api/wallet/withdraw
 Content-Type: application/json
