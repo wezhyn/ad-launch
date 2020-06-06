@@ -111,7 +111,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         e.printStackTrace();
                     }
                 }
-                , 0, 50, TimeUnit.SECONDS
+                , 0, 300, TimeUnit.SECONDS
         );
 
         chChannel.attr(SCHEDULED_SEND).set(scheduledSend);
