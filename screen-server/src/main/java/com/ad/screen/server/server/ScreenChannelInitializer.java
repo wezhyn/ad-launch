@@ -99,7 +99,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                                 task.setPreTask(fixedTask);
                                 //将消息推送到设备上
                                 chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));
-                            } else {
+                            }  else {
                                 if (preTask.isSendAgain()) {
                                     chChannel.writeAndFlush(createResponse(preTask, equipment.getKey()));
                                     log.debug("重新发送编号为: {} 的数据帧", preTask.getEquipEntryId());
