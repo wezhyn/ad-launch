@@ -109,12 +109,17 @@ public class RevenueConfig implements Serializable {
         throw new RuntimeException("时间范围错误");
     }
 
-    public String toJson() throws JsonProcessingException {
+    public String toJson() {
         Map<String, String> map = new HashMap<>(16);
         for (RevenueConfigPair revenueConfigPair : getAll()) {
             map.put(revenueConfigPair.getEndTime().toString(), revenueConfigPair.getRevenue().toString());
         }
-        return MAPPER.writeValueAsString(map);
+        try {
+            return MAPPER.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
 

@@ -1,10 +1,10 @@
 package com.ad.admain.controller.config;
 
+import com.ad.launch.order.RevenueConfig;
+import com.alibaba.fastjson.JSONObject;
 import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author wezhyn
@@ -17,10 +17,25 @@ public class SystemConfigController {
     @Autowired
     private ApplicationConfigService applicationConfigService;
 
-    @PostMapping("/revenue")
-    public ResponseResult revenue() {
+    @GetMapping("/revenue")
+    public ResponseResult revenueGet() {
         return ResponseResult.forSuccessBuilder()
-                .withData("revenue", applicationConfigService.getRevenueConfig())
+                .withData("revenue", applicationConfigService.getRevenueConfig().toJson())
+                .build();
+    }
+
+    @PostMapping("/revenue")
+    public ResponseResult revenue(@RequestBody JSONObject revenue) {
+        try {
+            final RevenueConfig config = RevenueConfig.fromJson(revenue.getString("revenue"));
+            applicationConfigService.update(config);
+        } catch (Exception e) {
+            return ResponseResult.forFailureBuilder()
+                    .withMessage("数据格式错误")
+                    .build();
+        }
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("更新成功")
                 .build();
     }
 }
