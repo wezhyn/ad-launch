@@ -92,18 +92,19 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
                         //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
                         for (Map.Entry<Integer, Task> entry : received.entrySet()) {
                             Task task = entry.getValue();
-
                             final FixedTask preTask = task.getPreTask();
                             if (preTask == null) {
                                 FixedTask fixedTask = new FixedTask(task);
                                 task.setPreTask(fixedTask);
                                 //将消息推送到设备上
                                 chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));
-                            }  else {
+                            } else {
                                 if (preTask.isSendAgain()) {
-                                    chChannel.writeAndFlush(createResponse(preTask, equipment.getKey()));
-                                    log.debug("重新发送编号为: {} 的数据帧", preTask.getEquipEntryId());
-                                    preTask.resetRetry();
+                                    ch.eventLoop().schedule(() -> {
+                                        chChannel.writeAndFlush(createResponse(preTask, equipment.getKey()));
+                                        log.debug("重新发送编号为: {} 的数据帧", preTask.getEquipEntryId());
+                                        preTask.resetRetry();
+                                    }, 20, TimeUnit.SECONDS);
                                 }
                             }
                         }

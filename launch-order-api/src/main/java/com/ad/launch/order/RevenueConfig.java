@@ -127,6 +127,7 @@ public class RevenueConfig implements Serializable {
     @EqualsAndHashCode
     @Setter
     public static class RevenueConfigPair implements Serializable {
+
         private final LocalTime endTime;
         private final int endHour;
         private Double revenue;
