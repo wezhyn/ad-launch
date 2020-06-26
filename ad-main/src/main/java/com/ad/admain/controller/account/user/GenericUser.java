@@ -148,6 +148,20 @@ public class GenericUser implements IUser {
         return "";
     }
 
+    public String getIdCardAftImg() {
+        if (certificationCard != null) {
+            return certificationCard.getIdCardAftImg();
+        }
+        return "";
+    }
+
+    public String getIdCardPreImg() {
+        if (certificationCard != null) {
+            return certificationCard.getIdCardPreImg();
+        }
+        return "";
+    }
+
     @Override
     public String getIdCard() {
         if (certificationCard != null) {

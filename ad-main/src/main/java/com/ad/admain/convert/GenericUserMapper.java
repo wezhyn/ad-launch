@@ -1,6 +1,7 @@
 package com.ad.admain.convert;
 
 import com.ad.admain.config.QiNiuProperties;
+import com.ad.admain.controller.account.CertificationCardVo;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.account.user.UserDto;
 import org.mapstruct.*;
@@ -30,19 +31,35 @@ public abstract class GenericUserMapper implements AbstractMapper<GenericUser, U
      */
     @Override
     @Mappings({
-            @Mapping(source="nickName", target="nickname"),
-            @Mapping(source="realName", target="realname"),
-            @Mapping(source="birthDay", target="birthday"),
-            @Mapping(source="enable", target="status"),
-            @Mapping(source="sex", target="gender"),
-            @Mapping(target="avatar",
-                    expression="java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )")
+            @Mapping(source = "nickName", target = "nickname"),
+            @Mapping(source = "realName", target = "realname"),
+            @Mapping(source = "birthDay", target = "birthday"),
+            @Mapping(source = "enable", target = "status"),
+            @Mapping(source = "sex", target = "gender"),
+            @Mapping(target = "avatar",
+                    expression = "java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )")
     })
     public abstract UserDto toDto(GenericUser genericUser);
 
 
+    @Mappings({
+            @Mapping(source = "nickName", target = "nickname"),
+            @Mapping(source = "realName", target = "realname"),
+            @Mapping(source = "birthDay", target = "birthday"),
+            @Mapping(source = "enable", target = "status"),
+            @Mapping(source = "sex", target = "gender"),
+            @Mapping(target = "avatar",
+                    expression = "java(qiNiuProperties.getHostName() + \"/\" + genericUser.getAvatar() )"),
+            @Mapping(target = "idCardPreImg",
+                    expression = "java(qiNiuProperties.getHostName() + \"/\" + genericUser.getIdCardPreImg() )"),
+            @Mapping(target = "idCardAftImg",
+                    expression = "java(qiNiuProperties.getHostName() + \"/\" + genericUser.getIdCardAftImg() )")
+    })
+    public abstract CertificationCardVo toDtoWithCard(GenericUser genericUser);
+
+
     @Override
-    @Mapping(target="equipmentList", ignore=true)
+    @Mapping(target = "equipmentList", ignore = true)
     @InheritInverseConfiguration(name = "toDto")
     @Mapping(target = "certificationCard", ignore = true)
     public abstract GenericUser toTo(UserDto userDto);

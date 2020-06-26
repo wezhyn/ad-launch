@@ -1,5 +1,6 @@
 package com.ad.admain.controller.account;
 
+import com.ad.admain.controller.account.user.CertificationCard;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.wezhyn.project.BaseService;
@@ -18,6 +19,8 @@ public interface GenericUserService extends BaseService<GenericUser, Integer>, C
 
 
     int modifyUserPasswordById(Integer id, String username, String password);
+
+    CertificationCard getUserCard(int id);
 
     Page<GenericUser> getUserListWithAuth(boolean auth, Pageable pageable);
 

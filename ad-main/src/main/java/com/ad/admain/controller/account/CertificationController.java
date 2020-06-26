@@ -1,5 +1,6 @@
 package com.ad.admain.controller.account;
 
+import com.ad.admain.config.QiNiuProperties;
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.account.user.UserDto;
@@ -24,7 +25,8 @@ import java.util.Optional;
 @RestController
 public class CertificationController extends AbstractBaseController<UserDto, Integer, GenericUser> {
 
-
+    @Autowired
+    private QiNiuProperties qiNiuProperties;
     @Autowired
     private GenericUserService genericUserService;
     @Autowired
@@ -40,8 +42,8 @@ public class CertificationController extends AbstractBaseController<UserDto, Int
 
     @PostMapping("/verify")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseResult verify() {
-        return null;
+    public ResponseResult verify(UserDto userDto) {
+        return update(userDto);
     }
 
     @PostMapping("/update")

@@ -10,6 +10,8 @@ import com.wezhyn.project.controller.NoNestResponseResult;
 import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.exception.UpdateOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -84,7 +88,17 @@ public class UserController extends AbstractBaseController<UserDto, Integer, Gen
 
     @GetMapping("/list")
     public ResponseResult getList(@RequestParam(name = "limit", defaultValue = "10") int limit, @RequestParam(name = "page", defaultValue = "1") int page) {
-        return listDto(limit, page);
+        final PageRequest pageable = PageRequest.of(page - 1, limit);
+        final Page<GenericUser> content = getService().getList(pageable);
+        List<CertificationCardVo> list = new ArrayList<>();
+        for (GenericUser user : content.getContent()) {
+            list.add(genericUserMapper.toDtoWithCard(user));
+        }
+        return ResponseResult.forSuccessBuilder()
+                .withMessage("获取列表成功")
+                .withData("items", list)
+                .withData("total", content.getTotalElements())
+                .build();
     }
 
     @PostMapping("/update")

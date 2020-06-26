@@ -68,6 +68,11 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     }
 
     @Override
+    public CertificationCard getUserCard(int id) {
+        return certificationCardRepository.findByUid(id);
+    }
+
+    @Override
     public Page<GenericUser> getUserListWithAuth(boolean auth, Pageable pageable) {
         return getRepository().findGenericUsersByEnable(auth ? GenericUser.UserEnable.NORMAL : GenericUser.UserEnable.NOT_AUTHENTICATION,
                 pageable);
