@@ -8,7 +8,6 @@
     <dubbo:application name="ad-consumer"/>
 
     <!-- 使用multicast广播注册中心暴露服务地址 -->
-    <dubbo:registry address="nacos://47.111.185.61:8848"/>
 
     <dubbo:reference interface="com.ad.launch.user.RemoteUserServiceI" id="remoteUserService"
     />

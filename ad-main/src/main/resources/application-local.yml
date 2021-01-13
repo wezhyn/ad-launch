@@ -1,16 +1,13 @@
 #短期阿里云免费试用数据库配置
 custom:
   mysql:
-    address: rm-bp1584b1c38e93grojo.mysql.rds.aliyuncs.com
-    password: Mmysql!!
+    address: 127.0.0.1
+    password: 123123qwe
     port: 3306
-    username: fkz
+    username: root
     database: fkz
     config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
-spring:
-    jpa:
-      repositories:
-        enabled: true
+
 dubbo:
   registry:
     username: nacos
@@ -25,17 +22,3 @@ rocketmq:
   name-server: localhost:9876
   producer:
     group: order-group
-
-logging:
-  level:
-    com:
-      ad:
-        screen:
-          server:
-            event: warn
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql:
-              BasicBinder: trace

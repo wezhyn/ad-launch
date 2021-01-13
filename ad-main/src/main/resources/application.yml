@@ -1,20 +1,9 @@
 server:
   port: 28080
   address: 0.0.0.0
-  tomcat:
-    max-threads: 8
-rocketmq:
-  name-server: 47.111.185.61:9876
-  producer:
-    group: order-group
-#  name-server: 127.0.0.1:9876
-management:
-  security:
-    enabled: false
 spring:
   profiles:
-    active: tmp
-  #    active: dev
+    active: local
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}

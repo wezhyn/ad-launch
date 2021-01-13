@@ -1,0 +1,102 @@
+#!/bin/bash
+# 快捷启动本地各个应用
+nacos=/opt/nacos
+rocketmq=/opt/rocketmq
+rocketmq_console=/opt/rocketmq-externals/rocketmq-console
+
+if [ ! -d $nacos ] || [ ! -d $rocketmq ]; then
+  echo "检查 nacos 和 rocketMq 配置"
+  exit 1
+fi
+
+nacosStart="$nacos/bin/startup.sh  -m standalone"
+namesrvStart=$rocketmq/bin/mqnamesrv
+brokerStart="$rocketmq/bin/mqbroker -n localhost:9876 -c $rocketmq/conf/broker.conf "
+nacosEnd=$nacos/bin/shutdown.sh
+namesrvEnd="$rocketmq/bin/mqshutdown namesrv"
+brokerEnd="$rocketmq/bin/mqshutdown broker"
+rocketmq_consoleStart="mvn clean spring-boot:run -f  $rocketmq_console/pom.xml -Dspring-boot.run.jvmArguments=\"-Dserver.port=9877 -Drocketmq.config.namesrvAddr=localhost:9876 \" -Dspring-boot.run.arguments=\"rocketmq_console\""
+rocketmq_consoleEnd="jps -m|grep \"rocketmq_console\"|cut -f 1 -d \" \"|xargs kill -9"
+
+
+apps=("nacos" "namesrv" "broker" "rocketmq_console")
+
+
+checkProcess() {
+  jps -m | grep -i "$1" | grep -v grep >/dev/null
+  if [ "$?" -ne 0 ]; then
+    echo 0
+  else
+    #    存在该应用
+    echo 1
+  fi
+}
+
+launchProcess() {
+  local app=$1
+  launchApp="$app"Start
+  eval launchCommond=\$"$launchApp"
+  if [ ! -d "$HOME/logs/$app" ]; then
+    mkdir -p "$HOME/logs/$app"
+  fi
+  logFile="$HOME/logs/$app/nohup"
+  if [ "$(checkProcess "$app")" -ne 1 ]; then
+    echo "start $app"
+    # shellcheck disable=SC2154
+    nohup sh -c "$launchCommond" >"$logFile" 2>&1 &
+  else
+    echo "$app is Running"
+  fi
+}
+
+finishProcess() {
+  local app=$1
+  local endApp="$app"End
+  eval endCommond=\$"$endApp"
+  if [ "$(checkProcess "$app")" -ne 0 ]; then
+    # shellcheck disable=SC2154
+    sh -c "$endCommond"
+  else
+    echo "$app is not Running"
+  fi
+}
+containElement() {
+  local ele=$1
+  shift
+  for e in "${apps[@]}"; do [[ "$e" == "$ele" ]] && return 0; done
+  echo 1
+}
+
+
+
+# 正式处理
+cm=$1
+if [ -z "$cm" ]; then
+  cm="start"
+  echo "开启 ad-launch 各个中间件"
+fi
+case "$cm" in
+"start")
+  for app in "${apps[@]}"; do
+    launchProcess "$app"
+  done
+  ;;
+"end")
+  for app in "${apps[@]}"; do
+    finishProcess "$app"
+  done
+  ;;
+"restart")
+  # nacos|namesrv|broker
+  app=$2
+  if [[ "$(containElement "$app")" -eq 1 ]]; then
+    echo "输入 ${apps[*]} 中的任意一个"
+    exit 1
+  fi
+  finishProcess "$app"
+  while [[ "$(checkProcess "$app")" -eq 1 ]]; do
+    sleep 1
+  done
+  launchProcess "$app"
+  ;;
+esac
