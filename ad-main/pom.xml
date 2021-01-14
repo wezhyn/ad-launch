@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.ad</groupId>
         <artifactId>ad-launch</artifactId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
     <artifactId>ad-main</artifactId>
     <version>1.2.0</version>
@@ -43,7 +43,6 @@
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <version>2.1.0</version>
         </dependency>
         <!-- Dubbo Spring Boot Starter -->
         <dependency>
@@ -62,7 +61,6 @@
         <dependency>
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo-registry-nacos</artifactId>
-            <version>${dubbo.version}</version>
         </dependency>
 
         <!--使用 mysql 地理信息设置-->
@@ -113,7 +111,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.47</version>
         </dependency>
         <!--		token tool-->
         <dependency>
@@ -139,11 +136,7 @@
             <artifactId>qiniu-java-sdk</artifactId>
             <version>7.2.0</version>
         </dependency>
-        <dependency>
-            <groupId>com.easemob</groupId>
-            <artifactId>rest-java-sdk</artifactId>
-            <version>1.0.5</version>
-        </dependency>
+
         <!-- aop依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -153,9 +146,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>25.1-jre</version>
         </dependency>
-
         <!--        支付宝 sdk-->
         <dependency>
             <groupId>com.alipay.sdk</groupId>
@@ -165,7 +156,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
         <!--腾讯短信服务-->
         <dependency>
             <groupId>com.github.qcloudsms</groupId>

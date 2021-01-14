@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>ad-launch</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <name>ad-launch</name>
     <packaging>pom</packaging>
     <description>闸种广告投放</description>
@@ -26,6 +26,12 @@
         <lombok.version>1.18.12</lombok.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <rocketmq-spring.version>2.1.0</rocketmq-spring.version>
+        <ali-pay.version>4.9.28.ALL</ali-pay.version>
+        <qcloudsms.version>1.0.6</qcloudsms.version>
+        <guava.version>25.1-jre</guava.version>
+        <mysql.version>5.1.47</mysql.version>
+        <qiniu.version>7.2.0</qiniu.version>
     </properties>
 
     <dependencies>
@@ -41,9 +47,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.ad</groupId>
-                <artifactId>launch-order-api</artifactId>
-                <version>1.0.0</version>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
             </dependency>
             <!-- Spring Boot -->
             <dependency>
@@ -86,26 +92,57 @@
                 <version>${dubbo.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.ad</groupId>
-                <artifactId>launch-user-api</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
                 <groupId>com.github.qcloudsms</groupId>
                 <artifactId>qcloudsms</artifactId>
-                <version>1.0.6</version>
+                <version>${qcloudsms.version}</version>
             </dependency>
             <!--        支付宝 sdk-->
             <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
             <dependency>
                 <groupId>com.alipay.sdk</groupId>
                 <artifactId>alipay-sdk-java</artifactId>
-                <version>4.9.28.ALL</version>
+                <version>${ali-pay.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ad</groupId>
+                <artifactId>launch-user-api</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.wezhyn.project</groupId>
                 <artifactId>common</artifactId>
-                <version>1.1.1</version>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ad</groupId>
+                <artifactId>ad-main</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ad</groupId>
+                <artifactId>launch-order-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-registry-nacos</artifactId>
+                <version>${dubbo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring.version}</version>
+            </dependency>
+            <!--七牛云-->
+            <dependency>
+                <groupId>com.qiniu</groupId>
+                <artifactId>qiniu-java-sdk</artifactId>
+                <version>${qiniu.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -116,7 +153,6 @@
         <module>launch-user-api</module>
         <module>launch-order-api</module>
         <module>screen-client</module>
-        <module>comsumer-test</module>
         <module>screen-server</module>
     </modules>
 

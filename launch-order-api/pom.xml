@@ -6,10 +6,10 @@
     <parent>
         <artifactId>ad-launch</artifactId>
         <groupId>com.ad</groupId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
     <artifactId>launch-order-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
 
     <name>launch-order-api</name>
     <!-- FIXME change it to the project's website -->
@@ -25,7 +25,6 @@
         <dependency>
             <groupId>com.wezhyn.project</groupId>
             <artifactId>common</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.ad</groupId>
@@ -34,28 +33,23 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.22</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.7.3</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

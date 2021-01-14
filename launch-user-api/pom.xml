@@ -6,10 +6,10 @@
     <parent>
         <artifactId>ad-launch</artifactId>
         <groupId>com.ad</groupId>
-        <version>1.0.0</version>
+        <version>1.2.0</version>
     </parent>
     <artifactId>launch-user-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
 
     <name>launch-user-api</name>
     <!-- FIXME change it to the project's website -->
@@ -25,13 +25,11 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.wezhyn.project</groupId>
             <artifactId>common</artifactId>
-            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
