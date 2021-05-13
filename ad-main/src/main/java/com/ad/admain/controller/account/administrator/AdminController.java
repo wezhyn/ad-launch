@@ -1,5 +1,7 @@
 package com.ad.admain.controller.account.administrator;
 
+import java.util.Optional;
+
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.AdminMapper;
@@ -12,9 +14,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author : wezhyn
@@ -64,11 +70,14 @@ public class AdminController extends AbstractBaseController<AdminDto, Integer, A
 
     @Override
     protected Admin preUpdate(Admin to) {
-        final AdAuthentication authentication=(AdAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        if (authentication==null) {
+        final AdAuthentication authentication = (AdAuthentication)SecurityContextHolder.getContext()
+            .getAuthentication();
+        if (authentication == null) {
             throw new UpdateOperationException("当前用户未认证");
         }
-        to.setId(authentication.getId());
+        if (to.getId() == null) {
+            to.setId(authentication.getId());
+        }
         return to;
     }
 

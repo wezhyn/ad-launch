@@ -1,5 +1,8 @@
 package com.ad.screen.server.service;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.ExecutorService;
+
 import com.ad.launch.order.RevenueConfig;
 import com.ad.screen.server.dao.DiskCompletionRepository;
 import com.ad.screen.server.entity.TaskKey;
@@ -9,9 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @ClassName CompletionImpl
@@ -42,6 +42,7 @@ public class CompletionImpl implements CompletionService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void tryComplete(TaskKey taskKey) {
         Integer driverExe = getOrderExecutedNumInComplete(taskKey.getOid());
         if (driverExe != null) {

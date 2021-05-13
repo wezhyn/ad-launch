@@ -6,10 +6,16 @@ import com.ad.admain.controller.pay.to.AdBillInfo;
 import com.ad.admain.convert.AbstractMapper;
 import com.ad.admain.convert.BillInfoMapper;
 import com.wezhyn.project.controller.ResponseResult;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wezhyn
@@ -19,20 +25,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/billinfo")
 public class BillInfoController extends AbstractBaseController<BillInfoDto, Integer, AdBillInfo> {
 
-
     private final BillInfoService billInfoService;
     private final BillInfoMapper billInfoMapper;
 
     public BillInfoController(BillInfoService billInfoService, BillInfoMapper billInfoMapper) {
-        this.billInfoService=billInfoService;
-        this.billInfoMapper=billInfoMapper;
+        this.billInfoService = billInfoService;
+        this.billInfoMapper = billInfoMapper;
     }
 
     @GetMapping("/list")
     public ResponseResult listBillInfos(
-            @RequestParam(name="limit", defaultValue="10") int limit,
-            @RequestParam(name="page", defaultValue="1") int page) {
-        return listDto(limit, page);
+        @RequestParam(name = "limit", defaultValue = "10") int limit,
+        @RequestParam(name = "page", defaultValue = "1") int page) {
+        AdBillInfo delete = AdBillInfo.builder().delete(false).build();
+        return listDto(limit, page, Example.of(delete));
     }
 
     @GetMapping("/{id}")
@@ -42,15 +48,14 @@ public class BillInfoController extends AbstractBaseController<BillInfoDto, Inte
 
     @PostMapping("/search/{type}")
     public ResponseResult searchOrder(
-            @RequestParam(name="limit", defaultValue="10") int limit,
-            @RequestParam(name="page", defaultValue="1") int page,
-            @PathVariable("type") BillInfoSearchType searchType,
-            @RequestParam("context") String context) {
-        Pageable pageable=PageRequest.of(page - 1, limit);
-        Page<AdBillInfo> searchResult=getService().search(searchType, context, pageable);
+        @RequestParam(name = "limit", defaultValue = "10") int limit,
+        @RequestParam(name = "page", defaultValue = "1") int page,
+        @PathVariable("type") BillInfoSearchType searchType,
+        @RequestParam("context") String context) {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<AdBillInfo> searchResult = getService().search(searchType, context, pageable);
         return doResponse(searchResult);
     }
-
 
     @Override
     public BillInfoService getService() {

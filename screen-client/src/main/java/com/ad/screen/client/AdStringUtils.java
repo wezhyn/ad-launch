@@ -64,12 +64,17 @@ public class AdStringUtils {
         for (byte b : buf) {
             int a;
             if (b < 127 && b > 0) {
-                a=b;
+                a = b;
             } else {
-                a=256 + b;
+                a = 256 + b;
             }
             sb.append(Integer.toHexString(a).toUpperCase());
         }
         return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        String code = "5A555354CFD4CABEC9E8B1B8";
+        System.out.println(code + " decode : " + code2String(code));
     }
 }

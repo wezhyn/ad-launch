@@ -1,14 +1,22 @@
 package com.ad.admain.controller.pay.to;
 
+import java.time.LocalDateTime;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.pay.TradeStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
 
 /**
  * 由 {@link AdOrderService#save(Object)} 创建
@@ -53,6 +61,7 @@ public class AdBillInfo extends BillInfo {
         private String alipayTradeNo;
         private String outBizNo;
         private String buyerId;
+        private Boolean delete;
         private String sellerId;
 
         private AdBillInfoBuilder() {
@@ -63,17 +72,22 @@ public class AdBillInfo extends BillInfo {
         }
 
         public AdBillInfoBuilder id(Integer id) {
-            this.id=id;
+            this.id = id;
+            return this;
+        }
+
+        public AdBillInfoBuilder delete(Boolean delete) {
+            this.delete = delete;
             return this;
         }
 
         public AdBillInfoBuilder orderId(Integer orderId) {
-            this.orderId=orderId;
+            this.orderId = orderId;
             return this;
         }
 
         public AdBillInfoBuilder tradeStatus(TradeStatus tradeStatus) {
-            this.tradeStatus=tradeStatus;
+            this.tradeStatus = tradeStatus;
             return this;
         }
 
@@ -125,6 +139,7 @@ public class AdBillInfo extends BillInfo {
         public AdBillInfo build() {
             AdBillInfo adBillInfo=new AdBillInfo();
             adBillInfo.setId(id);
+            adBillInfo.setDelete(delete);
             adBillInfo.setOrderId(orderId);
             adBillInfo.setTradeStatus(tradeStatus);
             adBillInfo.setTotalAmount(totalAmount);

@@ -1,14 +1,14 @@
 package com.ad.screen.server.handler;
 
+import java.io.UnsupportedEncodingException;
+import java.time.format.DateTimeFormatter;
+
 import com.ad.launch.order.AdStringUtils;
 import com.ad.screen.server.vo.IScreenFrameServer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import org.springframework.stereotype.Component;
-
-import java.io.UnsupportedEncodingException;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author wezhyn
@@ -26,16 +26,17 @@ public class ScreenProtocolOutEncoder extends MessageToByteEncoder<IScreenFrameS
         StringBuilder sb=new StringBuilder();
         sb.append("SOF")
                 .append(getResponseNum(msg))
-                .append(",")
-                .append(msg.equipmentImei())
-                .append(",")
-                .append(msg.type())
-                .append(",")
-                .append(msg.netData())
-                .append(",")
-                .append(getServerTime(msg))
-                .append(",")
-                .append("EOF\r\n");
+            .append(",")
+            .append(msg.equipmentImei())
+            .append(",")
+            .append(msg.type())
+            .append(",")
+            .append(msg.netData())
+            .append(",")
+            .append(getServerTime(msg))
+            .append(",")
+            .append("EOF\r\n");
+        System.out.println(sb.toString());
         out.writeBytes(sb.toString().getBytes());
     }
 

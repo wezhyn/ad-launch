@@ -1,7 +1,19 @@
 package com.ad.admain.controller.pay;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.ad.admain.controller.pay.dto.AppTradeNotification;
-import com.ad.admain.pay.*;
+import com.ad.admain.pay.AliPayHolder;
+import com.ad.admain.pay.AlipayAsyncNotificationGetterI;
+import com.ad.admain.pay.TradeStatus;
+import com.ad.admain.pay.ZfbTradeI;
+import com.ad.admain.pay.ZfbTradeResolver;
 import com.wezhyn.project.AbstractBaseMapAdapterModel;
 import com.wezhyn.project.controller.ResponseResult;
 import com.wezhyn.project.utils.EnumUtils;
@@ -12,13 +24,6 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 /**
  * @author wezhyn
@@ -43,7 +48,6 @@ public class ZfbController {
         boolean isHandle=isVerify ? new ZfbTradeResolver(zfbTrade).handle(notificationGetter) : isVerify;
         return isHandle ? "success" : "fail";
     }
-
 
     /**
      * 支付宝 app 支付同步通知,（忽略执行校验)

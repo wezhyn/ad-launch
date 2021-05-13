@@ -1,21 +1,23 @@
 package com.ad.admain.controller;
 
+import java.lang.reflect.Field;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import com.ad.admain.convert.AbstractMapper;
 import com.wezhyn.project.BaseService;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.controller.BaseController;
 import com.wezhyn.project.controller.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-
-import java.lang.reflect.Field;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * T ：Dto
@@ -26,16 +28,14 @@ import java.util.stream.Collectors;
  * @date : 2019/09/24
  */
 @Slf4j
-public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> implements BaseController<T, ID> {
+public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> implements BaseController<T, ID, U> {
 
-
-    private final Function<ID, ResponseResult> deleteByIdMapper=id->{
+    private final Function<ID, ResponseResult> deleteByIdMapper = id -> {
         getService().delete(id);
         return ResponseResult.forSuccessBuilder()
-                .withMessage("删除成功")
-                .build();
+            .withMessage("删除成功")
+            .build();
     };
-
 
     /**
      * 获取分页列表：无条件查询
@@ -46,27 +46,35 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      */
     @Override
     public ResponseResult listDto(int limit, int page) {
-        final PageRequest pageable=PageRequest.of(page - 1, limit);
-        final Page<U> list=getService().getList(pageable);
+        final PageRequest pageable = PageRequest.of(page - 1, limit, Sort.Direction.DESC, "id");
+
+        final Page<U> list = getService().getList(pageable);
+        return doResponse(list);
+    }
+
+    @Override
+    public ResponseResult listDto(int limit, int page, Example<U> example) {
+        final PageRequest pageable = PageRequest.of(page - 1, limit, Sort.Direction.DESC, "id");
+
+        final Page<U> list = getService().getList(example, pageable);
         return doResponse(list);
     }
 
     @Override
     public ResponseResult createTo(T entityDto) {
-        U to=getConvertMapper().toTo(entityDto);
-        to=preSave(to);
-        U savedTo=getService().save(to);
-        savedTo=afterSave(savedTo);
+        U to = getConvertMapper().toTo(entityDto);
+        to = preSave(to);
+        U savedTo = getService().save(to);
+        savedTo = afterSave(savedTo);
         return doResponse(savedTo, "创建成功");
     }
 
     @Override
     public ResponseResult update(T entityDto) {
-        U to=getConvertMapper().toTo(entityDto);
-        U updateTo=doUpdate(to);
+        U to = getConvertMapper().toTo(entityDto);
+        U updateTo = doUpdate(to);
         return doResponse(updateTo, "修改成功");
     }
-
 
     /**
      * 默认实现：根据Id删除实体类
@@ -77,9 +85,9 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
     @Override
 
     public ResponseResult delete(T entityDto) {
-        final Optional<ID> dtoId=getDtoId(entityDto);
+        final Optional<ID> dtoId = getDtoId(entityDto);
         return dtoId.map(deleteByIdMapper)
-                .orElseGet(()->ResponseResult.forFailureBuilder().withMessage("无对应实体主键").build());
+            .orElseGet(() -> ResponseResult.forFailureBuilder().withMessage("无对应实体主键").build());
     }
 
     /**
@@ -91,23 +99,23 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      * @return response
      */
     public ResponseResult listsDto(int limit, int page, T searchExample) {
-        final Page<U> list=getService().getList(PageRequest.of(page - 1, limit), getConvertMapper().toTo(searchExample));
+        final Page<U> list = getService().getList(PageRequest.of(page - 1, limit),
+            getConvertMapper().toTo(searchExample));
         return doResponse(list);
     }
 
     public ResponseResult currentIdResult(ID currentId) {
-        final Optional<U> idResult=getService().getById(currentId);
+        final Optional<U> idResult = getService().getById(currentId);
         return doResponse(idResult, "获取成功", "获取失败");
     }
 
     protected ResponseResult handleBindingResult(BindingResult result) {
-        String field=result.getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining("|"));
+        String field = result.getFieldErrors().stream()
+            .map(FieldError::getDefaultMessage)
+            .collect(Collectors.joining("|"));
         return ResponseResult.forFailureBuilder()
-                .withMessage(field).build();
+            .withMessage(field).build();
     }
-
 
     /**
      * 执行一些 在 save 之后的一些操作
@@ -130,9 +138,9 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
     }
 
     protected U doUpdate(U entity) {
-        entity=preUpdate(entity);
-        U updateTo=getService().update(entity);
-        updateTo=afterUpdate(updateTo);
+        entity = preUpdate(entity);
+        U updateTo = getService().update(entity);
+        updateTo = afterUpdate(updateTo);
         return updateTo;
     }
 
@@ -161,30 +169,30 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      */
     @SuppressWarnings("unchecked")
     public Optional<ID> getDtoId(T entityDto) {
-        final Class<?> dtoClass=entityDto.getClass();
-        final Field idField=ReflectionUtils.findField(dtoClass, "id");
-        if (idField==null) {
+        final Class<?> dtoClass = entityDto.getClass();
+        final Field idField = ReflectionUtils.findField(dtoClass, "id");
+        if (idField == null) {
             log.error("{} 无主键id列 ", dtoClass);
             return Optional.empty();
         }
         idField.setAccessible(true);
-        final Object id=ReflectionUtils.getField(idField, entityDto);
-        return id==null ? Optional.empty() : (Optional<ID>) Optional.of(id);
+        final Object id = ReflectionUtils.getField(idField, entityDto);
+        return id == null ? Optional.empty() : (Optional<ID>)Optional.of(id);
     }
 
     protected ResponseResult doResponse(Page<U> toList) {
         return ResponseResult.forSuccessBuilder()
-                .withMessage("获取列表成功")
-                .withData("items", getConvertMapper().toDtoList(toList.getContent()))
-                .withData("total", toList.getTotalElements())
-                .build();
+            .withMessage("获取列表成功")
+            .withData("items", getConvertMapper().toDtoList(toList.getContent()))
+            .withData("total", toList.getTotalElements())
+            .build();
     }
 
     protected ResponseResult doResponse(Optional<U> entity, String successMsg, String failMessage) {
-        return entity.map(u->doResponse(u, successMsg))
-                .orElseGet(()->ResponseResult.forFailureBuilder()
-                        .withMessage(failMessage)
-                        .build());
+        return entity.map(u -> doResponse(u, successMsg))
+            .orElseGet(() -> ResponseResult.forFailureBuilder()
+                .withMessage(failMessage)
+                .build());
     }
 
     /**
@@ -196,15 +204,15 @@ public abstract class AbstractBaseController<T, ID, U extends IBaseTo<ID>> imple
      */
     protected ResponseResult doResponse(U entity, String message) {
         return ResponseResult.forSuccessBuilder()
-                .withMessage(message)
-                .withData("to", getConvertMapper().toDto(entity))
-                .build();
+            .withMessage(message)
+            .withData("to", getConvertMapper().toDto(entity))
+            .build();
     }
 
     protected ResponseResult doResponse(String message) {
         return ResponseResult.forSuccessBuilder()
-                .withMessage(message)
-                .build();
+            .withMessage(message)
+            .build();
     }
 
     /**

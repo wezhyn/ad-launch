@@ -1,5 +1,9 @@
 package com.ad.admain.controller.pay.impl;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
 import com.ad.admain.controller.pay.exception.OrderStatusException;
@@ -10,13 +14,14 @@ import com.ad.admain.controller.pay.to.OrderStatus;
 import com.wezhyn.project.AbstractBaseService;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author : wezhyn
@@ -25,7 +30,8 @@ import java.util.Optional;
 @Service
 public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> implements AdOrderService {
 
-    private static final Page<AdOrder> EMPTY_ORDER_PAGE = new PageImpl<>(Collections.unmodifiableList(Collections.emptyList()));
+    private static final Page<AdOrder> EMPTY_ORDER_PAGE = new PageImpl<>(
+        Collections.unmodifiableList(Collections.emptyList()));
     private ProduceRepository produceRepository;
     private AdOrderRepository adOrderRepository;
 
@@ -51,10 +57,18 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
 
     @Override
     public Page<AdOrder> listOrdersWithUsername(int limit, int page) {
-        final PageRequest pageable = PageRequest.of(page - 1, limit);
-        final Page<AdOrder> list = getList(pageable);
+        final PageRequest pageable = PageRequest.of(page - 1, limit, Sort.Direction.DESC, "id");
+        final Page<AdOrder> list = getListNoDelete(pageable);
         Hibernate.initialize(list);
         return list;
+    }
+
+    public Page<AdOrder> getListNoDelete(Pageable pageable) {
+
+        AdOrder adOrder = new AdOrder();
+        adOrder.setIsDelete(false);
+        Example<AdOrder> orderExample = Example.of(adOrder);
+        return getRepository().findAll(orderExample, pageable);
     }
 
     @Override
@@ -109,7 +123,7 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         OrderStatus currentStatus = order.getOrderStatus();
         OrderStatus nextStatus = null;
         if (orderStatus.getNumber() == currentStatus.getNumber() + 1) {
-//            正常升级
+            //            正常升级
             nextStatus = orderStatus;
         } else if (orderStatus.getNumber() < 0) {
             switch (orderStatus) {
@@ -122,7 +136,8 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
                 }
                 case REFUNDED:
                 case REFUNDING: {
-                    if (currentStatus.getNumber() > 0 && currentStatus.getNumber() < OrderStatus.EXECUTION_COMPLETED.getNumber()) {
+                    if (currentStatus.getNumber() > 0 && currentStatus.getNumber() < OrderStatus.EXECUTION_COMPLETED
+                        .getNumber()) {
                         nextStatus = orderStatus;
                     }
                     break;
@@ -182,7 +197,6 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
         }
         return null;
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)

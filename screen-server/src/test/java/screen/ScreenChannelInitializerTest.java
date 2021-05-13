@@ -1,5 +1,7 @@
 package screen;
 
+import java.nio.charset.StandardCharsets;
+
 import com.ad.screen.server.ScreenApplication;
 import com.ad.screen.server.handler.GpsMsgMsgHandler;
 import com.ad.screen.server.handler.HeartBeatMsgMsgHandler;
@@ -17,8 +19,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @SpringBootTest(classes = ScreenApplication.class)
@@ -51,20 +51,21 @@ public class ScreenChannelInitializerTest {
 //                .netData(new Point2D(12000.84339, 3013.18313)).build();
 //        assertNotEquals(origin, result);
 
-        BaseScreenRequest request=BaseScreenRequest.builder()
-                .equipmentName("863987031739406").build();
-        AdScreenResponse data=AdScreenResponse.builder()
-                .entryId(1)
-                .repeatNum(100)
-                .verticalView(false)
-                .imei(request.getEquipmentName())
-                .viewLength((byte) 12)
-                .view("ZUST显示设备").build();
+        BaseScreenRequest request = BaseScreenRequest.builder()
+            .equipmentName("8639870317394061").build();
+        AdScreenResponse data = AdScreenResponse.builder()
+            .entryId(1)
+            .repeatNum(100)
+            .verticalView(false)
+            .imei(request.getEquipmentName())
+            .viewLength((byte)12)
+            .view("ZUST显示设备").build();
 
         channel.writeAndFlush(data);
         final ByteBuf objectStr=channel.readOutbound();
-        final CharSequence charSequence=objectStr.readCharSequence(objectStr.readableBytes(), StandardCharsets.US_ASCII);
-        String expectStr="SOF0084,863987031739406,3,1,0100,1,012,5A555354CFD4CABEC9E8B1B8,20200211213040,EOF\r\n";
+        final CharSequence charSequence = objectStr.readCharSequence(objectStr.readableBytes(),
+            StandardCharsets.US_ASCII);
+        String expectStr = "SOF0082,863987031739406,3,1,0012,1,012,5A555354CFD4CABEC9E8B1B8,20200211213040,EOF\r\n";
         Assert.assertEquals(expectStr, charSequence.toString());
 
     }

@@ -1,11 +1,20 @@
 package com.ad.screen.server.server;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ad.launch.order.AdEquipment;
 import com.ad.screen.server.cache.PooledIdAndEquipCache;
 import com.ad.screen.server.entity.FixedTask;
 import com.ad.screen.server.entity.Task;
-import com.ad.screen.server.handler.*;
+import com.ad.screen.server.handler.CompensateHandler;
+import com.ad.screen.server.handler.CompleteMsgHandler;
+import com.ad.screen.server.handler.ConfirmMsgHandler;
+import com.ad.screen.server.handler.GpsMsgMsgHandler;
+import com.ad.screen.server.handler.HeartBeatMsgMsgHandler;
+import com.ad.screen.server.handler.ScreenProtocolCheckInboundHandler;
+import com.ad.screen.server.handler.ScreenProtocolOutEncoder;
 import com.ad.screen.server.vo.resp.AdScreenResponse;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.SocketChannel;
@@ -14,10 +23,6 @@ import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @ClassName ChannelInitializer
@@ -37,11 +42,13 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
      * 设备attr的key,{@link ScreenChannelInitializer#channelRead} 处设置
      */
     public static final AttributeKey<String> IEMI = AttributeKey.valueOf("EQUIP_IEMI");
-    public static final AttributeKey<PooledIdAndEquipCache> POOLED_EQUIP_CACHE = AttributeKey.valueOf("EQUIP_POOLED_CACHE");
+    public static final AttributeKey<PooledIdAndEquipCache> POOLED_EQUIP_CACHE = AttributeKey.valueOf(
+        "EQUIP_POOLED_CACHE");
     /**
-     * 5分钟内调度频率
+     * 调度时间 = MIN_TIME * scheduleNum
      */
-    public static final Integer SCHEDULE_NUM = 25;
+    public static final Integer SCHEDULE_NUM = 5;
+    public static final Integer MIN_TIME = 12;
     private final HeartBeatMsgMsgHandler heartBeatMsgHandler;
     private final GpsMsgMsgHandler gpsMsgHandler;
     private final ConfirmMsgHandler confirmMsgHandler;
@@ -49,7 +56,9 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     private final CompleteMsgHandler completeMsgHandler;
     private final CompensateHandler compensateHandler;
 
-    public ScreenChannelInitializer(HeartBeatMsgMsgHandler heartBeatMsgHandler, GpsMsgMsgHandler gpsMsgHandler, ConfirmMsgHandler confirmMsgHandler, ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler, CompleteMsgHandler completeMsgHandler, CompensateHandler compensateHandler) {
+    public ScreenChannelInitializer(HeartBeatMsgMsgHandler heartBeatMsgHandler, GpsMsgMsgHandler gpsMsgHandler,
+        ConfirmMsgHandler confirmMsgHandler, ScreenProtocolCheckInboundHandler screenProtocolCheckInboundHandler,
+        CompleteMsgHandler completeMsgHandler, CompensateHandler compensateHandler) {
         this.heartBeatMsgHandler = heartBeatMsgHandler;
         this.gpsMsgHandler = gpsMsgHandler;
         this.confirmMsgHandler = confirmMsgHandler;
@@ -62,7 +71,7 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
     protected void initChannel(SocketChannel ch) throws Exception {
         final Channel chChannel = ch.pipeline().channel();
         chChannel.attr(FIRST_READ_CHANNEL).set(new AtomicBoolean(false));
-//        ch.pipeline().addLast(new ReadTimeoutHandler(130));
+        //        ch.pipeline().addLast(new ReadTimeoutHandler(130));
         ch.pipeline().addLast(new ScreenProtocolOutEncoder());
         ch.pipeline().addLast(new LineBasedFrameDecoder(80, true, true));
         ch.pipeline().addLast(screenProtocolCheckInboundHandler);
@@ -72,62 +81,60 @@ public class ScreenChannelInitializer extends io.netty.channel.ChannelInitialize
         ch.pipeline().addLast(completeMsgHandler);
         ch.pipeline().addLast(compensateHandler);
 
-
         final ScheduledFuture<?> scheduledSend = ch.eventLoop().scheduleAtFixedRate(() -> {
-                    try {
-                        final AtomicBoolean channelInitCompleted = chChannel.attr(FIRST_READ_CHANNEL).get();
-                        if (chChannel.attr(SCHEDULED_SEND).get() == null || channelInitCompleted == null ||
-                                !channelInitCompleted.get()) {
-//                            客户端被关闭| 客户端还未被正常初始化
-                            return;
-                        }
-                        final PooledIdAndEquipCache equipCache = chChannel.attr(POOLED_EQUIP_CACHE).get();
-                        AdEquipment equipment = equipCache.getEquipment();
-                        //若任务表内的数据不为空则发送数据
-                        Map<Integer, Task> received = equipCache.getAllTask();
-                        if (received.size() == 0) {
-                            log.debug("id为:{}的设备还没收到任务", equipment.getKey());
-                            return;
-                        }
-                        //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
-                        for (Map.Entry<Integer, Task> entry : received.entrySet()) {
-                            Task task = entry.getValue();
-                            final FixedTask preTask = task.getPreTask();
-                            if (preTask == null) {
-                                FixedTask fixedTask = new FixedTask(task);
-                                task.setPreTask(fixedTask);
-                                //将消息推送到设备上
-                                chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));
-                            } else {
-                                if (preTask.isSendAgain()) {
-                                    ch.eventLoop().schedule(() -> {
-                                        chChannel.writeAndFlush(createResponse(preTask, equipment.getKey()));
-                                        log.debug("重新发送编号为: {} 的数据帧", preTask.getEquipEntryId());
-                                        preTask.resetRetry();
-                                    }, 20, TimeUnit.SECONDS);
-                                }
+                try {
+                    final AtomicBoolean channelInitCompleted = chChannel.attr(FIRST_READ_CHANNEL).get();
+                    if (chChannel.attr(SCHEDULED_SEND).get() == null || channelInitCompleted == null ||
+                        !channelInitCompleted.get()) {
+                        //                            客户端被关闭| 客户端还未被正常初始化
+                        return;
+                    }
+                    final PooledIdAndEquipCache equipCache = chChannel.attr(POOLED_EQUIP_CACHE).get();
+                    AdEquipment equipment = equipCache.getEquipment();
+                    //若任务表内的数据不为空则发送数据
+                    Map<Integer, Task> received = equipCache.getAllTask();
+                    if (received.size() == 0) {
+                        log.debug("id为:{}的设备还没收到任务", equipment.getKey());
+                        return;
+                    }
+                    //遍历检查是否有新未发送的task,有则更新任务列表后空白帧的信息
+                    for (Map.Entry<Integer, Task> entry : received.entrySet()) {
+                        Task task = entry.getValue();
+                        final FixedTask preTask = task.getPreTask();
+                        if (preTask == null) {
+                            FixedTask fixedTask = new FixedTask(task);
+                            task.setPreTask(fixedTask);
+                            //将消息推送到设备上
+                            chChannel.writeAndFlush(createResponse(fixedTask, equipment.getKey()));
+                        } else {
+                            if (preTask.isSendAgain()) {
+                                ch.eventLoop().schedule(() -> {
+                                    chChannel.writeAndFlush(createResponse(preTask, equipment.getKey()));
+                                    log.debug("重新发送编号为: {} 的数据帧", preTask.getEquipEntryId());
+                                    preTask.resetRetry();
+                                }, 5, TimeUnit.SECONDS);
                             }
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                , 0, 300, TimeUnit.SECONDS
+            }
+            , 0, MIN_TIME * SCHEDULE_NUM, TimeUnit.SECONDS
         );
 
         chChannel.attr(SCHEDULED_SEND).set(scheduledSend);
     }
 
-
     private AdScreenResponse createResponse(FixedTask task, String iemi) {
         return AdScreenResponse.builder()
-                .entryId(task.getEquipEntryId())
-                .view(task.getTask().getView())
-                .verticalView(task.getTask().getVerticalView() == null ? false : task.getTask().getVerticalView())
-                .repeatNum(task.getRepeatNum())
-                .imei(iemi)
-                .viewLength((byte) task.getTask().getView().length())
-                .build();
+            .entryId(task.getEquipEntryId())
+            .view(task.getTask().getView())
+            .verticalView(task.getTask().getVerticalView() == null ? false : task.getTask().getVerticalView())
+            .repeatNum(task.getRepeatNum())
+            .imei(iemi)
+            .viewLength((byte)task.getTask().getView().length())
+            .build();
     }
 
 }

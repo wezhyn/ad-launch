@@ -1,5 +1,11 @@
 package com.ad.screen.client;
 
+import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.ad.launch.order.TaskMessage;
 import com.ad.screen.client.vo.req.GpsMsg;
 import com.ad.screen.client.vo.req.HeartBeatMsg;
@@ -18,21 +24,17 @@ import javafx.geometry.Point2D;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
-
-import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author wezhyn
@@ -106,31 +108,7 @@ public class ScreenClient {
     }
 
     public static void main(String[] args) throws InterruptedException, ParseException {
-        final CommandLineArg command=createCommand(args);
-        ExecutorService service=Executors.newCachedThreadPool();
-        AtomicLong count=new AtomicLong(0);
-        AtomicInteger runnerCount=new AtomicInteger(command.getStartRunner());
-        AtomicInteger taskCount=new AtomicInteger(command.getStartMsg());
-        DefaultMQProducer producer=createMq();
-        while (true) {
-            if (runnerCount.get() < command.getEndRunner()) {
-                final int nowCount=runnerCount.getAndIncrement();
-                service.submit(() -> {
-                    runOne(command, createEquipName(nowCount), count);
-                });
-                TimeUnit.MILLISECONDS.sleep(300);
-            } else {
-                Thread.yield();
-            }
-            if (command.isSend && taskCount.get() < command.getEndMsg()) {
-                if (new Random().nextInt(20)==0) {
-                    final int nowCount=taskCount.getAndIncrement();
-                    service.submit(()->sendMessage(nowCount, producer));
-                }
-            } else {
-                Thread.yield();
-            }
-        }
+        String equip = RandomStringUtils.random(16, false, true);
     }
 
     private static String createEquipName(Integer count) {
@@ -184,7 +162,6 @@ public class ScreenClient {
                                     .addLast(new LineBasedFrameDecoder(100, true, true))
                                     .addLast(new ScreenProtocolCheckInboundHandler(27, 3, 4, true))
                                     .addLast(new ScreenProtocolOutEncoder())
-//                                    .addLast(new IdleStateHandler(120, 170, 180))
                                     .addLast(new ConfirmHandler())
                                     .addLast(new AdScreenHanlder(count));
                             socketChannel.eventLoop().schedule(()->{
@@ -218,11 +195,11 @@ public class ScreenClient {
 
     }
 
-    private static GpsMsg simulateGps(String equip) {
-        Random r=new Random();
-        DecimalFormat df=new DecimalFormat("0.00000");
-        double x=Double.parseDouble(df.format(12000.00000 + r.nextInt(10)*0.0001d));
-        double y=Double.parseDouble(df.format(3020.00000 + r.nextInt(10)*0.0001d));
+    public static GpsMsg simulateGps(String equip) {
+        Random r = new Random();
+        DecimalFormat df = new DecimalFormat("0.00000");
+        double x = Double.parseDouble(df.format(12000.00000 + r.nextInt(10) * 0.0001d));
+        double y = Double.parseDouble(df.format(3020.00000 + r.nextInt(10) * 0.0001d));
         return new GpsMsg(new Point2D(x, y), equip);
     }
 

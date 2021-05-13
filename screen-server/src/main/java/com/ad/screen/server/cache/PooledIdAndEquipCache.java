@@ -1,5 +1,12 @@
 package com.ad.screen.server.cache;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.ad.launch.order.AdEquipment;
 import com.ad.screen.server.entity.Task;
 import com.ad.screen.server.server.ScreenChannelInitializer;
@@ -7,13 +14,6 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @ClassName EquipmentCache
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class PooledIdAndEquipCache {
 
-    public static final Integer MAX_SCHEDULE_NUM=25;
+    public static final Integer MAX_SCHEDULE_NUM = 25;
     private final AtomicInteger versionCount;
     /*
     设备信息
@@ -47,16 +47,10 @@ public class PooledIdAndEquipCache {
      * 为了保障上述两者间的同步性，
      */
     private ConcurrentMap<Integer, Task> taskMap;
-
-
-    public PooledIdAndEquipCache(Channel channel, AdEquipment equipment) {
-        this.channel=channel;
-        this.equipment=equipment;
-        this.rest=new AtomicInteger(ScreenChannelInitializer.SCHEDULE_NUM);
-        this.taskMap=new ConcurrentHashMap<>(16);
-        this.isChannelClose=false;
-        this.versionCount=new AtomicInteger(1);
-    }
+    /**
+     * 当前设备是否已经被分配给某个设备进行任务分配
+     */
+    private AtomicBoolean isAllocating = new AtomicBoolean(false);
 
     /**
      * 获取 Task
@@ -72,25 +66,13 @@ public class PooledIdAndEquipCache {
         return Collections.unmodifiableMap(taskMap);
     }
 
-    /**
-     * 确保插入的Task其Key是唯一的
-     *
-     * @param tasks task
-     */
-    public void insertTask(Task tasks) throws ChannelCloseException {
-        if (isChannelClose()) {
-//                分配过程中channel关闭
-            throw new ChannelCloseException();
-        }
-        for (; ; ) {
-//            默认当前Task不会超过 SCHEDULE_NUM,version[0,24]
-            int version=versionCount.getAndIncrement()%ScreenChannelInitializer.SCHEDULE_NUM;
-            if (taskMap.putIfAbsent(version, tasks)==null) {
-                tasks.setEntryId(version);
-                break;
-            }
-        }
-        log.info("向 IMEI 设备 : {} 安排了编号为：{} 的任务", getEquipment().getKey(), tasks.getEntryId());
+    public PooledIdAndEquipCache(Channel channel, AdEquipment equipment) {
+        this.channel = channel;
+        this.equipment = equipment;
+        this.rest = new AtomicInteger(ScreenChannelInitializer.SCHEDULE_NUM);
+        this.taskMap = new ConcurrentHashMap<>(16);
+        this.isChannelClose = false;
+        this.versionCount = new AtomicInteger(1);
     }
 
     /**
@@ -103,16 +85,32 @@ public class PooledIdAndEquipCache {
     }
 
     /**
-     * 当前设备是否已经被分配给某个设备进行任务分配
+     * 确保插入的Task其Key是唯一的
+     *
+     * @param tasks task
      */
-    private AtomicBoolean isAllocating=new AtomicBoolean(false);
+    public void insertTask(Task tasks) throws ChannelCloseException {
+        if (isChannelClose()) {
+            //                分配过程中channel关闭
+            throw new ChannelCloseException();
+        }
+        for (; ; ) {
+            //            默认当前Task不会超过 SCHEDULE_NUM,version[0,24]
+            int version = versionCount.getAndIncrement() % ScreenChannelInitializer.SCHEDULE_NUM;
+            if (taskMap.putIfAbsent(version, tasks) == null) {
+                tasks.setEntryId(version);
+                break;
+            }
+        }
+        log.info("向 IMEI 设备 : {} 安排了编号为：{} 的任务", getEquipment().getKey(), tasks.getEntryId());
+    }
 
     public void restIncr(int incr) {
         while (true) {
             try {
                 if (tryAllocate()) {
-                    int old=rest.get();
-                    int expect=old + incr;
+                    int old = rest.get();
+                    int expect = old + incr;
                     if (rest.compareAndSet(old, expect)) {
                         break;
                     }
@@ -126,8 +124,8 @@ public class PooledIdAndEquipCache {
     public boolean tryRestOccupy(int rate) {
         try {
             if (tryAllocate()) {
-                int rest=getRest();
-                if (rest > rate) {
+                int rest = getRest();
+                if (rest != 0 && rest >= rate) {
                     this.rest.compareAndSet(rest, rest - rate);
                     return true;
                 }

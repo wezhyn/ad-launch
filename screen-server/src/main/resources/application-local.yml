@@ -36,3 +36,6 @@ rocketmq:
   name-server: localhost:9876
   producer:
     group: order-group
+nacos:
+  config:
+    server-addr: 127.0.0.1:8848

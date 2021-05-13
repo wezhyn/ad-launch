@@ -1,13 +1,17 @@
 package com.wezhyn.project.controller;
 
+import com.wezhyn.project.IBaseTo;
+import org.springframework.data.domain.Example;
+
 /**
  * @author wezhyn
  * @since 12.31.2019
  */
-public interface BaseController<T, ID> {
-
+public interface BaseController<T, ID, U extends IBaseTo<ID>> {
 
     ResponseResult listDto(int limit, int page);
+
+    ResponseResult listDto(int limit, int page, Example<U> example);
 
     /**
      * 创建 实体类

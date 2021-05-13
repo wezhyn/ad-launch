@@ -1,11 +1,11 @@
 package com.wezhyn.project;
 
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.Collection;
 import java.util.Optional;
+
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @author : wezhyn
@@ -55,7 +55,6 @@ public interface BaseService<T, ID> {
      */
     void batchDelete(Collection<T> idCollection);
 
-
     /**
      * 无条件查询
      * 根据传进来 limit 和 page组成 pageable的进行分页
@@ -64,6 +63,8 @@ public interface BaseService<T, ID> {
      * @return 分页
      */
     Page<T> getList(Pageable pageable);
+
+    Page<T> getList(Example<T> example, Pageable pageable);
 
     /**
      * 条件查询：假设要查询 id =1 ,name ="xxx" 的列表，则 searchField 只有 id 与 name 两个属性，负责将出现异常
