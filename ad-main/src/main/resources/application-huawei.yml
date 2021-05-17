@@ -1,0 +1,23 @@
+custom:
+  mysql:
+    address: wezhyn.izhaoo.com
+    password: 123123
+    port: 3306
+    username: root
+    database: fkz
+    config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
+
+dubbo:
+  registry:
+    username: nacos
+    password: nacos
+    address: nacos://wezhyn.izhaoo.com
+    port: 8848
+  consumer:
+    group: ${spring.profiles.active}
+    version: 1.0.0
+    timeout: 5000
+rocketmq:
+  name-server: wezhyn.izhaoo.com:9876
+  producer:
+    group: order-group

@@ -3,7 +3,7 @@ server:
   address: 0.0.0.0
 spring:
   profiles:
-    active: local
+    active: huawei
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
@@ -52,7 +52,7 @@ custom:
       - /api/admin/logout
 netty:
   server:
-    address: localhost
+    address: 0.0.0.0
     port: 8888
     allTimeout: 60
 

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: huawei
   application:
     name: ad-comsumer
   datasource:

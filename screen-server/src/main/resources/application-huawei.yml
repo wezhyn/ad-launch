@@ -1,0 +1,41 @@
+#短期阿里云免费试用数据库配置
+custom:
+  mysql:
+    address: wezhyn.izhaoo.com
+    password: 123123
+    port: 3306
+    username: root
+    database: fkz
+    config: autoReconnect=true&useSSL=false&useUnicode=true&characterEncoding=utf8&useAffectedRows=true
+#用于显示绑定的参数具体值
+logging:
+  level:
+    com:
+      ad:
+        screen:
+          server:
+            event: warn
+            server: debug
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+dubbo:
+  registry:
+    username: nacos
+    password: nacos
+    address: nacos://wezhyn.izhaoo.com
+    port: 8848
+  consumer:
+    group: ${spring.profiles.active}
+    version: 1.0.0
+    timeout: 5000
+rocketmq:
+  name-server: wezhyn.izhaoo.com:9876
+  producer:
+    group: order-group
+nacos:
+  config:
+    server-addr: wezhyn.izhaoo.com:8848
