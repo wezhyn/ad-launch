@@ -29,7 +29,7 @@
         <rocketmq-spring.version>2.1.0</rocketmq-spring.version>
         <ali-pay.version>4.9.28.ALL</ali-pay.version>
         <qcloudsms.version>1.0.6</qcloudsms.version>
-        <guava.version>25.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <mysql.version>5.1.47</mysql.version>
         <qiniu.version>7.2.0</qiniu.version>
     </properties>
