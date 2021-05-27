@@ -1,5 +1,16 @@
 package com.ad.admain.controller.equipment.entity;
 
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import com.ad.admain.controller.account.user.GenericUser;
 import com.wezhyn.project.IBaseTo;
 import com.wezhyn.project.annotation.StrategyEnum;
@@ -12,9 +23,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
 
 /**
  * @author wezhyn
@@ -69,8 +77,10 @@ public class Equipment implements IBaseTo<Integer> {
 
     private LocalDateTime endTime;
 
-
     @ColumnDefault("1")
+    /**
+     * 标识当前设备是否正在运行
+     */
     private Boolean status;
 
     @ColumnDefault("0")

@@ -1,7 +1,8 @@
 package com.ad.admain.config;
 
 import com.ad.admain.controller.ISmsService;
-import com.ad.admain.controller.impl.LogSmsService;
+import com.ad.admain.controller.impl.QCloudSmsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 public class SmsConfig {
 
 
-/*
     @Autowired
     private QqCloudSmsProperties qqCloudSmsProperties;
 
@@ -21,10 +21,11 @@ public class SmsConfig {
     public ISmsService smsService() {
         return new QCloudSmsService(qqCloudSmsProperties);
     }
-*/
 
+    /*
     @Bean
     public ISmsService smsService() {
         return new LogSmsService();
     }
+    */
 }
