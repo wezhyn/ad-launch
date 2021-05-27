@@ -1,13 +1,20 @@
 package com.ad.admain.controller.config;
 
-import com.ad.launch.order.RevenueConfig;
-import com.alibaba.fastjson.JSONObject;
-import com.wezhyn.project.controller.ResponseResult;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+import com.ad.launch.order.RevenueConfig;
+import com.wezhyn.project.controller.ResponseResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wezhyn
@@ -37,7 +44,14 @@ public class SystemConfigController {
     @SuppressWarnings("unchecked")
     public ResponseResult revenue(@RequestBody JSONObject revenue) {
         try {
-            final ArrayList<Double> revenueList = revenue.getObject("revenue", ArrayList.class);
+            final JSONArray revenueArray = revenue.getJSONArray("revenue");
+            if (revenueArray == null) {
+                return ResponseResult.forFailureBuilder().withMessage("无参数信息").build();
+            }
+            final List<Double> revenueList = revenueArray.stream()
+                .map(Object::toString)
+                .map(Double::valueOf)
+                .collect(Collectors.toList());
             final RevenueConfig defaultConfig = new RevenueConfig();
             final RevenueConfig.RevenueConfigPair[] pairs = defaultConfig.getAll();
             for (int i = 0; i < pairs.length; i++) {

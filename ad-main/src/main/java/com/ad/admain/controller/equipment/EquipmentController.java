@@ -11,11 +11,17 @@ import com.wezhyn.project.exception.UpdateOperationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wezhyn
@@ -60,7 +66,14 @@ public class EquipmentController extends AbstractBaseController<EquipmentDto, In
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
     public ResponseResult createTo(@Validated @RequestBody EquipmentDto entityDto) {
-        return super.createTo(entityDto);
+        try {
+            return super.createTo(entityDto);
+        } catch (Exception e) {
+            return ResponseResult.forHttpStatusCode(HttpStatus.OK.value())
+                .withPath("/api/equipment/create")
+                .withMessage("请检查设备IEMI是否重复或各项数据是否为空")
+                .build();
+        }
     }
 
     /**

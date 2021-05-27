@@ -9,6 +9,13 @@ spring:
     url: jdbc:mysql://${custom.mysql.address}:${custom.mysql.port}/${custom.mysql.database}?${custom.mysql.config}
     username: ${custom.mysql.username}
     password: ${custom.mysql.password}
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      idle-timeout: 500000
+      max-lifetime: 540000
+      connection-timeout: 60000
+      connection-test-query: SELECT 1
   jpa:
     show-sql: true
     hibernate:

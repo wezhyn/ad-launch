@@ -158,7 +158,7 @@ public class PayController {
             switch (originStatus) {
                 case EXECUTING:
                 case WAITING_EXECUTION: {
-                    throw new RuntimeException("未开动");
+                    throw new RuntimeException("订单等待分配中，不能退款");
                 }
                 case EXECUTION_COMPLETED: {
                     throw new RuntimeException("订单已经结束");
@@ -174,7 +174,7 @@ public class PayController {
                             .build();
                     } else {
                         return ResponseResult.forFailureBuilder()
-                            .withMessage("退款异常")
+                            .withMessage("请勿重复退款")
                             .build();
                     }
                 }
