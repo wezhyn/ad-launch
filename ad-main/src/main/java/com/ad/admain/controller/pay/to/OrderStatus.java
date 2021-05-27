@@ -24,9 +24,8 @@ public enum OrderStatus implements NumberEnum, StringEnum {
     REFUNDED(-2),
     WAITING_PAYMENT(0),
     SUCCESS_PAYMENT(1),
-    WAITING_EXECUTION(2),
-    EXECUTING(3),
-    EXECUTION_COMPLETED(4);
+    EXECUTING(2),
+    EXECUTION_COMPLETED(3);
 
     private int orderCode;
 

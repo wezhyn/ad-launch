@@ -1,5 +1,9 @@
 package com.ad.screen.server.event;
 
+import java.lang.ref.WeakReference;
+import java.math.BigDecimal;
+import java.util.List;
+
 import com.ad.launch.order.CompleteTaskMessage;
 import com.ad.launch.order.RemoteRevenueServiceI;
 import com.ad.launch.order.RevenueConfig;
@@ -10,10 +14,6 @@ import com.ad.screen.server.service.DeliverIncomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.lang.ref.WeakReference;
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @author wezhyn
@@ -28,8 +28,9 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
     private volatile WeakReference<RevenueConfig> revenueConfig;
     private final CompleteTaskCallback completeTaskCallback;
 
-    public CompleteTaskListener(DiskCompletionRepository diskCompletionRepository, DeliverIncomeService deliverIncomeService,
-                                RemoteRevenueServiceI remoteRevenueService, CompleteTaskCallback completeTaskCallback) {
+    public CompleteTaskListener(DiskCompletionRepository diskCompletionRepository,
+        DeliverIncomeService deliverIncomeService,
+        RemoteRevenueServiceI remoteRevenueService, CompleteTaskCallback completeTaskCallback) {
         this.diskCompletionRepository = diskCompletionRepository;
         this.deliverIncomeService = deliverIncomeService;
         this.remoteRevenueService = remoteRevenueService;
@@ -43,10 +44,10 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
         this.completeTaskCallback = completeTaskCallback;
     }
 
-
     @Override
     public void onApplicationEvent(CompleteTaskEvent completeTaskEvent) {
-        final List<DiskCompletion> completions = diskCompletionRepository.findAllByAdOrderId(completeTaskEvent.getOrderId());
+        final List<DiskCompletion> completions = diskCompletionRepository.findAllByAdOrderId(
+            completeTaskEvent.getOrderId());
         BigDecimal cost = new BigDecimal(0);
         for (DiskCompletion completion : completions) {
             final Double amount = calculateAmount(completion.getExecutedNum(), completion.getTimeScope());
@@ -59,8 +60,8 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
 
     public Double calculateAmount(int exeNum, int timeScope) {
         RevenueConfig config = revenueConfig();
-        return BigDecimal.valueOf(config.revenue(timeScope)).multiply(new BigDecimal(0.3 * exeNum))
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        return BigDecimal.valueOf(config.revenue(timeScope)).multiply(new BigDecimal(exeNum))
+            .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     public RevenueConfig revenueConfig() {

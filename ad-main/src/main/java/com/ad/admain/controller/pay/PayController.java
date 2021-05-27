@@ -157,8 +157,7 @@ public class PayController {
             }
             final OrderStatus originStatus = uo.getOrderStatus();
             switch (originStatus) {
-                case EXECUTING:
-                case WAITING_EXECUTION: {
+                case EXECUTING: {
                     throw new RuntimeException("订单等待分配中，不能退款");
                 }
                 case EXECUTION_COMPLETED: {

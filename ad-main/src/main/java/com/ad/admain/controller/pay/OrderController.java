@@ -1,5 +1,9 @@
 package com.ad.admain.controller.pay;
 
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.pay.convert.AdOrderMapper;
 import com.ad.admain.controller.pay.convert.AdOrderWithUserMapper;
@@ -8,6 +12,7 @@ import com.ad.admain.controller.pay.dto.AdProduceDto;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.AdProduce;
+import com.ad.admain.controller.pay.to.OrderStatus;
 import com.ad.admain.mq.order.CheckOrderMessage;
 import com.ad.admain.mq.order.CheckOrderProduceImpl;
 import com.ad.admain.security.AdAuthentication;
@@ -21,10 +26,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author : lb
@@ -140,6 +149,7 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
             return ResponseResult.forFailureBuilder().withMessage(savedOrder.getOrderStatus().getValue()).build();
         }
         getService().verifyOrder(order);
+        orderService.modifyOrderStatus(order.getId(), OrderStatus.EXECUTING);
         orderProduce.paymentOrder(createTask(savedOrder));
         return ResponseResult.forSuccessBuilder().withMessage("修改成功").build();
     }
