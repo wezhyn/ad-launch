@@ -1,7 +1,15 @@
 package com.ad.admain.controller.account.impl;
 
+import java.util.Optional;
+
 import com.ad.admain.controller.account.GenericUserService;
-import com.ad.admain.controller.account.user.*;
+import com.ad.admain.controller.account.user.CertificationCard;
+import com.ad.admain.controller.account.user.CertificationCardRepository;
+import com.ad.admain.controller.account.user.GenericUser;
+import com.ad.admain.controller.account.user.GenericUserRepository;
+import com.ad.admain.controller.account.user.SocialType;
+import com.ad.admain.controller.account.user.SocialUser;
+import com.ad.admain.controller.account.user.SocialUserRepository;
 import com.ad.admain.security.jwt.JwtDetailService;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.Optional;
 
 
 /**
@@ -62,7 +68,6 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
     public int modifyUserPasswordById(Integer id, String username, String password) {
         String newPasword = passwordEncoder.encode(password);
         String secret = com.wezhyn.project.utils.StringUtils.getRandomString(50);
-//        todo:解耦
         jwtDetailService.saveSecretByUsername(id, username, secret);
         return genericUserRepository.updateUserPassword(id, newPasword);
     }

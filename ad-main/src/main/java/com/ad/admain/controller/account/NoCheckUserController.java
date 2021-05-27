@@ -1,5 +1,10 @@
 package com.ad.admain.controller.account;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
 import com.ad.admain.controller.AbstractBaseController;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.account.user.UserDto;
@@ -10,10 +15,11 @@ import com.wezhyn.project.controller.ResponseResult;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wezhyn
@@ -38,11 +44,19 @@ public class NoCheckUserController extends AbstractBaseController<UserDto, Integ
     @PostMapping(value={"/register", "/create"})
     public ResponseResult register(@Valid @RequestBody RegisterDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String field=bindingResult.getFieldErrors().stream()
-                    .map(FieldError::getDefaultMessage)
-                    .collect(Collectors.joining("|"));
+            String field = bindingResult.getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("|"));
             return ResponseResult.forFailureBuilder()
-                    .withMessage(field).build();
+                .withMessage(field).build();
+        }
+        final Optional<GenericUser> hasMobile = genericUserService.getOneByUsernameOrPhone(
+            userDto.getMobilePhone());
+        if (hasMobile.isPresent()) {
+            return ResponseResult.forFailureBuilder().withMessage("该手机账户已被绑定").build();
+        }
+        if (genericUserService.getUserByUsername(userDto.getUsername()).isPresent()) {
+            return ResponseResult.forFailureBuilder().withMessage("该用户名已经被占用").build();
         }
         return createTo(userDto);
     }
