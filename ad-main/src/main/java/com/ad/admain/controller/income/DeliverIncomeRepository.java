@@ -20,7 +20,7 @@ public interface DeliverIncomeRepository extends JpaRepository<DriverInCome, Int
     @Query(nativeQuery = true, value = "update driver_in_come set amount=amount-:amount where driver_id=:userId")
     int decrUserAmount(Integer userId, Double amount);
 
-    @Query(nativeQuery = true, value = "select amount from driver_in_come where driver_id=:userId")
+    @Query(nativeQuery = true, value = "select sum(amount) from fkz.driver_in_come_details where driver_id=:userId")
     double getUserAmount(Integer userId);
 
     @Query(nativeQuery = true, value = "select amount from driver_in_come where driver_id=:userId for update ")

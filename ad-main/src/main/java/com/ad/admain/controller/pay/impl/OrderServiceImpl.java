@@ -113,6 +113,12 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Double sumUserOrders(Integer userId) {
+        return getRepository().getUserAmount(userId);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean modifyOrderStatus(Integer orderId, OrderStatus orderStatus) {
         final Optional<AdOrder> one = getRepository().findById(orderId);

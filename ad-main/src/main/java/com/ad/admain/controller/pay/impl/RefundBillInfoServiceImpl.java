@@ -11,7 +11,6 @@ import com.ad.admain.controller.pay.to.RefundOrder;
 import com.ad.admain.pay.TradeStatus;
 import com.wezhyn.project.AbstractBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +75,12 @@ public class RefundBillInfoServiceImpl extends AbstractBaseService<RefundBillInf
     }
 
     @Override
-    public JpaRepository<RefundBillInfo, Integer> getRepository() {
+    public Double sumRefunds(Integer uid) {
+        return getRepository().getUserAmount(uid);
+    }
+
+    @Override
+    public RefundBillInfoRepository getRepository() {
         return refundOrderRepository;
     }
 }

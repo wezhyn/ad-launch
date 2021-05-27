@@ -1,5 +1,9 @@
 package com.ad.admain.controller.pay.repository;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
 import org.springframework.data.domain.Page;
@@ -8,9 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import javax.transaction.Transactional;
-import java.util.List;
 
 /**
  * @author : wezhyn
@@ -66,12 +67,13 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      */
     Page<AdOrder> findAdOrdersByUidAndIsDeleteIsFalse(Integer uId, Pageable pageable);
 
+    @Query(nativeQuery = true, value = "select sum(total_amount) from ad_order where uid=:userId and order_delete=0 ")
+    double getUserAmount(Integer userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ad_order o set o.executed =:executed where o.id=:oid")
     @Transactional
     Integer updateExecuted(Integer oid, Integer executed);
-
 
     List<AdOrder> findAdOrdersByOrderStatusEquals(OrderStatus orderStatus);
 

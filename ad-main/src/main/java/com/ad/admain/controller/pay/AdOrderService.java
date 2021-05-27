@@ -1,13 +1,14 @@
 package com.ad.admain.controller.pay;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
 import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author : wezhyn
@@ -48,6 +49,9 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
     Optional<AdOrder> trySuccessOrder(Integer orderId, Integer uid);
 
     Page<AdOrder> listUserOrders(Integer userId, Pageable pageable);
+
+    @Transactional(readOnly = true)
+    Double sumUserOrders(Integer userId);
 
     boolean modifyOrderStatus(Integer orderId, OrderStatus orderStatus);
 
