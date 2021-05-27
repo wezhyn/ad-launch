@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface RefundBillInfoRepository extends JpaRepository<RefundBillInfo, Integer> {
 
     @Query(nativeQuery = true,
-        value = "select sum(total_amount) from ad_refund_bill_info where buyer_id=:userId and bill_delete = 0")
+        value = "select sum(refund_fee) from ad_refund_bill_info where buyer_id=:userId and bill_delete = 0")
     double getUserAmount(Integer userId);
 
 }
