@@ -120,7 +120,8 @@ public class PayController {
     }
 
     @PostMapping("/mock")
-    public ResponseResult verifyMock(String id, String totalAmount) {
+    public ResponseResult verifyMock(String id, String totalAmount,
+        @AuthenticationPrincipal AdAuthentication authentication) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter mockTradeNo = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         Map<String, String> parsedMap = new HashMap<>();
@@ -130,7 +131,7 @@ public class PayController {
         parsedMap.put("trade_no", mockTime + RandomStringUtils.randomNumeric(20 - mockTime.length()));
         parsedMap.put("total_amount", totalAmount);
         parsedMap.put("app_id", AliPayProperties.APP_ID);
-        parsedMap.put("buyer_id", "2088102179506184");
+        parsedMap.put("buyer_id", authentication.getId().toString());
         parsedMap.put("seller_id", AliPayProperties.AD_SYSTEM_SELLER_ID);
         parsedMap.put("gmt_create", dateTimeFormatter.format(LocalDateTime.now()));
         parsedMap.put("gmt_payment", dateTimeFormatter.format(LocalDateTime.now()));
