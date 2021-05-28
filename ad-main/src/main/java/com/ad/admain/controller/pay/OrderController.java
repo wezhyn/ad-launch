@@ -53,14 +53,13 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     @Autowired
     private CheckOrderProduceImpl orderProduce;
 
-
-    public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper, ProduceMapper produceMapper) {
+    public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper,
+        ProduceMapper produceMapper) {
         this.orderService = orderService;
         this.orderInfoService = orderInfoService;
         this.orderMapper = orderMapper;
         this.produceMapper = produceMapper;
     }
-
 
     /**
      * 创建订单，并返回订单信息用于支付宝支付：orderInfo
@@ -70,8 +69,9 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
      * @throws Exception order
      */
     @RequestMapping("/create")
-    public ResponseResult create(@Valid @RequestBody AdProduceDto produceDto, BindingResult bindingResult, @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
-//        设置当前用户id
+    public ResponseResult create(@Valid @RequestBody AdProduceDto produceDto, BindingResult bindingResult,
+        @AuthenticationPrincipal AdAuthentication authentication) throws Exception {
+        //        设置当前用户id
         final AdProduce produce = produceMapper.toTo(produceDto);
         if (bindingResult.hasErrors()) {
             return handleBindingResult(bindingResult);
@@ -81,26 +81,26 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         orderProduce.checkOrder(new CheckOrderMessage(savedOrder.getId(), savedOrder.getUid()));
         if (savedOrder.getId() != null) {
             return ResponseResult.forSuccessBuilder()
-                    .withData("id", savedOrder.getId())
-                    .withMessage("创建订单成功")
-                    .build();
+                .withData("id", savedOrder.getId())
+                .withMessage("创建订单成功")
+                .build();
         }
 
         return ResponseResult.forFailureBuilder()
-                .withMessage("系统异常")
-                .build();
+            .withMessage("系统异常")
+            .build();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseResult deleteOrder(
-            @PathVariable(name = "id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
+        @PathVariable(name = "id") Integer orderId, @AuthenticationPrincipal AdAuthentication authentication) {
         if (!orderService.isUserOrder(orderId, authentication.getId())) {
             throw new RuntimeException("非法访问订单");
         }
         orderService.delete(orderId);
         return ResponseResult.forSuccessBuilder()
-                .withMessage("删除订单成功").build();
+            .withMessage("删除订单成功").build();
     }
 
     @GetMapping("/{id}")
@@ -112,30 +112,30 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     @GetMapping("/list")
     @PreAuthorize("isAuthenticated()")
     public ResponseResult getList(@RequestParam(name = "limit", defaultValue = "10") int limit,
-                                  @RequestParam(name = "page", defaultValue = "1") int page,
-                                  @AuthenticationPrincipal AdAuthentication authentication) {
+        @RequestParam(name = "page", defaultValue = "1") int page,
+        @AuthenticationPrincipal AdAuthentication authentication) {
 
         if (authentication.isAdmin()) {
             final Page<AdOrder> orders = getService().listOrdersWithUsername(limit, page);
             return ResponseResult.forSuccessBuilder()
-                    .withMessage("获取列表成功")
-                    .withData("items", adOrderWithUserMapper.toDtoList(orders.getContent()))
-                    .withData("total", orders.getTotalElements())
-                    .build();
+                .withMessage("获取列表成功")
+                .withData("items", adOrderWithUserMapper.toDtoList(orders.getContent()))
+                .withData("total", orders.getTotalElements())
+                .build();
 
         } else {
-            final Page<AdOrder> adOrders = getService().listUserOrders(authentication.getId(), PageRequest.of(page - 1, limit, Sort.by("id").descending()));
+            final Page<AdOrder> adOrders = getService().listUserOrders(authentication.getId(),
+                PageRequest.of(page - 1, limit, Sort.by("id").descending()));
             return doResponse(adOrders);
         }
     }
 
-
     @PostMapping("/search/{type}")
     public ResponseResult searchOrder(
-            @RequestParam(name = "limit", defaultValue = "10") int limit,
-            @RequestParam(name = "page", defaultValue = "1") int page,
-            @PathVariable("type") OrderSearchType searchType,
-            @RequestParam("context") String context) {
+        @RequestParam(name = "limit", defaultValue = "10") int limit,
+        @RequestParam(name = "page", defaultValue = "1") int page,
+        @PathVariable("type") OrderSearchType searchType,
+        @RequestParam("context") String context) {
         Pageable pageable = PageRequest.of(page - 1, limit);
         Page<AdOrder> searchResult = getService().search(searchType, context, pageable);
         return doResponse(searchResult);
@@ -156,20 +156,19 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
 
     private TaskMessage createTask(AdOrder order) {
         return TaskMessage.builder()
-                .deliverNum(order.getDeliverNum())
-                .latitude(order.getLatitude())
-                .longitude(order.getLongitude())
-                .oid(order.getId())
-                .produceContext(order.getProduceContext())
-                .rate(order.getRate())
-                .scope(order.getScope())
-                .totalNum(order.getNum())
-                .vertical(order.getProduce().getVertical())
-                .uid(order.getUid())
-                .build();
+            .deliverNum(order.getDeliverNum())
+            .latitude(order.getLatitude())
+            .longitude(order.getLongitude())
+            .oid(order.getId())
+            .produceContext(order.getProduceContext())
+            .rate(order.getRate())
+            .scope(order.getScope())
+            .totalNum(order.getNum())
+            .vertical(order.getProduce().getVertical())
+            .uid(order.getUid())
+            .build();
 
     }
-
 
     @Override
     public AdOrderService getService() {

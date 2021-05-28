@@ -67,7 +67,7 @@ public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
      */
     Page<AdOrder> findAdOrdersByUidAndIsDeleteIsFalse(Integer uId, Pageable pageable);
 
-    @Query(nativeQuery = true, value = "select sum(total_amount) from ad_order where uid=:userId and order_delete=0 ")
+    @Query(nativeQuery = true, value = "select sum(total_amount) from ad_order where uid=:userId ")
     double getUserAmount(Integer userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

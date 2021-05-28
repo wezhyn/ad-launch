@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ad.admain.controller.account.user.SocialType;
 import com.ad.admain.controller.pay.AdOrderService;
@@ -72,19 +75,39 @@ public class DeliverController {
         billExample.setBuyerId(adAuthentication.getId().toString());
         billExample.setDelete(false);
         final Page<RefundBillInfo> refunds = refundBillInfoService.getList(Example.of(billExample), pageable);
-
+        Map<Integer, List<IncomeDetailsVo>> orderMap = new HashMap<>();
         List<IncomeDetailsVo> results = new ArrayList<>();
-        if (details != null) {
-            details.forEach(d -> results.add(new IncomeDetailsVo(d.getId(), d.getAmount(), d.getRecordTime(), "收益")));
-        }
         if (orders != null) {
             orders.forEach(
-                o -> results.add(new IncomeDetailsVo(o.getId(), -1 * o.getTotalAmount(), o.getCreateTime(), "订单支付")));
+                o -> {
+                    final IncomeDetailsVo orderDetail = new IncomeDetailsVo(o.getId(), -1 * o.getTotalAmount(),
+                        o.getCreateTime(), "订单支付");
+                    final ArrayList<IncomeDetailsVo> result = new ArrayList<>();
+                    result.add(orderDetail);
+                    orderMap.put(o.getId(), result);
+                });
         }
         if (refunds != null) {
-            refunds.forEach(
-                b -> results.add(new IncomeDetailsVo(b.getId(), b.getTotalAmount(), b.getGmtCreate(), "退款")));
+            refunds.forEach(b -> {
+                final IncomeDetailsVo refundDetail = new IncomeDetailsVo(b.getId(), b.getRefundFee(), b.getGmtCreate(),
+                    "退款");
+                final List<IncomeDetailsVo> detailsVos = orderMap.get(b.getOrderId());
+                if (detailsVos != null) {
+                    detailsVos.add(refundDetail);
+                }
+            });
         }
+        if (details != null) {
+            details.forEach(d -> {
+                final IncomeDetailsVo incomeVo = new IncomeDetailsVo(d.getId(), d.getAmount(), d.getRecordTime(), "收益");
+                final List<IncomeDetailsVo> detailsVos = orderMap.get(d.getOid());
+                if (detailsVos != null) {
+                    detailsVos.add(incomeVo);
+                }
+            });
+        }
+        orderMap.keySet().stream().sorted(Comparator.reverseOrder())
+            .forEach(i -> results.addAll(orderMap.get(i)));
         return ResponseResult.forSuccessBuilder()
             .withData("items", results)
             .withData("total", results.size())

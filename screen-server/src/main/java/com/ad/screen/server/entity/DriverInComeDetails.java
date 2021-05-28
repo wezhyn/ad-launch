@@ -1,16 +1,17 @@
 package com.ad.screen.server.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 /**
  * @author wezhyn
@@ -31,12 +32,15 @@ public class DriverInComeDetails {
 
     private Double amount;
 
+    private Integer oid;
+
     @ColumnDefault("current_timestamp")
     private LocalDateTime recordTime;
 
-    public DriverInComeDetails(Integer driverId, Double amount, LocalDateTime recordTime) {
+    public DriverInComeDetails(Integer driverId, Double amount, Integer oid, LocalDateTime recordTime) {
         this.driverId = driverId;
         this.amount = amount;
+        this.oid = oid;
         this.recordTime = recordTime;
     }
 }

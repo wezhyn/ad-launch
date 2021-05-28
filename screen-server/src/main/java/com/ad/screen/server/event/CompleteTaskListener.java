@@ -52,7 +52,8 @@ public class CompleteTaskListener implements ApplicationListener<CompleteTaskEve
         for (DiskCompletion completion : completions) {
             final Double amount = calculateAmount(completion.getExecutedNum(), completion.getTimeScope());
             cost = cost.add(new BigDecimal(amount));
-            deliverIncomeService.saveOrIncr(completion.getDriverId(), amount, completion.getRecordTime());
+            deliverIncomeService.saveOrIncr(completion.getDriverId(), amount, completion.getRecordTime(),
+                completeTaskEvent.getOrderId());
             log.debug("{} 增加收入 {}", completion.getDriverId(), amount);
         }
         completeTaskCallback.send(new CompleteTaskMessage(completeTaskEvent.getOrderId(), cost.doubleValue()));
