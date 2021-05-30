@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.ad.admain.controller.pay.AdOrderService;
 import com.ad.admain.controller.pay.OrderSearchType;
+import com.ad.admain.controller.pay.dto.ITopUserNum;
 import com.ad.admain.controller.pay.exception.OrderStatusException;
 import com.ad.admain.controller.pay.repository.AdOrderRepository;
 import com.ad.admain.controller.pay.repository.ProduceRepository;
@@ -44,6 +45,12 @@ public class OrderServiceImpl extends AbstractBaseService<AdOrder, Integer> impl
     @Override
     public Optional<AdOrder> getById(Integer integer) {
         return adOrderRepository.findById(integer);
+    }
+
+    @Override
+    public List<ITopUserNum> topAd() {
+        final List<ITopUserNum> uids = adOrderRepository.topAd();
+        return uids == null ? Collections.emptyList() : uids;
     }
 
     @Override

@@ -1,18 +1,27 @@
 package com.ad.admain.controller.pay;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import com.ad.admain.controller.AbstractBaseController;
+import com.ad.admain.controller.account.GenericUserService;
+import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.pay.convert.AdOrderMapper;
 import com.ad.admain.controller.pay.convert.AdOrderWithUserMapper;
 import com.ad.admain.controller.pay.convert.ProduceMapper;
 import com.ad.admain.controller.pay.dto.AdProduceDto;
+import com.ad.admain.controller.pay.dto.ITopUserNum;
 import com.ad.admain.controller.pay.dto.OrderDto;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.AdProduce;
 import com.ad.admain.controller.pay.to.OrderStatus;
+import com.ad.admain.controller.pay.vo.TopAdUser;
 import com.ad.admain.mq.order.CheckOrderMessage;
 import com.ad.admain.mq.order.CheckOrderProduceImpl;
 import com.ad.admain.security.AdAuthentication;
@@ -52,6 +61,8 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
     private AdOrderWithUserMapper adOrderWithUserMapper;
     @Autowired
     private CheckOrderProduceImpl orderProduce;
+    @Autowired
+    private GenericUserService genericUserService;
 
     public OrderController(AdOrderService orderService, BillInfoService orderInfoService, AdOrderMapper orderMapper,
         ProduceMapper produceMapper) {
@@ -61,7 +72,21 @@ public class OrderController extends AbstractBaseController<OrderDto, Integer, A
         this.produceMapper = produceMapper;
     }
 
+    @GetMapping("/top")
+    public ResponseResult topAd() {
+        final List<ITopUserNum> uids = orderService.topAd();
+        final Map<Integer, Integer> collect = uids.stream().collect(
+            Collectors.toMap(ITopUserNum::getUid, ITopUserNum::getNum));
+        final List<GenericUser> userList = genericUserService.findByIds(new ArrayList<>(collect.keySet()));
+        List<TopAdUser> results = new ArrayList<>();
+        userList.forEach(user -> results.add(new TopAdUser(user.getId(), user.getUsername(),
+            user.getNickName(), user.getIntro(), user.getEmail(), collect.get(user.getId()))));
+        results.sort(Comparator.comparing(TopAdUser::getOrderNum).reversed());
+        return ResponseResult.forSuccessBuilder().withData("user", results).build();
+    }
+
     /**
+     * u
      * 创建订单，并返回订单信息用于支付宝支付：orderInfo
      *
      * @param produceDto 订单创建内容

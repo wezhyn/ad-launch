@@ -1,5 +1,7 @@
 package com.ad.admain.controller.account.impl;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import com.ad.admain.controller.account.GenericUserService;
@@ -18,8 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 
 /**
  * @author : wezhyn
@@ -29,7 +31,8 @@ import org.springframework.util.StringUtils;
  * Copyright (c) 2018-2019 All Rights Reserved.
  */
 @Service
-public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Integer> implements GenericUserService, SocialUserService {
+public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Integer>
+    implements GenericUserService, SocialUserService {
 
     private final GenericUserRepository genericUserRepository;
     @Autowired
@@ -79,8 +82,9 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
 
     @Override
     public Page<GenericUser> getUserListWithAuth(boolean auth, Pageable pageable) {
-        return getRepository().findGenericUsersByEnable(auth ? GenericUser.UserEnable.NORMAL : GenericUser.UserEnable.NOT_AUTHENTICATION,
-                pageable);
+        return getRepository().findGenericUsersByEnable(
+            auth ? GenericUser.UserEnable.NORMAL : GenericUser.UserEnable.NOT_AUTHENTICATION,
+            pageable);
     }
 
     @Override
@@ -102,26 +106,34 @@ public class GenericUserServiceImpl extends AbstractBaseService<GenericUser, Int
         return getRepository().updateUserAvatar(username, avatarKey);
     }
 
+    @Override
+    public List<GenericUser> findByIds(List<Integer> uids) {
+        if (CollectionUtils.isEmpty(uids)) {
+            return Collections.emptyList();
+        }
+        return getRepository().findAllById(uids);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg, String aftImg, Integer id) {
+    public Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg,
+        String aftImg, Integer id) {
         return genericUserRepository.findById(id)
-                .filter(g -> g.getEnable() == GenericUser.UserEnable.NOT_AUTHENTICATION)
-                .map(u -> {
-                    CertificationCard certificationCard = u.getCertificationCard();
-                    if (certificationCard == null) {
-                        certificationCard = new CertificationCard();
-                    }
-                    certificationCard.setIdCard(idCard);
-                    certificationCard.setRealName(realName);
-                    certificationCard.setIdCardPreImg(preImg);
-                    certificationCard.setIdCardAftImg(aftImg);
-                    certificationCard.setUid(id);
-                    certificationCard = certificationCardRepository.save(certificationCard);
-                    u.setCertificationCard(certificationCard);
-                    return genericUserRepository.save(u);
-                });
+            .filter(g -> g.getEnable() == GenericUser.UserEnable.NOT_AUTHENTICATION)
+            .map(u -> {
+                CertificationCard certificationCard = u.getCertificationCard();
+                if (certificationCard == null) {
+                    certificationCard = new CertificationCard();
+                }
+                certificationCard.setIdCard(idCard);
+                certificationCard.setRealName(realName);
+                certificationCard.setIdCardPreImg(preImg);
+                certificationCard.setIdCardAftImg(aftImg);
+                certificationCard.setUid(id);
+                certificationCard = certificationCardRepository.save(certificationCard);
+                u.setCertificationCard(certificationCard);
+                return genericUserRepository.save(u);
+            });
     }
 
     @Override

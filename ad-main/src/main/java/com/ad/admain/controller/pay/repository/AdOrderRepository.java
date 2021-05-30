@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.ad.admain.controller.pay.dto.ITopUserNum;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
 import org.springframework.data.domain.Page;
@@ -20,10 +21,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AdOrderRepository extends JpaRepository<AdOrder, Integer> {
 
-
     @Modifying
     @Query(nativeQuery = true, value = "update ad_order o set o.verify= :verify , o.feedback=:feedback where id=:oId")
     Integer verifyOrder(Integer oId, String feedback, Integer verify);
+
+    @Query(nativeQuery = true, value = "select uid,count(*) as 'num' from ad_order  group by uid")
+    List<ITopUserNum> topAd();
 
     /**
      * 更新订单属性

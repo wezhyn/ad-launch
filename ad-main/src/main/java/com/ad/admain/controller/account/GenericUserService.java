@@ -1,13 +1,14 @@
 package com.ad.admain.controller.account;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.ad.admain.controller.account.user.CertificationCard;
 import com.ad.admain.controller.account.user.GenericUser;
 import com.ad.admain.controller.impl.IFileUpload;
 import com.wezhyn.project.BaseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Optional;
 
 /**
  * @author : wezhyn
@@ -36,12 +37,14 @@ public interface GenericUserService extends BaseService<GenericUser, Integer>, C
      */
     int updateUserAvatar(String username, String avatarKey);
 
+    List<GenericUser> findByIds(List<Integer> uids);
 
     /**
      * 仅当 {@link GenericUser#getEnable()}  == {@code NOT_AUTHENTICATION} 时，才更新实名信息
      *
      * @return user
      */
-    Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg, String aftImg, Integer id);
+    Optional<GenericUser> updateUserAuthenticationInfo(String realName, String idCard, String preImg, String aftImg,
+        Integer id);
 
 }

@@ -3,6 +3,7 @@ package com.ad.admain.controller.pay;
 import java.util.List;
 import java.util.Optional;
 
+import com.ad.admain.controller.pay.dto.ITopUserNum;
 import com.ad.admain.controller.pay.to.AdOrder;
 import com.ad.admain.controller.pay.to.OrderStatus;
 import com.wezhyn.project.BaseService;
@@ -25,8 +26,9 @@ public interface AdOrderService extends BaseService<AdOrder, Integer> {
      */
     Page<AdOrder> search(OrderSearchType type, String context, Pageable pageable);
 
-
     Boolean isUserOrder(Integer orderId, Integer UserId);
+
+    List<ITopUserNum> topAd();
 
     /**
      * 查找某个用户的订单
